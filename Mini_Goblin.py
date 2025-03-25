@@ -158,7 +158,7 @@ async def handle_metadata_reply(message):
             await message.delete()
             if 'original_msg_id' in submission:
                 original_msg = await message.channel.fetch_message(submission['original_msg_id'])
-                await original_msg.delete()
+                pass  # No action needed for message deletion
             if 'prompt_id' in submission:
                 prompt_msg = await message.channel.fetch_message(submission['prompt_id'])
                 await prompt_msg.delete()
@@ -252,11 +252,10 @@ class TaggingModal(discord.ui.Modal):
     
     # Cleanup
         try:
-            await interaction.message.delete()
+            pass  # No action needed for message deletion
             channel = bot.get_channel(submission['channel_id'])
             if channel:
                 msg = await channel.fetch_message(submission['original_msg_id'])
-                await msg.delete()
         except Exception as e:
             logging.error(f"Cleanup error: {e}")
        
