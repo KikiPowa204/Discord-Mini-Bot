@@ -11,7 +11,7 @@ import logging
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
 DB_FILE = "miniatures.db"  # Database file path
-
+print(f"Using database file: {DB_FILE}")
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 # Custom database module
 import mini_storage  # Your database operations file
@@ -261,19 +261,28 @@ class TaggingModal(discord.ui.Modal):
             logging.error(f"Cleanup error: {e}")
        
 async def handle_submission(message):
+    print (message)
     try:
         # Validate input
         if not message.attachments:
             await message.channel.send("❌ Please attach an image!")
             return
             
-        image_url = message.attachments[0].url
-        
-        # Parse metadata
-        lines = [line.strip() for line in message.content.split('\n') if line.strip()]
-        stl_name = next((line[4:].strip() for line in lines if line.lower().startswith('stl:')), None)
-        bundle_name = next((line[7:].strip() for line in lines if line.lower().startswith('bundle:')), None)
-        
+        stl_name = None
+        bundle_name = None
+        tags = None
+
+        for line in message.content.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+            if line.lower().startswith('stl:'):
+                stl_name = line[4:].strip()
+            elif line.lower().startswith('bundle:'):
+                bundle_name = line[7:].strip()
+            elif line.lower().startswith('tags:'):
+                tags = line[5:].strip()
+
         if not stl_name:
             await message.channel.send("❌ Missing STL name (use 'STL: Model Name')")
             return
@@ -284,7 +293,7 @@ async def handle_submission(message):
             message_id=message.id,
             image_url=image_url,
             stl_name=stl_name,
-            bundle_name=bundle_name
+            bundle_name=bundle_name,
         )
         
         await message.add_reaction('✅')

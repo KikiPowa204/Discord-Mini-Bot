@@ -4,9 +4,10 @@ from datetime import datetime
 import hashlib
 import os
 # mini_storage.py
+import mini_storage
 
 DB_FILE = Path(__file__).parent / "miniatures.db"
-
+print(f"Using database file: {DB_FILE}")
 def init_db():
     """Initialize database with verification"""
     conn = None
@@ -42,23 +43,30 @@ def init_db():
 
 # In mini_storage.py
 def store_submission(user_id, message_id, image_url, stl_name, bundle_name, tags=None):
+    print (f"Opening database connection to: {DB_FILE}")
     with sqlite3.connect(DB_FILE) as conn:
         c = conn.cursor()
         c.execute('''
             INSERT INTO miniatures 
             (user_id, message_id, image_url, stl_name, bundle_name, tags)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (user_id, message_id, image_url, stl_name, bundle_name, tags))
+        ''',(user_id, message_id, image_url, stl_name, bundle_name, tags or ""))
         conn.commit()
         print(f"✅ Stored submission: {stl_name} ({message_id})")
-        
         # Verify insertion
         c.execute("SELECT 1 FROM miniatures WHERE message_id=?", (message_id,))
         if not c.fetchone():
             raise RuntimeError("Insertion verification failed!")            
-        
-        if conn: conn.close()
-
+    print("Database connection closed.")    
+    if conn: conn.close()
+def check_table_schema():
+    with sqlite3.connect(DB_FILE) as conn:
+        c = conn.cursor()
+        c.execute("PRAGMA table_info(miniatures);")
+        schema = c.fetchall()
+        print("Current table schema:")
+        for column in schema:
+            print(column)
 def is_duplicate(image_hash):
     with sqlite3.connect(DB_FILE) as conn:
         c = conn.cursor()
