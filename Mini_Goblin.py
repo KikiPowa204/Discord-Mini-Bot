@@ -16,10 +16,6 @@ bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 # Custom database module
 import mini_storage  # Your database operations file
 
-# Initialize bot
-intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Default settings
 DEFAULTS = {
@@ -30,12 +26,15 @@ DEFAULTS = {
 }
 
 # Runtime storage
-bot.pending_subs = {}
-bot.submit_chan = None
-bot.gallery_chan = None
+intents = discord.Intents.default()
+intents.message_content = True
+intents.messages = True  # Needed for message history
 
+bot = commands.Bot(command_prefix='!', intents=intents)
+bot.pending_subs = {}  # Single source for pending submissions
 @bot.event
 async def on_ready():
+    bot.pending_subs = {}
     print(f'{bot.user.name} online!')
     # Initialize database
     mini_storage.init_db()
@@ -99,80 +98,120 @@ async def on_message(message):
         logging.error(f"Error: {str(e)}", exc_info=True)
 async def handle_metadata_reply(message):
     if not message.reference:
-        return
-    
-    submission = pending_submissions.get(message.reference.message_id)
-    if not submission:
+        logging.error("No message reference found")
         return
     
     try:
-        lines = [line.strip() for line in message.content.split('\n') if line.strip()]
-        stl_name = next((line[4:].strip() for line in lines if line.lower().startswith('stl:')), None)
-        bundle_name = next((line[7:].strip() for line in lines if line.lower().startswith('bundle:')), None)
+        # Log the current pending submissions
+        logging.info(f"Pending submissions before processing: {bot.pending_subs}")
         
-        if not stl_name or not bundle_name:
-            await message.channel.send("❌ Must include both STL and Bundle!", delete_after=10)
+        # Get the pending submission from bot.pending_subs
+        submission = bot.pending_subs.get(message.reference.message_id)
+        if not submission:
+            logging.error(f"No submission found for message {message.reference.message_id}")
+            await message.channel.send("❌ Submission not found. Please post a new image.", delete_after=10)
+            return
+                
+        # Parse metadata
+        stl_name = None
+        bundle_name = None
+        tags = None
+        
+        for line in message.content.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+                
+            if ':' in line:
+                key, value = line.split(':', 1)
+                key = key.strip().lower()
+                value = value.strip()
+                
+                if key == 'stl':
+                    stl_name = value
+                elif key == 'bundle':
+                    bundle_name = value
+                elif key == 'tags':
+                    tags = value
+        
+        # Validate required fields
+        if not stl_name:
+            await message.channel.send("❌ Missing STL name (use 'STL: ModelName')", delete_after=10)
             return
             
-        store_submission(
+        if not bundle_name:
+            await message.channel.send("❌ Missing Bundle name (use 'Bundle: BundleName')", delete_after=10)
+            return
+        
+        # Store submission
+        mini_storage.store_submission(
             user_id=submission['user_id'],
             message_id=submission['original_msg_id'],
             image_url=submission['image_url'],
             stl_name=stl_name,
-            bundle_name=bundle_name
+            bundle_name=bundle_name,
+            tags=tags
         )
         
         # Cleanup
         try:
             await message.delete()
-            await message.channel.delete_messages([
-                discord.Object(id=submission['prompt_id']),
-                discord.Object(id=submission['original_msg_id'])
-            ])
+            if 'original_msg_id' in submission:
+                original_msg = await message.channel.fetch_message(submission['original_msg_id'])
+                await original_msg.delete()
+            if 'prompt_id' in submission:
+                prompt_msg = await message.channel.fetch_message(submission['prompt_id'])
+                await prompt_msg.delete()
         except discord.NotFound:
             pass
             
-        del pending_submissions[message.reference.message_id]
+        # Remove from pending submissions
+        if message.reference.message_id in bot.pending_subs:
+            del bot.pending_subs[message.reference.message_id]
+            
+        # Send confirmation
+        await message.channel.send(
+            f"✅ {stl_name} from {bundle_name} has been cataloged!" + 
+            (f"\nTags: {tags}" if tags else ""),
+            delete_after=15
+        )
         
     except Exception as e:
-        logging.error(f"Metadata error: {e}")
-        await message.channel.send("❌ Failed to save tags", delete_after=5)
+        logging.error(f"Metadata processing failed: {str(e)}", exc_info=True)
+        await message.channel.send(
+            "❌ Failed to process your submission. Please use:\n"
+            "STL: ModelName\nBundle: BundleName\nTags: optional",
+            delete_after=15
+        )
 async def process_image_submission(message):
     try:
-        if not message.attachments:
-            return
-            
         image = message.attachments[0]
-        if not image.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
-            return
-            
         image_url = image.url
-        image_hash = hashlib.md5(image_url.encode()).hexdigest()
         
-        if is_duplicate(image_hash):
-            await message.channel.send("🛑 This image was already submitted!", delete_after=5)
-            return
-            
         prompt = await message.channel.send(
             f"{message.author.mention} **Tag your miniature:**\n"
             "Reply to THIS message with:\n"
             "`STL: Model Name`\n"
             "`Bundle: Bundle Name`\n"
-            "`Tags: tag1, tag2`",
+            "`Tags: tag1, tag2` (optional)",
             reference=message
         )
         
-        pending_submissions[prompt.id] = {
+        # Store in bot.pending_subs
+        bot.pending_subs[prompt.id] = {
             'user_id': message.author.id,
             'image_url': image_url,
             'original_msg_id': message.id,
-            'prompt_id': prompt.id
+            'prompt_id': prompt.id,
+            'channel_id': message.channel.id
         }
         
+        # Log the pending submissions
+        logging.info(f"Pending submissions updated: {bot.pending_subs}")
+        
     except Exception as e:
-        logging.error(f"Error in process_image_submission: {str(e)}", exc_info=True)
-        await message.channel.send("❌ Failed to process image", delete_after=5)       
-    
+        logging.error(f"Image processing error: {e}")
+        await message.channel.send("❌ Failed to process image", delete_after=5)    
 class SubmissionButtons(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=3600)  # 1 hour timeout
@@ -189,25 +228,37 @@ class TaggingModal(discord.ui.Modal):
         self.add_item(discord.ui.TextInput(label="Tags (optional)", placeholder="NMM, OSL, freehand", required=False))
     
     async def on_submit(self, interaction):
-        # Get the original submission
-        original_id = next((k for k,v in pending_submissions.items() if v['prompt_id'] == interaction.message.id), None)
-        if not original_id:
-            await interaction.response.send_message("Submission expired. Please post a new image.", ephemeral=True)
+        # Find the submission in bot.pending_subs
+        submission = next(
+            (v for k,v in bot.pending_subs.items() 
+            if v['prompt_id'] == interaction.message.id),
+            None
+    )
+    
+        if not submission:
+            await interaction.response.send_message("Submission expired", ephemeral=True)
             return
-            
-        submission = pending_submissions[original_id]
         
-        # Store in database
         store_submission(
-            user_id=submission['user_id'],
-            message_id=submission['original_msg_id'],
-            image_url=submission['image_url'],
-            stl_name=self.children[0].value,
-            bundle_name=self.children[1].value,
-            tags=self.children[2].value
-        )
-        
-        await interaction.response.send_message("✅ Miniature tagged successfully!", ephemeral=True)
+        user_id=submission['user_id'],
+        message_id=submission['original_msg_id'],
+        image_url=submission['image_url'],
+        stl_name=self.children[0].value,
+        bundle_name=self.children[1].value,
+        tags=self.children[2].value if self.children[2].value else None
+    )
+    
+        await interaction.response.send_message("✅ Tagged successfully!", ephemeral=True)
+    
+    # Cleanup
+        try:
+            await interaction.message.delete()
+            channel = bot.get_channel(submission['channel_id'])
+            if channel:
+                msg = await channel.fetch_message(submission['original_msg_id'])
+                await msg.delete()
+        except Exception as e:
+            logging.error(f"Cleanup error: {e}")
        
 async def handle_submission(message):
     try:
@@ -248,54 +299,46 @@ async def handle_submission(message):
 
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
-    """Search for examples with proper image display"""
+    """Display miniatures matching the search term"""
     try:
-        # Parse query
-        parts = search_query.rsplit(maxsplit=1)
-        model_name = parts[0] if len(parts) == 1 else ' '.join(parts[:-1])
-        count = min(int(parts[-1]), 10) if len(parts) > 1 and parts[-1].isdigit() else 5
+        # Parse query (allow optional count like "lucian 3")
+        parts = search_query.split()
+        name = ' '.join(parts[:-1]) if len(parts) > 1 and parts[-1].isdigit() else search_query
+        count = int(parts[-1]) if len(parts) > 1 and parts[-1].isdigit() else 5
+        count = min(count, 10)  # Limit to 10 results max
 
         with sqlite3.connect(DB_FILE) as conn:
             c = conn.cursor()
             c.execute('''
-                SELECT message_id, stl_name, bundle_name 
+                SELECT image_url, stl_name, bundle_name 
                 FROM miniatures
                 WHERE stl_name LIKE ?
                 ORDER BY RANDOM()
                 LIMIT ?
-            ''', (f'%{model_name}%', count))
+            ''', (f'%{name}%', count))
             
             results = c.fetchall()
 
         if not results:
-            return await ctx.send(f"No examples found for '{model_name}'", delete_after=15)
+            return await ctx.send(f"No examples found for '{name}'", delete_after=15)
 
-        for msg_id, stl_name, bundle_name in results:
+        for image_url, stl_name, bundle_name in results:
             try:
-                # Fetch original message
-                original_msg = await ctx.channel.fetch_message(msg_id)
-                if original_msg.attachments:
-                    # Re-upload the image properly
-                    file = await original_msg.attachments[0].to_file()
-                    embed = discord.Embed(
-                        title=f"{stl_name}",
-                        description=f"From {bundle_name}",
-                        color=0x3498db
-                    )
-                    embed.set_image(url=f"attachment://{file.filename}")
-                    await ctx.send(embed=embed, file=file)
-                else:
-                    # Fallback to URL if attachment missing
-                    await ctx.send(f"🖼️ **{stl_name}**\n{original_msg.content}")
-                    
-            except discord.NotFound:
-                # Message was deleted but DB record remains
-                continue
+                embed = discord.Embed(
+                    title=f"{stl_name}",
+                    description=f"From {bundle_name}" if bundle_name else "",
+                    color=0x3498db
+                )
+                embed.set_image(url=image_url)
+                await ctx.send(embed=embed)
+                
+            except Exception as e:
+                print(f"Error showing {stl_name}: {e}")
+                await ctx.send(f"🖼️ **{stl_name}** (Image unavailable)")
 
     except Exception as e:
         await ctx.send(f"❌ Error: {str(e)}", delete_after=10)
         logging.error(f"Show command failed: {str(e)}")
-
 import logging
 
 # Set up logging
@@ -311,10 +354,9 @@ logging.basicConfig(
 async def debug_pending(ctx):
     """Show current pending submissions"""
     output = ["Current pending submissions:"]
-    for msg_id, data in pending_submissions.items():
-        output.append(f"- {msg_id}: {data.get('stl_name', 'Untagged')}")
+    for msg_id, data in bot.pending_subs.items():
+        output.append(f"- Prompt ID: {msg_id}, Data: {data}")
     await ctx.send('\n'.join(output)[:2000])
-
 @bot.command()
 async def debug_db(ctx):
     """Show database status"""

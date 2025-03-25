@@ -4,13 +4,6 @@ from datetime import datetime
 import hashlib
 import os
 # mini_storage.py
-import sqlite3
-from datetime import datetime
-
-import sqlite3
-from pathlib import Path
-from datetime import datetime
-import hashlib
 
 DB_FILE = Path(__file__).parent / "miniatures.db"
 
@@ -22,15 +15,15 @@ def init_db():
         c = conn.cursor()
         
         c.execute('''
-        CREATE TABLE IF NOT EXISTS miniatures (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            message_id INTEGER,
-            image_url TEXT NOT NULL,
-            image_hash TEXT UNIQUE NOT NULL,
-            stl_name TEXT NOT NULL,
-            bundle_name TEXT,
-            timestamp DATETIME NOT NULL
+             CREATE TABLE IF NOT EXISTS miniatures (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                message_id INTEGER NOT NULL,
+                image_url TEXT NOT NULL,
+                stl_name TEXT NOT NULL,
+                bundle_name TEXT NOT NULL,
+                tags TEXT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )''')
         
         conn.commit()
@@ -47,34 +40,23 @@ def init_db():
     finally:
         if conn: conn.close()
 
-def store_submission(user_id: int, message_id: int, image_url: str, stl_name: str, bundle_name: str):
-    """Store submission with full validation"""
-    conn = None
-    try:
-        image_hash = hashlib.md5(image_url.encode()).hexdigest()
-        conn = sqlite3.connect(DB_FILE)
+# In mini_storage.py
+def store_submission(user_id, message_id, image_url, stl_name, bundle_name, tags=None):
+    with sqlite3.connect(DB_FILE) as conn:
         c = conn.cursor()
-        
         c.execute('''
-        INSERT INTO miniatures 
-        (user_id, message_id, image_url, image_hash, stl_name, bundle_name, timestamp)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (user_id, message_id, image_url, image_hash, stl_name, bundle_name, datetime.now()))
-        
+            INSERT INTO miniatures 
+            (user_id, message_id, image_url, stl_name, bundle_name, tags)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (user_id, message_id, image_url, stl_name, bundle_name, tags))
         conn.commit()
         print(f"✅ Stored submission: {stl_name} ({message_id})")
         
         # Verify insertion
         c.execute("SELECT 1 FROM miniatures WHERE message_id=?", (message_id,))
         if not c.fetchone():
-            raise RuntimeError("Insertion verification failed!")
-            
-    except sqlite3.IntegrityError:
-        print("⚠️ Duplicate image detected (hash already exists)")
-    except Exception as e:
-        print(f"🚨 Storage error: {e}")
-        raise
-    finally:
+            raise RuntimeError("Insertion verification failed!")            
+        
         if conn: conn.close()
 
 def is_duplicate(image_hash):
