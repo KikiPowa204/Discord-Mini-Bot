@@ -8,7 +8,6 @@ import sqlite3
 from mini_storage import store_submission, is_duplicate
 import logging
 import asyncio
-from dotenv import load_dotenv
 
 # Load environment variables first
 
@@ -29,11 +28,25 @@ DEFAULTS = {
     'gallery_chan': 'miniature-gallery'
 }
 
+def get_server_db(guild_id):
+    """Get a database connection for a specific server"""
+    db_dir = Path("server_dbs")
+    db_dir.mkdir(exist_ok=True)
+    db_path = db_dir / f"guild_{guild_id}.db"
+    return sqlite3.connect(db_path)
 
 # Runtime storage
 intents = discord.Intents.default()
 intents.message_content = True
 intents.messages = True  # Needed for message history
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def setup(ctx):
+    """Initialize database for this server"""
+    guild_id = ctx.guild.id
+    mini_storage.init_db(guild_id)
+    await ctx.send("✅ Server database initialized!")
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 bot.pending_subs = {}  # Single source for pending submissions
@@ -56,6 +69,7 @@ async def on_ready():
 async def setup(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
+    mini_storage.init_db(ctx.guild.id)
     # Check if the bot has the necessary permissions
     bot_member = ctx.guild.get_member(bot.user.id)
     if not bot_member.guild_permissions.manage_channels:
@@ -135,6 +149,7 @@ async def on_message(message):
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)
 async def handle_metadata_reply(message):
+    guild_id = message.guild.id
     if not message.reference:
         logging.error("No message reference found")
         return
@@ -222,6 +237,10 @@ async def handle_metadata_reply(message):
             delete_after=15
         )
 async def process_image_submission(message):
+    # Add guild_id but make it optional
+    guild_id = message.guild.id if message.guild else None
+    mini_storage.store_submission(
+        guild_id=guild_id)
     try:
         image = message.attachments[0]
         image_url = image.url
@@ -390,33 +409,25 @@ async def delete_entry(ctx):
         logging.error(f"Error deleting message: {e}")
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
-    """Display miniatures matching the search term"""
-    if ctx.channel != bot.gallery_chan:
-        await ctx.send(f"❌ This command can only be used in {bot.gallery_chan.mention}.", delete_after=10)
-        return
-    try:
-        # Parse query (allow optional count like "lucian 3")
-        parts = search_query.split()
-        name = ' '.join(parts[:-1]) if len(parts) > 1 and parts[-1].isdigit() else search_query
-        count = int(parts[-1]) if len(parts) > 1 and parts[-1].isdigit() else 5
-        count = min(count, 10)  # Limit to 10 results max
-
-        with sqlite3.connect(DB_FILE) as conn:
-            c = conn.cursor()
-            c.execute('''
-                SELECT image_url, user_id, stl_name, bundle_name
-                FROM miniatures
-                WHERE stl_name LIKE ?
-                ORDER BY RANDOM()
-                LIMIT ?
-            ''', (f'%{name}%', count))
-            
-            results = c.fetchall()
+    # Automatically handles both single-DB and multi-DB modes
+    db_path = mini_storage.get_db_path(ctx.guild.id if ctx.guild else None)
+    
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute('''
+            SELECT image_url, user_id, stl_name, bundle_name
+            FROM miniatures
+            WHERE stl_name LIKE ?
+            ORDER BY RANDOM()
+            LIMIT ?
+        ''', (f'%{search_query}%', 5))
+        results = c.fetchall()
 
         if not results:
             return await ctx.send(f"No examples found for '{name}'", delete_after=15)
 
         for image_url, user_id, stl_name, bundle_name in results:
+            await ctx.send(f"**{stl_name}** (from {bundle_name})\n{image_url}")
             try:
                 embed = discord.Embed(
                 title=f"{stl_name}",
@@ -433,8 +444,7 @@ async def show_examples(ctx, *, search_query: str):
                 print(f"Error showing {stl_name}: {e}")
                 await ctx.send(f"🖼️ **{stl_name}** (Image unavailable)")
 
-    except Exception as e:
-        await ctx.send(f"❌ Error: {str(e)}", delete_after=10)
+    
         logging.error(f"Show command failed: {str(e)}")
 import logging
 

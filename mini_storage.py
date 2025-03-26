@@ -1,83 +1,90 @@
 import sqlite3
 from pathlib import Path
-from datetime import datetime
-import hashlib
 import os
-# mini_storage.py
-import mini_storage
+from typing import Optional
 
-DB_FILE = Path(__file__).parent / "miniatures.db"
-print(f"Using database file: {DB_FILE}")
-def init_db():
-    """Initialize database with verification"""
-    conn = None
-    try:
-        conn = sqlite3.connect(DB_FILE)
-        c = conn.cursor()
-        
-        c.execute('''
-             CREATE TABLE IF NOT EXISTS miniatures (
+# Backward compatible default DB path
+DEFAULT_DB = Path(__file__).parent / "miniatures.db"
+
+def get_db_path(guild_id: Optional[int] = None) -> Path:
+    """Get appropriate database path (maintains backward compatibility)"""
+    if guild_id is None:
+        # Use legacy single-database mode
+        return DEFAULT_DB
+    
+    # Multi-server mode
+    db_dir = Path("server_databases")
+    db_dir.mkdir(exist_ok=True)
+    return db_dir / f"guild_{guild_id}.db"
+
+def init_db(guild_id: Optional[int] = None):
+    """Initialize database (works for both single and multi-server)"""
+    db_path = get_db_path(guild_id)
+    print(f"Using database file: {db_path}")
+    
+    with sqlite3.connect(db_path) as conn:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS miniatures (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 message_id INTEGER NOT NULL,
                 image_url TEXT NOT NULL,
+                image_hash TEXT UNIQUE,
                 stl_name TEXT NOT NULL,
                 bundle_name TEXT NOT NULL,
                 tags TEXT,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )''')
-        
-        conn.commit()
-        print(f"✅ Database initialized at: {DB_FILE}")
-        
-        # Verify table exists
-        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='miniatures'")
-        if not c.fetchone():
-            raise RuntimeError("Table creation failed!")
-            
-    except Exception as e:
-        print(f"🚨 Database error: {e}")
-        raise
-    finally:
-        if conn: conn.close()
+            )
+        ''')
+    print(f"✅ Database initialized at: {db_path}")
 
-# In mini_storage.py
-def store_submission(user_id, message_id, image_url, stl_name, bundle_name, tags=None):
-    print (f"Opening database connection to: {DB_FILE}")
-    with sqlite3.connect(DB_FILE) as conn:
-        c = conn.cursor()
-        c.execute('''
+def store_submission(
+    user_id: int,
+    message_id: int,
+    image_url: str,
+    stl_name: str,
+    bundle_name: str,
+    tags: Optional[str] = None,
+    guild_id: Optional[int] = None,
+    image_hash: Optional[str] = None
+):
+    """Store submission with backward compatibility"""
+    db_path = get_db_path(guild_id)
+    print(f"Storing in: {db_path}")
+    
+    with sqlite3.connect(db_path) as conn:
+        conn.execute('''
             INSERT INTO miniatures 
-            (user_id, message_id, image_url, stl_name, bundle_name, tags)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''',(user_id, message_id, image_url, stl_name, bundle_name, tags or ""))
-        conn.commit()
-        print(f"✅ Stored submission: {stl_name} ({message_id})")
-        # Verify insertion
-        c.execute("SELECT 1 FROM miniatures WHERE message_id=?", (message_id,))
-        if not c.fetchone():
-            raise RuntimeError("Insertion verification failed!")            
-    print("Database connection closed.")    
-    if conn: conn.close()
-def check_table_schema():
-    with sqlite3.connect(DB_FILE) as conn:
-        c = conn.cursor()
-        c.execute("PRAGMA table_info(miniatures);")
-        schema = c.fetchall()
-        print("Current table schema:")
-        for column in schema:
-            print(column)
-def is_duplicate(image_hash):
-    with sqlite3.connect(DB_FILE) as conn:
-        c = conn.cursor()
-        c.execute('SELECT 1 FROM miniatures WHERE image_hash = ?', (image_hash,))
-        return c.fetchone() is not None
+            (user_id, message_id, image_url, image_hash, stl_name, bundle_name, tags)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (user_id, message_id, image_url, image_hash, stl_name, bundle_name, tags))
+    
+    print(f"✅ Stored: {stl_name} (Message: {message_id})")
 
-# Test when run directly
+# Maintain all existing functions with guild_id parameter
+def is_duplicate(image_hash: str, guild_id: Optional[int] = None) -> bool:
+    db_path = get_db_path(guild_id)
+    with sqlite3.connect(db_path) as conn:
+        return conn.execute(
+            'SELECT 1 FROM miniatures WHERE image_hash = ?', 
+            (image_hash,)
+        ).fetchone() is not None
+
+def check_table_schema(guild_id: Optional[int] = None):
+    db_path = get_db_path(guild_id)
+    with sqlite3.connect(db_path) as conn:
+        print(f"Schema for {db_path}:")
+        for column in conn.execute("PRAGMA table_info(miniatures);"):
+            print(column)
+
+# Backward compatibility - initialize default DB if run directly
 if __name__ == "__main__":
-    init_db()
-    # Test insertion
-    store_submission(123, 999, "http://test.com/img.jpg", "Test Model", "Test Bundle")
-# Test immediately when module loads
-print(f"🔍 Database location VERIFIED: {os.path.exists(DB_FILE)}")
-init_db()
+    init_db()  # Legacy single-database initialization
+    store_submission(
+        user_id=123, 
+        message_id=999, 
+        image_url="http://test.com/img.jpg", 
+        stl_name="Test Model", 
+        bundle_name="Test Bundle"
+    )
+    check_table_schema()
