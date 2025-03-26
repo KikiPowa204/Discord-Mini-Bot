@@ -1,0 +1,905 @@
+2025-03-25 14:21:02,913 - INFO - logging in using static token
+2025-03-25 14:21:03,713 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:21:04,174 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-m868",{"micros":265065,"calls":["id_created",{"micros":946,"calls":[]},"session_lookup_time",{"micros":248,"calls":[]},"session_lookup_finished",{"micros":25,"calls":[]},"discord-sessions-prd-1-200",{"micros":263646,"calls":["start_session",{"micros":237265,"calls":["discord-api-rpc-56fc7c5545-7ggr8",{"micros":185830,"calls":["get_user",{"micros":58207},"get_guilds",{"micros":8954},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":11},"pending_payments",{"micros":2271}]}]},"starting_guild_connect",{"micros":42,"calls":[]},"presence_started",{"micros":7959,"calls":[]},"guilds_started",{"micros":79,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":18219,"calls":[]},"connect_finished",{"micros":18225,"calls":[]},"build_ready",{"micros":22,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":49,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: cae7fbbf0f162e59cae4ea8e761322fc).
+2025-03-25 14:24:57,127 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 14:24:57,127 - INFO - Cleaning up tasks.
+2025-03-25 14:24:57,127 - INFO - Cleaning up after 1 tasks.
+2025-03-25 14:24:57,128 - INFO - All tasks finished cancelling.
+2025-03-25 14:24:57,128 - INFO - Closing the event loop.
+2025-03-25 14:29:51,113 - INFO - logging in using static token
+2025-03-25 14:29:51,738 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:29:51,977 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-lw72",{"micros":112791,"calls":["id_created",{"micros":643,"calls":[]},"session_lookup_time",{"micros":362,"calls":[]},"session_lookup_finished",{"micros":14,"calls":[]},"discord-sessions-prd-1-151",{"micros":111498,"calls":["start_session",{"micros":46502,"calls":["discord-api-rpc-56fc7c5545-bgvnd",{"micros":39339,"calls":["get_user",{"micros":6853},"get_guilds",{"micros":3839},"send_scheduled_deletion_message",{"micros":8},"guild_join_requests",{"micros":2222},"authorized_ip_coro",{"micros":7},"pending_payments",{"micros":434}]}]},"starting_guild_connect",{"micros":37,"calls":[]},"presence_started",{"micros":2514,"calls":[]},"guilds_started",{"micros":82,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":62289,"calls":[]},"connect_finished",{"micros":62294,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 57c68b676c3e4298609373fd5b516427).
+2025-03-25 14:30:49,610 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 14:30:49,611 - INFO - Cleaning up tasks.
+2025-03-25 14:30:49,611 - INFO - Cleaning up after 1 tasks.
+2025-03-25 14:30:49,612 - INFO - All tasks finished cancelling.
+2025-03-25 14:30:49,612 - INFO - Closing the event loop.
+2025-03-25 14:30:50,832 - INFO - logging in using static token
+2025-03-25 14:30:51,718 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:30:52,055 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-4ml0",{"micros":128794,"calls":["id_created",{"micros":987,"calls":[]},"session_lookup_time",{"micros":243,"calls":[]},"session_lookup_finished",{"micros":12,"calls":[]},"discord-sessions-prd-1-107",{"micros":126441,"calls":["start_session",{"micros":36798,"calls":["discord-api-rpc-56fc7c5545-h2tcw",{"micros":30214,"calls":["get_user",{"micros":6412},"get_guilds",{"micros":2926},"send_scheduled_deletion_message",{"micros":4},"guild_join_requests",{"micros":0},"authorized_ip_coro",{"micros":6},"pending_payments",{"micros":303}]}]},"starting_guild_connect",{"micros":62,"calls":[]},"presence_started",{"micros":15622,"calls":[]},"guilds_started",{"micros":98,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":73777,"calls":[]},"connect_finished",{"micros":73783,"calls":[]},"build_ready",{"micros":23,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 0a8a2cb5983813c92e35a02c26be0ec7).
+2025-03-25 14:31:20,982 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 14:31:20,982 - INFO - Cleaning up tasks.
+2025-03-25 14:31:20,982 - INFO - Cleaning up after 1 tasks.
+2025-03-25 14:31:20,983 - INFO - All tasks finished cancelling.
+2025-03-25 14:31:20,983 - INFO - Closing the event loop.
+2025-03-25 14:31:22,050 - INFO - logging in using static token
+2025-03-25 14:31:22,895 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:31:23,198 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-rh1j",{"micros":86577,"calls":["id_created",{"micros":805,"calls":[]},"session_lookup_time",{"micros":3399,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-82",{"micros":81897,"calls":["start_session",{"micros":39849,"calls":["discord-api-rpc-56fc7c5545-trnx9",{"micros":31052,"calls":["get_user",{"micros":4554},"get_guilds",{"micros":3523},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":0},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":443}]}]},"starting_guild_connect",{"micros":37,"calls":[]},"presence_started",{"micros":16560,"calls":[]},"guilds_started",{"micros":77,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":25288,"calls":[]},"connect_finished",{"micros":25293,"calls":[]},"build_ready",{"micros":20,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 2b61d865cce76fb6556c3168199fff1e).
+2025-03-25 14:34:14,212 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 14:34:14,213 - INFO - Cleaning up tasks.
+2025-03-25 14:34:14,214 - INFO - Cleaning up after 1 tasks.
+2025-03-25 14:34:14,214 - INFO - All tasks finished cancelling.
+2025-03-25 14:34:14,215 - INFO - Closing the event loop.
+2025-03-25 14:34:15,197 - INFO - logging in using static token
+2025-03-25 14:34:15,799 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:34:16,022 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-7k7b",{"micros":84714,"calls":["id_created",{"micros":805,"calls":[]},"session_lookup_time",{"micros":5264,"calls":[]},"session_lookup_finished",{"micros":15,"calls":[]},"discord-sessions-prd-1-119",{"micros":78371,"calls":["start_session",{"micros":47686,"calls":["discord-api-rpc-56fc7c5545-6l489",{"micros":40719,"calls":["get_user",{"micros":4906},"get_guilds",{"micros":4096},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":368}]}]},"starting_guild_connect",{"micros":39,"calls":[]},"presence_started",{"micros":392,"calls":[]},"guilds_started",{"micros":122,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":30061,"calls":[]},"connect_finished",{"micros":30066,"calls":[]},"build_ready",{"micros":16,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 542cc7f657aedb3bbac3071b14ea22c1).
+2025-03-25 14:35:29,524 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 14:35:29,524 - INFO - Cleaning up tasks.
+2025-03-25 14:35:29,524 - INFO - Cleaning up after 1 tasks.
+2025-03-25 14:35:29,525 - INFO - All tasks finished cancelling.
+2025-03-25 14:35:29,525 - INFO - Closing the event loop.
+2025-03-25 14:35:31,166 - INFO - logging in using static token
+2025-03-25 14:35:31,870 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:35:32,289 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-1cxp",{"micros":278780,"calls":["id_created",{"micros":736,"calls":[]},"session_lookup_time",{"micros":305,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-15",{"micros":277438,"calls":["start_session",{"micros":231047,"calls":["discord-api-rpc-56fc7c5545-79hvg",{"micros":159861,"calls":["get_user",{"micros":22240},"get_guilds",{"micros":17010},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":50504}]}]},"starting_guild_connect",{"micros":31,"calls":[]},"presence_started",{"micros":220,"calls":[]},"guilds_started",{"micros":71,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":45996,"calls":[]},"connect_finished",{"micros":46000,"calls":[]},"build_ready",{"micros":16,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":50,"calls":[]}]}]}] (Session ID: b4828664087c6fd0e1328ef7fe63656b).
+2025-03-25 14:36:20,787 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 14:36:20,787 - INFO - Cleaning up tasks.
+2025-03-25 14:36:20,788 - INFO - Cleaning up after 1 tasks.
+2025-03-25 14:36:20,789 - INFO - All tasks finished cancelling.
+2025-03-25 14:36:20,789 - INFO - Closing the event loop.
+2025-03-25 14:36:21,846 - INFO - logging in using static token
+2025-03-25 14:36:22,488 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:36:22,750 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-vx2s",{"micros":134111,"calls":["id_created",{"micros":776,"calls":[]},"session_lookup_time",{"micros":376,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-273",{"micros":132611,"calls":["start_session",{"micros":105980,"calls":["discord-api-rpc-56fc7c5545-6r9s8",{"micros":97338,"calls":["get_user",{"micros":6023},"get_guilds",{"micros":3629},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":309},"authorized_ip_coro",{"micros":11},"pending_payments",{"micros":407}]}]},"starting_guild_connect",{"micros":49,"calls":[]},"presence_started",{"micros":13075,"calls":[]},"guilds_started",{"micros":85,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":13333,"calls":[]},"connect_finished",{"micros":13338,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 8e1ed1a39880a6c86821d91412bcb902).
+2025-03-25 14:37:26,615 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 14:37:26,615 - INFO - Cleaning up tasks.
+2025-03-25 14:37:26,615 - INFO - Cleaning up after 1 tasks.
+2025-03-25 14:37:26,616 - INFO - All tasks finished cancelling.
+2025-03-25 14:37:26,616 - INFO - Closing the event loop.
+2025-03-25 14:37:28,929 - INFO - logging in using static token
+2025-03-25 14:37:29,553 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:37:29,763 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-706w",{"micros":81380,"calls":["id_created",{"micros":976,"calls":[]},"session_lookup_time",{"micros":269,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-170",{"micros":79789,"calls":["start_session",{"micros":40178,"calls":["discord-api-rpc-56fc7c5545-s54pd",{"micros":32906,"calls":["get_user",{"micros":4780},"get_guilds",{"micros":3079},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":725},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":370}]}]},"starting_guild_connect",{"micros":35,"calls":[]},"presence_started",{"micros":12171,"calls":[]},"guilds_started",{"micros":1262,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":26070,"calls":[]},"connect_finished",{"micros":26074,"calls":[]},"build_ready",{"micros":17,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 4589b46141a29485b9a7c205028d5828).
+2025-03-25 14:41:27,448 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 14:41:27,449 - INFO - Cleaning up tasks.
+2025-03-25 14:41:27,450 - INFO - Cleaning up after 1 tasks.
+2025-03-25 14:41:27,451 - INFO - All tasks finished cancelling.
+2025-03-25 14:41:27,451 - INFO - Closing the event loop.
+2025-03-25 14:41:28,985 - INFO - logging in using static token
+2025-03-25 14:41:29,579 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:41:29,956 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-5j0q",{"micros":236169,"calls":["id_created",{"micros":803,"calls":[]},"session_lookup_time",{"micros":2022,"calls":[]},"session_lookup_finished",{"micros":17,"calls":[]},"discord-sessions-prd-1-317",{"micros":232912,"calls":["start_session",{"micros":215016,"calls":["discord-api-rpc-56fc7c5545-cn9xk",{"micros":197639,"calls":["get_user",{"micros":19708},"get_guilds",{"micros":6027},"send_scheduled_deletion_message",{"micros":5},"guild_join_requests",{"micros":0},"authorized_ip_coro",{"micros":6},"pending_payments",{"micros":6292}]}]},"starting_guild_connect",{"micros":38,"calls":[]},"presence_started",{"micros":6480,"calls":[]},"guilds_started",{"micros":76,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":11227,"calls":[]},"connect_finished",{"micros":11232,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":48,"calls":[]}]}]}] (Session ID: bb884e5bba94e990e07ba14b664b281b).
+2025-03-25 14:41:35,286 - ERROR - Show command failed: cannot access local variable 'original_msg' where it is not associated with a value
+2025-03-25 14:46:46,051 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 14:46:46,051 - INFO - Cleaning up tasks.
+2025-03-25 14:46:46,052 - INFO - Cleaning up after 1 tasks.
+2025-03-25 14:46:46,053 - INFO - All tasks finished cancelling.
+2025-03-25 14:46:46,053 - INFO - Closing the event loop.
+2025-03-25 14:46:48,351 - INFO - logging in using static token
+2025-03-25 14:46:48,957 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:46:49,221 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-mswg",{"micros":118219,"calls":["id_created",{"micros":727,"calls":[]},"session_lookup_time",{"micros":457,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-249",{"micros":116694,"calls":["start_session",{"micros":104743,"calls":["discord-api-rpc-56fc7c5545-kjz7k",{"micros":87498,"calls":["get_user",{"micros":8352},"get_guilds",{"micros":5688},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":0},"authorized_ip_coro",{"micros":7},"pending_payments",{"micros":9080}]}]},"starting_guild_connect",{"micros":33,"calls":[]},"presence_started",{"micros":260,"calls":[]},"guilds_started",{"micros":99,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":11489,"calls":[]},"connect_finished",{"micros":11494,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 2558da3c28bf0b99f2c0083ced3e3e40).
+2025-03-25 14:48:22,263 - ERROR - Metadata error: NOT NULL constraint failed: miniatures.image_hash
+2025-03-25 14:51:04,291 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 14:51:04,291 - INFO - Cleaning up tasks.
+2025-03-25 14:51:04,292 - INFO - Cleaning up after 1 tasks.
+2025-03-25 14:51:04,293 - INFO - All tasks finished cancelling.
+2025-03-25 14:51:04,293 - INFO - Closing the event loop.
+2025-03-25 14:57:23,257 - INFO - logging in using static token
+2025-03-25 14:57:23,890 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:57:24,133 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-mkzm",{"micros":110433,"calls":["id_created",{"micros":930,"calls":[]},"session_lookup_time",{"micros":5066,"calls":[]},"session_lookup_finished",{"micros":14,"calls":[]},"discord-sessions-prd-1-97",{"micros":103111,"calls":["start_session",{"micros":80185,"calls":["discord-api-rpc-56fc7c5545-b6cvx",{"micros":73401,"calls":["get_user",{"micros":8403},"get_guilds",{"micros":12471},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":347},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":350}]}]},"starting_guild_connect",{"micros":39,"calls":[]},"presence_started",{"micros":387,"calls":[]},"guilds_started",{"micros":82,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":22344,"calls":[]},"connect_finished",{"micros":22349,"calls":[]},"build_ready",{"micros":16,"calls":[]},"clean_ready",{"micros":2,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":49,"calls":[]}]}]}] (Session ID: 450c1bd4c66d164e9d7ba0d9878fd58b).
+2025-03-25 14:58:50,346 - ERROR - Metadata error: NOT NULL constraint failed: miniatures.image_hash
+2025-03-25 14:59:42,804 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 14:59:42,804 - INFO - Cleaning up tasks.
+2025-03-25 14:59:42,805 - INFO - Cleaning up after 1 tasks.
+2025-03-25 14:59:42,805 - INFO - All tasks finished cancelling.
+2025-03-25 14:59:42,806 - INFO - Closing the event loop.
+2025-03-25 14:59:44,622 - INFO - logging in using static token
+2025-03-25 14:59:45,453 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 14:59:45,906 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-4ml0",{"micros":246632,"calls":["id_created",{"micros":979,"calls":[]},"session_lookup_time",{"micros":2231,"calls":[]},"session_lookup_finished",{"micros":22,"calls":[]},"discord-sessions-prd-1-245",{"micros":243134,"calls":["start_session",{"micros":211590,"calls":["discord-api-prd-canary-rpc-5cc5cbfb58-lc9p9",{"micros":137532,"calls":["get_user",{"micros":5192},"get_guilds",{"micros":26036},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":4246},"authorized_ip_coro",{"micros":5},"pending_payments",{"micros":30080}]}]},"starting_guild_connect",{"micros":43,"calls":[]},"presence_started",{"micros":21121,"calls":[]},"guilds_started",{"micros":98,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":10204,"calls":[]},"connect_finished",{"micros":10212,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 5165117a9639e0ebc45413df263b9a2f).
+2025-03-25 15:00:36,548 - ERROR - Metadata error: NOT NULL constraint failed: miniatures.image_hash
+2025-03-25 15:03:23,613 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:03:23,614 - INFO - Cleaning up tasks.
+2025-03-25 15:03:23,614 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:03:23,615 - INFO - All tasks finished cancelling.
+2025-03-25 15:03:23,615 - INFO - Closing the event loop.
+2025-03-25 15:03:24,997 - INFO - logging in using static token
+2025-03-25 15:03:25,963 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:03:26,277 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-qw5k",{"micros":90399,"calls":["id_created",{"micros":1129,"calls":[]},"session_lookup_time",{"micros":7484,"calls":[]},"session_lookup_finished",{"micros":18,"calls":[]},"discord-sessions-prd-1-127",{"micros":81166,"calls":["start_session",{"micros":48125,"calls":["discord-api-rpc-56fc7c5545-gknzc",{"micros":40089,"calls":["get_user",{"micros":5702},"get_guilds",{"micros":3702},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":0},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":408}]}]},"starting_guild_connect",{"micros":41,"calls":[]},"presence_started",{"micros":20935,"calls":[]},"guilds_started",{"micros":96,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":11879,"calls":[]},"connect_finished",{"micros":11885,"calls":[]},"build_ready",{"micros":79,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 668fc4948bddf6895849ea307a835aba).
+2025-03-25 15:05:43,406 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:05:43,406 - INFO - Cleaning up tasks.
+2025-03-25 15:05:43,407 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:05:43,408 - INFO - All tasks finished cancelling.
+2025-03-25 15:05:43,408 - INFO - Closing the event loop.
+2025-03-25 15:05:44,959 - INFO - logging in using static token
+2025-03-25 15:05:45,907 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:05:46,187 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-81hp",{"micros":69548,"calls":["id_created",{"micros":936,"calls":[]},"session_lookup_time",{"micros":270,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-149",{"micros":68050,"calls":["start_session",{"micros":48750,"calls":["discord-api-rpc-56fc7c5545-j9kwg",{"micros":41771,"calls":["get_user",{"micros":6591},"get_guilds",{"micros":4603},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":373}]}]},"starting_guild_connect",{"micros":34,"calls":[]},"presence_started",{"micros":328,"calls":[]},"guilds_started",{"micros":128,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":18785,"calls":[]},"connect_finished",{"micros":18791,"calls":[]},"build_ready",{"micros":16,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 8f9dd8042847392d06ce319b2461acf7).
+2025-03-25 15:07:26,563 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:07:26,564 - INFO - Cleaning up tasks.
+2025-03-25 15:07:26,564 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:07:26,565 - INFO - All tasks finished cancelling.
+2025-03-25 15:07:26,566 - INFO - Closing the event loop.
+2025-03-25 15:07:27,676 - INFO - logging in using static token
+2025-03-25 15:07:28,288 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:07:28,550 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-crhf",{"micros":107437,"calls":["id_created",{"micros":961,"calls":[]},"session_lookup_time",{"micros":251,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-31",{"micros":105621,"calls":["start_session",{"micros":43157,"calls":["discord-api-rpc-56fc7c5545-8t4x2",{"micros":35224,"calls":["get_user",{"micros":5749},"get_guilds",{"micros":3489},"send_scheduled_deletion_message",{"micros":10},"guild_join_requests",{"micros":378},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":443}]}]},"starting_guild_connect",{"micros":58,"calls":[]},"presence_started",{"micros":40596,"calls":[]},"guilds_started",{"micros":126,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":21654,"calls":[]},"connect_finished",{"micros":21660,"calls":[]},"build_ready",{"micros":19,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 7cc5515c91f73f6b0e42899813ff428c).
+2025-03-25 15:08:05,530 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:08:05,531 - INFO - Cleaning up tasks.
+2025-03-25 15:08:05,531 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:08:05,532 - INFO - All tasks finished cancelling.
+2025-03-25 15:08:05,532 - INFO - Closing the event loop.
+2025-03-25 15:08:06,438 - INFO - logging in using static token
+2025-03-25 15:08:07,571 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:08:07,899 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-0rt2",{"micros":104161,"calls":["id_created",{"micros":1515,"calls":[]},"session_lookup_time",{"micros":829,"calls":[]},"session_lookup_finished",{"micros":20,"calls":[]},"discord-sessions-prd-1-313",{"micros":100523,"calls":["start_session",{"micros":50176,"calls":["discord-api-rpc-56fc7c5545-5g68p",{"micros":42199,"calls":["get_user",{"micros":8427},"get_guilds",{"micros":2800},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":4721},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":470}]}]},"starting_guild_connect",{"micros":40,"calls":[]},"presence_started",{"micros":258,"calls":[]},"guilds_started",{"micros":129,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":49896,"calls":[]},"connect_finished",{"micros":49901,"calls":[]},"build_ready",{"micros":15,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 36a9c80f47a0e15c254d1d0590d4d410).
+2025-03-25 15:08:28,060 - ERROR - Metadata error: 'NoneType' object is not subscriptable
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 130, in handle_metadata_reply
+    user_id=submission['user_id'],
+            ~~~~~~~~~~^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+2025-03-25 15:10:16,160 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:10:16,161 - INFO - Cleaning up tasks.
+2025-03-25 15:10:16,161 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:10:16,162 - INFO - All tasks finished cancelling.
+2025-03-25 15:10:16,162 - INFO - Closing the event loop.
+2025-03-25 15:10:17,363 - INFO - logging in using static token
+2025-03-25 15:10:17,988 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:10:18,243 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-pb2l",{"micros":121566,"calls":["id_created",{"micros":778,"calls":[]},"session_lookup_time",{"micros":8692,"calls":[]},"session_lookup_finished",{"micros":15,"calls":[]},"discord-sessions-prd-1-216",{"micros":111787,"calls":["start_session",{"micros":64634,"calls":["discord-api-rpc-56fc7c5545-4kf6h",{"micros":54533,"calls":["get_user",{"micros":5584},"get_guilds",{"micros":3648},"send_scheduled_deletion_message",{"micros":8},"guild_join_requests",{"micros":7821},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":422}]}]},"starting_guild_connect",{"micros":49,"calls":[]},"presence_started",{"micros":10246,"calls":[]},"guilds_started",{"micros":128,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":36700,"calls":[]},"connect_finished",{"micros":36706,"calls":[]},"build_ready",{"micros":20,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: ab2d3dfc85678b6bf80a358f2937e592).
+2025-03-25 15:16:00,547 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:16:00,548 - INFO - Cleaning up tasks.
+2025-03-25 15:16:00,548 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:16:00,549 - INFO - All tasks finished cancelling.
+2025-03-25 15:16:00,549 - INFO - Closing the event loop.
+2025-03-25 15:16:01,788 - INFO - logging in using static token
+2025-03-25 15:16:02,491 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:16:02,704 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-08c4",{"micros":78019,"calls":["id_created",{"micros":1484,"calls":[]},"session_lookup_time",{"micros":405,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-13",{"micros":75823,"calls":["start_session",{"micros":43308,"calls":["discord-api-rpc-56fc7c5545-mxbbv",{"micros":34801,"calls":["get_user",{"micros":5296},"get_guilds",{"micros":3099},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":385},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":443}]}]},"starting_guild_connect",{"micros":38,"calls":[]},"presence_started",{"micros":13939,"calls":[]},"guilds_started",{"micros":78,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":18378,"calls":[]},"connect_finished",{"micros":18383,"calls":[]},"build_ready",{"micros":72,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 3741aa072c8ddc6ea9b3d343d1bc7868).
+2025-03-25 15:16:30,045 - ERROR - Metadata error: 'NoneType' object is not subscriptable
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 130, in handle_metadata_reply
+    user_id=submission['user_id'],
+            ~~~~~~~~~~^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+2025-03-25 15:18:33,096 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:18:33,096 - INFO - Cleaning up tasks.
+2025-03-25 15:18:33,097 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:18:33,098 - INFO - All tasks finished cancelling.
+2025-03-25 15:18:33,098 - INFO - Closing the event loop.
+2025-03-25 15:18:34,134 - INFO - logging in using static token
+2025-03-25 15:18:34,758 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:18:34,959 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-bcxc",{"micros":62232,"calls":["id_created",{"micros":1285,"calls":[]},"session_lookup_time",{"micros":384,"calls":[]},"session_lookup_finished",{"micros":17,"calls":[]},"discord-sessions-prd-1-205",{"micros":60200,"calls":["start_session",{"micros":58678,"calls":["discord-api-rpc-56fc7c5545-r9s28",{"micros":50125,"calls":["get_user",{"micros":5461},"get_guilds",{"micros":3583},"send_scheduled_deletion_message",{"micros":13},"guild_join_requests",{"micros":14171},"authorized_ip_coro",{"micros":12},"pending_payments",{"micros":479}]}]},"starting_guild_connect",{"micros":37,"calls":[]},"presence_started",{"micros":403,"calls":[]},"guilds_started",{"micros":70,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":932,"calls":[]},"connect_finished",{"micros":945,"calls":[]},"build_ready",{"micros":63,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: ee731b414a3de3ad094916f13901efa1).
+2025-03-25 15:23:41,101 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:23:41,101 - INFO - Cleaning up tasks.
+2025-03-25 15:23:41,102 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:23:41,103 - INFO - All tasks finished cancelling.
+2025-03-25 15:23:41,103 - INFO - Closing the event loop.
+2025-03-25 15:23:42,641 - INFO - logging in using static token
+2025-03-25 15:23:43,255 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:23:43,478 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-zgdf",{"micros":85285,"calls":["id_created",{"micros":866,"calls":[]},"session_lookup_time",{"micros":321,"calls":[]},"session_lookup_finished",{"micros":19,"calls":[]},"discord-sessions-prd-1-102",{"micros":82872,"calls":["start_session",{"micros":70191,"calls":["discord-api-rpc-56fc7c5545-86ms7",{"micros":49281,"calls":["get_user",{"micros":9156},"get_guilds",{"micros":6448},"send_scheduled_deletion_message",{"micros":9},"guild_join_requests",{"micros":587},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":2100}]}]},"starting_guild_connect",{"micros":46,"calls":[]},"presence_started",{"micros":275,"calls":[]},"guilds_started",{"micros":76,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":12209,"calls":[]},"connect_finished",{"micros":12214,"calls":[]},"build_ready",{"micros":66,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 0a3d1338565d2b64ac8f9728e7c94495).
+2025-03-25 15:24:01,727 - ERROR - Metadata error: name 'submission' is not defined
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 139, in handle_metadata_reply
+    user_id=submission['user_id'],
+            ^^^^^^^^^^
+NameError: name 'submission' is not defined
+2025-03-25 15:24:33,118 - ERROR - Metadata error: name 'submission' is not defined
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 139, in handle_metadata_reply
+    user_id=submission['user_id'],
+            ^^^^^^^^^^
+NameError: name 'submission' is not defined
+2025-03-25 15:24:52,550 - ERROR - Metadata error: name 'submission' is not defined
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 139, in handle_metadata_reply
+    user_id=submission['user_id'],
+            ^^^^^^^^^^
+NameError: name 'submission' is not defined
+2025-03-25 15:26:44,094 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:26:44,095 - INFO - Cleaning up tasks.
+2025-03-25 15:26:44,095 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:26:44,096 - INFO - All tasks finished cancelling.
+2025-03-25 15:26:44,096 - INFO - Closing the event loop.
+2025-03-25 15:26:45,083 - INFO - logging in using static token
+2025-03-25 15:26:45,933 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:26:46,196 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-qjpd",{"micros":53864,"calls":["id_created",{"micros":773,"calls":[]},"session_lookup_time",{"micros":4126,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-27",{"micros":45121,"calls":["start_session",{"micros":41187,"calls":["discord-api-rpc-56fc7c5545-t6l2f",{"micros":33495,"calls":["get_user",{"micros":5461},"get_guilds",{"micros":2579},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":692},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":428}]}]},"starting_guild_connect",{"micros":36,"calls":[]},"presence_started",{"micros":292,"calls":[]},"guilds_started",{"micros":83,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":3458,"calls":[]},"connect_finished",{"micros":3464,"calls":[]},"build_ready",{"micros":55,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: c46e5e99a9d47bb378b6b7ebf0322709).
+2025-03-25 15:27:17,573 - ERROR - No submission found for message 1354099263067521136
+2025-03-25 15:30:55,551 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:30:55,552 - INFO - Cleaning up tasks.
+2025-03-25 15:30:55,552 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:30:55,553 - INFO - All tasks finished cancelling.
+2025-03-25 15:30:55,554 - INFO - Closing the event loop.
+2025-03-25 15:30:56,486 - INFO - logging in using static token
+2025-03-25 15:30:57,097 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:30:57,346 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-jfcr",{"micros":118548,"calls":["id_created",{"micros":866,"calls":[]},"session_lookup_time",{"micros":426,"calls":[]},"session_lookup_finished",{"micros":22,"calls":[]},"discord-sessions-prd-1-149",{"micros":116850,"calls":["start_session",{"micros":85300,"calls":["discord-api-rpc-56fc7c5545-lbksf",{"micros":69841,"calls":["get_user",{"micros":20912},"get_guilds",{"micros":6713},"send_scheduled_deletion_message",{"micros":9},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":7},"pending_payments",{"micros":758}]}]},"starting_guild_connect",{"micros":39,"calls":[]},"presence_started",{"micros":27609,"calls":[]},"guilds_started",{"micros":71,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":3742,"calls":[]},"connect_finished",{"micros":3748,"calls":[]},"build_ready",{"micros":79,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 21d5eaba3e6ad1f6f285df22676603f9).
+2025-03-25 15:31:25,751 - ERROR - No submission found for message 1354100281092214805
+2025-03-25 15:31:59,893 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:31:59,894 - INFO - Cleaning up tasks.
+2025-03-25 15:31:59,894 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:31:59,895 - INFO - All tasks finished cancelling.
+2025-03-25 15:31:59,895 - INFO - Closing the event loop.
+2025-03-25 15:32:00,865 - INFO - logging in using static token
+2025-03-25 15:32:01,506 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:32:01,732 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-sm99",{"micros":95102,"calls":["id_created",{"micros":811,"calls":[]},"session_lookup_time",{"micros":4888,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-58",{"micros":89106,"calls":["start_session",{"micros":60716,"calls":["discord-api-rpc-56fc7c5545-bqm25",{"micros":51124,"calls":["get_user",{"micros":8537},"get_guilds",{"micros":6239},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":1749}]}]},"starting_guild_connect",{"micros":35,"calls":[]},"presence_started",{"micros":14735,"calls":[]},"guilds_started",{"micros":81,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":13470,"calls":[]},"connect_finished",{"micros":13474,"calls":[]},"build_ready",{"micros":61,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 2c6df0fd8dce37618b780abd0f104d6c).
+2025-03-25 15:32:19,969 - ERROR - Metadata processing failed: 'Bot' object has no attribute 'pending_subs'
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 107, in handle_metadata_reply
+    submission = bot.pending_subs.get(message.reference.message_id)
+                 ^^^^^^^^^^^^^^^^
+AttributeError: 'Bot' object has no attribute 'pending_subs'
+2025-03-25 15:32:47,587 - ERROR - Metadata processing failed: 'Bot' object has no attribute 'pending_subs'
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 107, in handle_metadata_reply
+    submission = bot.pending_subs.get(message.reference.message_id)
+                 ^^^^^^^^^^^^^^^^
+AttributeError: 'Bot' object has no attribute 'pending_subs'
+2025-03-25 15:38:29,670 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:38:29,671 - INFO - Cleaning up tasks.
+2025-03-25 15:38:29,672 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:38:29,673 - INFO - All tasks finished cancelling.
+2025-03-25 15:38:29,674 - INFO - Closing the event loop.
+2025-03-25 15:38:30,633 - INFO - logging in using static token
+2025-03-25 15:38:31,557 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:38:31,931 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-0rt2",{"micros":133084,"calls":["id_created",{"micros":1070,"calls":[]},"session_lookup_time",{"micros":452,"calls":[]},"session_lookup_finished",{"micros":14,"calls":[]},"discord-sessions-prd-1-190",{"micros":131212,"calls":["start_session",{"micros":64954,"calls":["discord-api-rpc-56fc7c5545-l52p2",{"micros":58327,"calls":["get_user",{"micros":4659},"get_guilds",{"micros":8186},"send_scheduled_deletion_message",{"micros":5},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":7},"pending_payments",{"micros":414}]}]},"starting_guild_connect",{"micros":37,"calls":[]},"presence_started",{"micros":15357,"calls":[]},"guilds_started",{"micros":103,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":50655,"calls":[]},"connect_finished",{"micros":50663,"calls":[]},"build_ready",{"micros":93,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: f0eb990c639969136c0c0bcabf75ef99).
+2025-03-25 15:38:40,792 - ERROR - Error: cannot access local variable 'prompt' where it is not associated with a value
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 91, in on_message
+    await process_image_submission(message)
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 192, in process_image_submission
+    'prompt_id': prompt.id
+                 ^^^^^^
+UnboundLocalError: cannot access local variable 'prompt' where it is not associated with a value
+2025-03-25 15:39:05,101 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:39:05,102 - INFO - Cleaning up tasks.
+2025-03-25 15:39:05,102 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:39:05,103 - INFO - All tasks finished cancelling.
+2025-03-25 15:39:05,103 - INFO - Closing the event loop.
+2025-03-25 15:39:06,354 - INFO - logging in using static token
+2025-03-25 15:39:07,134 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:39:07,377 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-8fwp",{"micros":111189,"calls":["id_created",{"micros":938,"calls":[]},"session_lookup_time",{"micros":291,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-248",{"micros":109702,"calls":["start_session",{"micros":53403,"calls":["discord-api-rpc-56fc7c5545-h46pm",{"micros":43914,"calls":["get_user",{"micros":5565},"get_guilds",{"micros":2885},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1081},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":500}]}]},"starting_guild_connect",{"micros":42,"calls":[]},"presence_started",{"micros":8861,"calls":[]},"guilds_started",{"micros":81,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":47231,"calls":[]},"connect_finished",{"micros":47238,"calls":[]},"build_ready",{"micros":73,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 3c6d85713d2a41ec5b847569eb9b53b4).
+2025-03-25 15:39:16,735 - ERROR - Error: cannot access local variable 'prompt' where it is not associated with a value
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 91, in on_message
+    await process_image_submission(message)
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 192, in process_image_submission
+    'prompt_id': prompt.id
+                 ^^^^^^
+UnboundLocalError: cannot access local variable 'prompt' where it is not associated with a value
+2025-03-25 15:39:34,026 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:39:34,026 - INFO - Cleaning up tasks.
+2025-03-25 15:39:34,027 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:39:34,028 - INFO - All tasks finished cancelling.
+2025-03-25 15:39:34,028 - INFO - Closing the event loop.
+2025-03-25 15:39:34,880 - INFO - logging in using static token
+2025-03-25 15:39:35,487 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:39:35,939 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-scrz",{"micros":317585,"calls":["id_created",{"micros":920,"calls":[]},"session_lookup_time",{"micros":983,"calls":[]},"session_lookup_finished",{"micros":23,"calls":[]},"discord-sessions-prd-1-236",{"micros":315339,"calls":["start_session",{"micros":240542,"calls":["discord-api-rpc-56fc7c5545-s28k8",{"micros":218051,"calls":["get_user",{"micros":31517},"get_guilds",{"micros":47824},"send_scheduled_deletion_message",{"micros":8},"guild_join_requests",{"micros":2},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":7597}]}]},"starting_guild_connect",{"micros":37,"calls":[]},"presence_started",{"micros":3917,"calls":[]},"guilds_started",{"micros":72,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":70693,"calls":[]},"connect_finished",{"micros":70698,"calls":[]},"build_ready",{"micros":69,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 05941a5fa5c6d3940e615e024ed2934c).
+2025-03-25 15:39:57,280 - ERROR - Error: cannot access local variable 'prompt' where it is not associated with a value
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 91, in on_message
+    await process_image_submission(message)
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 192, in process_image_submission
+    'prompt_id': prompt.id
+                 ^^^^^^
+UnboundLocalError: cannot access local variable 'prompt' where it is not associated with a value
+2025-03-25 15:40:29,982 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:40:29,983 - INFO - Cleaning up tasks.
+2025-03-25 15:40:29,983 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:40:29,983 - INFO - All tasks finished cancelling.
+2025-03-25 15:40:29,984 - INFO - Closing the event loop.
+2025-03-25 15:40:31,103 - INFO - logging in using static token
+2025-03-25 15:40:31,977 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:40:32,452 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-bksw",{"micros":262601,"calls":["id_created",{"micros":801,"calls":[]},"session_lookup_time",{"micros":258,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-276",{"micros":260942,"calls":["start_session",{"micros":241126,"calls":["discord-api-rpc-56fc7c5545-79hvg",{"micros":202416,"calls":["get_user",{"micros":59969},"get_guilds",{"micros":17587},"send_scheduled_deletion_message",{"micros":8},"guild_join_requests",{"micros":551},"authorized_ip_coro",{"micros":6},"pending_payments",{"micros":29776}]}]},"starting_guild_connect",{"micros":28,"calls":[]},"presence_started",{"micros":3138,"calls":[]},"guilds_started",{"micros":69,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":16499,"calls":[]},"connect_finished",{"micros":16505,"calls":[]},"build_ready",{"micros":72,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: a73bdfdb732df5401594a396cb8175de).
+2025-03-25 15:40:40,293 - ERROR - Error: cannot access local variable 'prompt' where it is not associated with a value
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 91, in on_message
+    await process_image_submission(message)
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 192, in process_image_submission
+    'prompt_id': prompt.id
+                 ^^^^^^
+UnboundLocalError: cannot access local variable 'prompt' where it is not associated with a value
+2025-03-25 15:41:07,470 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:41:07,470 - INFO - Cleaning up tasks.
+2025-03-25 15:41:07,470 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:41:07,471 - INFO - All tasks finished cancelling.
+2025-03-25 15:41:07,471 - INFO - Closing the event loop.
+2025-03-25 15:41:08,423 - INFO - logging in using static token
+2025-03-25 15:41:09,305 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:41:09,602 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-69sz",{"micros":67595,"calls":["id_created",{"micros":714,"calls":[]},"session_lookup_time",{"micros":2147,"calls":[]},"session_lookup_finished",{"micros":21,"calls":[]},"discord-sessions-prd-1-53",{"micros":63732,"calls":["start_session",{"micros":40381,"calls":["discord-api-rpc-56fc7c5545-tlwz7",{"micros":31977,"calls":["get_user",{"micros":5589},"get_guilds",{"micros":4126},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":5},"pending_payments",{"micros":377}]}]},"starting_guild_connect",{"micros":38,"calls":[]},"presence_started",{"micros":313,"calls":[]},"guilds_started",{"micros":83,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":22851,"calls":[]},"connect_finished",{"micros":22856,"calls":[]},"build_ready",{"micros":57,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 38ecfa1a614addb277a94c1b372cc8ec).
+2025-03-25 15:41:32,014 - ERROR - Error: cannot access local variable 'prompt' where it is not associated with a value
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 91, in on_message
+    await process_image_submission(message)
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 192, in process_image_submission
+    'prompt_id': prompt.id
+                 ^^^^^^
+UnboundLocalError: cannot access local variable 'prompt' where it is not associated with a value
+2025-03-25 15:42:28,339 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:42:28,339 - INFO - Cleaning up tasks.
+2025-03-25 15:42:28,340 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:42:28,340 - INFO - All tasks finished cancelling.
+2025-03-25 15:42:28,340 - INFO - Closing the event loop.
+2025-03-25 15:42:29,482 - INFO - logging in using static token
+2025-03-25 15:42:30,096 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:42:30,350 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-9bfv",{"micros":119210,"calls":["id_created",{"micros":650,"calls":[]},"session_lookup_time",{"micros":5345,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-74",{"micros":112840,"calls":["start_session",{"micros":65701,"calls":["discord-api-rpc-56fc7c5545-h46pm",{"micros":59356,"calls":["get_user",{"micros":28736},"get_guilds",{"micros":3219},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":6},"pending_payments",{"micros":358}]}]},"starting_guild_connect",{"micros":36,"calls":[]},"presence_started",{"micros":24353,"calls":[]},"guilds_started",{"micros":81,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":22569,"calls":[]},"connect_finished",{"micros":22574,"calls":[]},"build_ready",{"micros":89,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: ada22bf8aaee207796b2d831738cac98).
+2025-03-25 15:42:40,298 - ERROR - Error: cannot access local variable 'prompt' where it is not associated with a value
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 90, in on_message
+    await process_image_submission(message)
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 191, in process_image_submission
+    'prompt_id': prompt.id
+                 ^^^^^^
+UnboundLocalError: cannot access local variable 'prompt' where it is not associated with a value
+2025-03-25 15:56:39,037 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 15:56:39,038 - INFO - Cleaning up tasks.
+2025-03-25 15:56:39,038 - INFO - Cleaning up after 1 tasks.
+2025-03-25 15:56:39,039 - INFO - All tasks finished cancelling.
+2025-03-25 15:56:39,039 - INFO - Closing the event loop.
+2025-03-25 15:56:40,730 - INFO - logging in using static token
+2025-03-25 15:56:41,597 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 15:56:42,030 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-x62v",{"micros":214838,"calls":["id_created",{"micros":1036,"calls":[]},"session_lookup_time",{"micros":309,"calls":[]},"session_lookup_finished",{"micros":14,"calls":[]},"discord-sessions-prd-1-77",{"micros":213145,"calls":["start_session",{"micros":167156,"calls":["discord-api-rpc-56fc7c5545-trnx9",{"micros":154609,"calls":["get_user",{"micros":6407},"get_guilds",{"micros":27608},"send_scheduled_deletion_message",{"micros":15},"guild_join_requests",{"micros":9702},"authorized_ip_coro",{"micros":4},"pending_payments",{"micros":664}]}]},"starting_guild_connect",{"micros":77,"calls":[]},"presence_started",{"micros":26550,"calls":[]},"guilds_started",{"micros":150,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":19170,"calls":[]},"connect_finished",{"micros":19176,"calls":[]},"build_ready",{"micros":27,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":4,"calls":[]}]}]}] (Session ID: d67ed78bbc80cbbd405194c609c9a268).
+2025-03-25 15:56:53,533 - ERROR - Error: cannot access local variable 'prompt' where it is not associated with a value
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 90, in on_message
+    await process_image_submission(message)
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 191, in process_image_submission
+    'prompt_id': prompt.id
+                 ^^^^^^
+UnboundLocalError: cannot access local variable 'prompt' where it is not associated with a value
+2025-03-25 16:03:00,247 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 16:03:00,248 - INFO - Cleaning up tasks.
+2025-03-25 16:03:00,248 - INFO - Cleaning up after 1 tasks.
+2025-03-25 16:03:00,249 - INFO - All tasks finished cancelling.
+2025-03-25 16:03:00,249 - INFO - Closing the event loop.
+2025-03-25 16:03:01,836 - INFO - logging in using static token
+2025-03-25 16:03:02,511 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 16:03:04,113 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-3jfh",{"micros":1452990,"calls":["id_created",{"micros":2180,"calls":[]},"session_lookup_time",{"micros":407,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-251",{"micros":1449291,"calls":["start_session",{"micros":1395443,"calls":["discord-api-rpc-56fc7c5545-b44t6",{"micros":1358857,"calls":["get_user",{"micros":1205742},"get_guilds",{"micros":5662},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":17093},"authorized_ip_coro",{"micros":7},"pending_payments",{"micros":17267}]}]},"starting_guild_connect",{"micros":35,"calls":[]},"presence_started",{"micros":6177,"calls":[]},"guilds_started",{"micros":156,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":47452,"calls":[]},"connect_finished",{"micros":47458,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 26154767ef9393bd7bea2bf89e35e3f3).
+2025-03-25 16:03:36,127 - ERROR - No submission found for message 1354108366196314164
+2025-03-25 16:11:31,482 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 16:11:31,482 - INFO - Cleaning up tasks.
+2025-03-25 16:11:31,482 - INFO - Cleaning up after 1 tasks.
+2025-03-25 16:11:31,483 - INFO - All tasks finished cancelling.
+2025-03-25 16:11:31,483 - INFO - Closing the event loop.
+2025-03-25 16:11:35,178 - INFO - logging in using static token
+2025-03-25 16:11:36,036 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 16:11:36,335 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-pwc9",{"micros":87097,"calls":["id_created",{"micros":1353,"calls":[]},"session_lookup_time",{"micros":256,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-25",{"micros":85108,"calls":["start_session",{"micros":60000,"calls":["discord-api-rpc-56fc7c5545-pl2sn",{"micros":51665,"calls":["get_user",{"micros":5162},"get_guilds",{"micros":4008},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":444},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":503}]}]},"starting_guild_connect",{"micros":40,"calls":[]},"presence_started",{"micros":9901,"calls":[]},"guilds_started",{"micros":111,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":15019,"calls":[]},"connect_finished",{"micros":15026,"calls":[]},"build_ready",{"micros":25,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 9564dba1a2e3fb29d8a520d37ccbc5ee).
+2025-03-25 16:12:37,831 - ERROR - No submission found for message 1354110582634053673
+2025-03-25 16:16:53,437 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 16:16:53,437 - INFO - Cleaning up tasks.
+2025-03-25 16:16:53,438 - INFO - Cleaning up after 1 tasks.
+2025-03-25 16:16:53,439 - INFO - All tasks finished cancelling.
+2025-03-25 16:16:53,439 - INFO - Closing the event loop.
+2025-03-25 16:16:55,510 - INFO - logging in using static token
+2025-03-25 16:16:56,144 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 16:16:56,442 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-8s91",{"micros":154822,"calls":["id_created",{"micros":1076,"calls":[]},"session_lookup_time",{"micros":441,"calls":[]},"session_lookup_finished",{"micros":18,"calls":[]},"discord-sessions-prd-1-121",{"micros":152155,"calls":["start_session",{"micros":136204,"calls":["discord-api-rpc-56fc7c5545-tms9g",{"micros":126454,"calls":["get_user",{"micros":30740},"get_guilds",{"micros":8744},"send_scheduled_deletion_message",{"micros":10},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":1089}]}]},"starting_guild_connect",{"micros":57,"calls":[]},"presence_started",{"micros":272,"calls":[]},"guilds_started",{"micros":119,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":15478,"calls":[]},"connect_finished",{"micros":15482,"calls":[]},"build_ready",{"micros":16,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: b80d075347d3ef996e13eb2e0c6dc41a).
+2025-03-25 16:17:12,551 - INFO - Pending submissions updated: {1354111885686996992: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354111883472408647/1.png?ex=67e41a77&is=67e2c8f7&hm=ad602aea0e71fca17ca41e0e9db5808d0d6a9d6c7c85a73cb405e2684484f2e4&', 'original_msg_id': 1354111884063801394, 'prompt_id': 1354111885686996992, 'channel_id': 1354032257425342524}}
+2025-03-25 16:17:29,957 - INFO - Pending submissions before processing: {1354111885686996992: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354111883472408647/1.png?ex=67e41a77&is=67e2c8f7&hm=ad602aea0e71fca17ca41e0e9db5808d0d6a9d6c7c85a73cb405e2684484f2e4&', 'original_msg_id': 1354111884063801394, 'prompt_id': 1354111885686996992, 'channel_id': 1354032257425342524}}
+2025-03-25 16:17:29,957 - ERROR - No submission found for message 1354111885577814117
+2025-03-25 16:17:45,241 - INFO - Pending submissions before processing: {1354111885686996992: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354111883472408647/1.png?ex=67e41a77&is=67e2c8f7&hm=ad602aea0e71fca17ca41e0e9db5808d0d6a9d6c7c85a73cb405e2684484f2e4&', 'original_msg_id': 1354111884063801394, 'prompt_id': 1354111885686996992, 'channel_id': 1354032257425342524}}
+2025-03-25 16:17:45,242 - ERROR - No submission found for message 1354111884063801394
+2025-03-25 16:21:43,248 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 16:21:43,249 - INFO - Cleaning up tasks.
+2025-03-25 16:21:43,249 - INFO - Cleaning up after 1 tasks.
+2025-03-25 16:21:43,250 - INFO - All tasks finished cancelling.
+2025-03-25 16:21:43,250 - INFO - Closing the event loop.
+2025-03-25 16:21:45,820 - INFO - logging in using static token
+2025-03-25 16:21:46,847 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 16:21:47,092 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-rprs",{"micros":82908,"calls":["id_created",{"micros":1078,"calls":[]},"session_lookup_time",{"micros":2168,"calls":[]},"session_lookup_finished",{"micros":14,"calls":[]},"discord-sessions-prd-1-51",{"micros":78890,"calls":["start_session",{"micros":44395,"calls":["discord-api-rpc-56fc7c5545-trnx9",{"micros":36197,"calls":["get_user",{"micros":6961},"get_guilds",{"micros":3156},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":429}]}]},"starting_guild_connect",{"micros":40,"calls":[]},"presence_started",{"micros":13063,"calls":[]},"guilds_started",{"micros":137,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":21232,"calls":[]},"connect_finished",{"micros":21237,"calls":[]},"build_ready",{"micros":14,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: bab1cb64259e45d73eb31e2305036dd0).
+2025-03-25 16:22:07,329 - INFO - Pending submissions updated: {1354113122218016878: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354113120196628562/1.png?ex=67e41b9e&is=67e2ca1e&hm=deb910e4b4cfb0efc240a79574d9f25b21b17a68eb513dd0390c53ac9a3a925b&', 'original_msg_id': 1354113120498487327, 'prompt_id': 1354113122218016878, 'channel_id': 1354032257425342524}}
+2025-03-25 16:22:12,898 - INFO - Pending submissions before processing: {1354113122218016878: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354113120196628562/1.png?ex=67e41b9e&is=67e2ca1e&hm=deb910e4b4cfb0efc240a79574d9f25b21b17a68eb513dd0390c53ac9a3a925b&', 'original_msg_id': 1354113120498487327, 'prompt_id': 1354113122218016878, 'channel_id': 1354032257425342524}}
+2025-03-25 16:22:12,898 - ERROR - No submission found for message 1354113122675200020
+2025-03-25 16:22:23,802 - INFO - Pending submissions before processing: {1354113122218016878: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354113120196628562/1.png?ex=67e41b9e&is=67e2ca1e&hm=deb910e4b4cfb0efc240a79574d9f25b21b17a68eb513dd0390c53ac9a3a925b&', 'original_msg_id': 1354113120498487327, 'prompt_id': 1354113122218016878, 'channel_id': 1354032257425342524}}
+2025-03-25 16:22:23,802 - ERROR - No submission found for message 1354113120498487327
+2025-03-25 16:27:43,101 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 16:27:43,101 - INFO - Cleaning up tasks.
+2025-03-25 16:27:43,101 - INFO - Cleaning up after 1 tasks.
+2025-03-25 16:27:43,102 - INFO - All tasks finished cancelling.
+2025-03-25 16:27:43,103 - INFO - Closing the event loop.
+2025-03-25 16:36:42,290 - INFO - logging in using static token
+2025-03-25 16:36:42,925 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 16:36:43,186 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-vtsh",{"micros":130712,"calls":["id_created",{"micros":947,"calls":[]},"session_lookup_time",{"micros":329,"calls":[]},"session_lookup_finished",{"micros":20,"calls":[]},"discord-sessions-prd-1-79",{"micros":129162,"calls":["start_session",{"micros":115163,"calls":["discord-api-rpc-56fc7c5545-7nlxd",{"micros":101158,"calls":["get_user",{"micros":20148},"get_guilds",{"micros":5858},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":6},"pending_payments",{"micros":459}]}]},"starting_guild_connect",{"micros":46,"calls":[]},"presence_started",{"micros":9422,"calls":[]},"guilds_started",{"micros":162,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":4341,"calls":[]},"connect_finished",{"micros":4347,"calls":[]},"build_ready",{"micros":16,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: fa40b59ae937e46bf669f4b3768adc06).
+2025-03-25 16:37:15,592 - INFO - Pending submissions updated: {1354116932281962609: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354116930406977586/20250301_212538.jpg?ex=67e41f2a&is=67e2cdaa&hm=c7bc07c4fdb5cdb0625cd2c87f5aa9b5d14e9aaf415c9a6bfe2b7e7959ef588d&', 'original_msg_id': 1354116930591654020, 'prompt_id': 1354116932281962609, 'channel_id': 1354032257425342524}}
+2025-03-25 16:38:01,193 - INFO - Pending submissions before processing: {1354116932281962609: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354116930406977586/20250301_212538.jpg?ex=67e41f2a&is=67e2cdaa&hm=c7bc07c4fdb5cdb0625cd2c87f5aa9b5d14e9aaf415c9a6bfe2b7e7959ef588d&', 'original_msg_id': 1354116930591654020, 'prompt_id': 1354116932281962609, 'channel_id': 1354032257425342524}}
+2025-03-25 16:38:01,194 - ERROR - Metadata processing failed: table miniatures has no column named tags
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 147, in handle_metadata_reply
+    mini_storage.store_submission(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        user_id=submission['user_id'],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        tags=tags
+        ^^^^^^^^^
+    )
+    ^
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\mini_storage.py", line 47, in store_submission
+    c.execute('''
+    ~~~~~~~~~^^^^
+        INSERT INTO miniatures
+        ^^^^^^^^^^^^^^^^^^^^^^
+        (user_id, message_id, image_url, stl_name, bundle_name, tags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        VALUES (?, ?, ?, ?, ?, ?)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ''', (user_id, message_id, image_url, stl_name, bundle_name, tags))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: table miniatures has no column named tags
+2025-03-25 16:38:56,151 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 16:38:56,152 - INFO - Cleaning up tasks.
+2025-03-25 16:38:56,152 - INFO - Cleaning up after 1 tasks.
+2025-03-25 16:38:56,153 - INFO - All tasks finished cancelling.
+2025-03-25 16:38:56,153 - INFO - Closing the event loop.
+2025-03-25 16:38:58,687 - INFO - logging in using static token
+2025-03-25 16:38:59,274 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 16:38:59,535 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-f9cj",{"micros":109349,"calls":["id_created",{"micros":651,"calls":[]},"session_lookup_time",{"micros":7557,"calls":[]},"session_lookup_finished",{"micros":12,"calls":[]},"discord-sessions-prd-1-55",{"micros":100104,"calls":["start_session",{"micros":51013,"calls":["discord-api-rpc-56fc7c5545-jrpc6",{"micros":40774,"calls":["get_user",{"micros":6613},"get_guilds",{"micros":5545},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":439}]}]},"starting_guild_connect",{"micros":40,"calls":[]},"presence_started",{"micros":11309,"calls":[]},"guilds_started",{"micros":132,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":37567,"calls":[]},"connect_finished",{"micros":37574,"calls":[]},"build_ready",{"micros":31,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: ad9c76e59f216cbea69b068d5c8f438b).
+2025-03-25 16:39:09,943 - INFO - Pending submissions updated: {1354117411795898408: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354117409958531082/20250301_212538.jpg?ex=67e41f9c&is=67e2ce1c&hm=44757a7e894b6a35ce97a320be8e97ac26cc86dc009c491828c941b56e56a6ea&', 'original_msg_id': 1354117410013315143, 'prompt_id': 1354117411795898408, 'channel_id': 1354032257425342524}}
+2025-03-25 16:39:24,826 - INFO - Pending submissions before processing: {1354117411795898408: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354117409958531082/20250301_212538.jpg?ex=67e41f9c&is=67e2ce1c&hm=44757a7e894b6a35ce97a320be8e97ac26cc86dc009c491828c941b56e56a6ea&', 'original_msg_id': 1354117410013315143, 'prompt_id': 1354117411795898408, 'channel_id': 1354032257425342524}}
+2025-03-25 16:39:24,827 - ERROR - Metadata processing failed: table miniatures has no column named tags
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 147, in handle_metadata_reply
+    mini_storage.store_submission(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        user_id=submission['user_id'],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        tags=tags
+        ^^^^^^^^^
+    )
+    ^
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\mini_storage.py", line 47, in store_submission
+    c.execute('''
+    ~~~~~~~~~^^^^
+        INSERT INTO miniatures
+        ^^^^^^^^^^^^^^^^^^^^^^
+        (user_id, message_id, image_url, stl_name, bundle_name, tags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        VALUES (?, ?, ?, ?, ?, ?)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ''', (user_id, message_id, image_url, stl_name, bundle_name, tags))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: table miniatures has no column named tags
+2025-03-25 16:40:43,735 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 16:40:43,736 - INFO - Cleaning up tasks.
+2025-03-25 16:40:43,736 - INFO - Cleaning up after 1 tasks.
+2025-03-25 16:40:43,737 - INFO - All tasks finished cancelling.
+2025-03-25 16:40:43,737 - INFO - Closing the event loop.
+2025-03-25 16:41:02,844 - INFO - logging in using static token
+2025-03-25 16:41:03,496 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 16:41:03,791 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-pz6s",{"micros":127806,"calls":["id_created",{"micros":1141,"calls":[]},"session_lookup_time",{"micros":314,"calls":[]},"session_lookup_finished",{"micros":17,"calls":[]},"discord-sessions-prd-1-292",{"micros":125991,"calls":["start_session",{"micros":77009,"calls":["discord-api-rpc-56fc7c5545-fmk8m",{"micros":46743,"calls":["get_user",{"micros":8718},"get_guilds",{"micros":4735},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":1874}]}]},"starting_guild_connect",{"micros":42,"calls":[]},"presence_started",{"micros":33874,"calls":[]},"guilds_started",{"micros":141,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":14892,"calls":[]},"connect_finished",{"micros":14898,"calls":[]},"build_ready",{"micros":22,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 10cff6f1b3e78eab013a4581397b0363).
+2025-03-25 16:41:21,028 - INFO - Pending submissions updated: {1354117961857892362: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354117960070987878/20250301_212538.jpg?ex=67e4201f&is=67e2ce9f&hm=54e1c6d420225708fe23109b401e88933bec44599b9161a9d9c977f21254d1f5&', 'original_msg_id': 1354117960414924800, 'prompt_id': 1354117961857892362, 'channel_id': 1354032257425342524}}
+2025-03-25 16:41:23,972 - INFO - Pending submissions before processing: {1354117961857892362: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354117960070987878/20250301_212538.jpg?ex=67e4201f&is=67e2ce9f&hm=54e1c6d420225708fe23109b401e88933bec44599b9161a9d9c977f21254d1f5&', 'original_msg_id': 1354117960414924800, 'prompt_id': 1354117961857892362, 'channel_id': 1354032257425342524}}
+2025-03-25 16:41:23,973 - ERROR - Metadata processing failed: table miniatures has no column named tags
+Traceback (most recent call last):
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\Mini_Goblin.py", line 147, in handle_metadata_reply
+    mini_storage.store_submission(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        user_id=submission['user_id'],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        tags=tags
+        ^^^^^^^^^
+    )
+    ^
+  File "c:\Users\kiann\AppData\Local\Programs\Python\Python313\Scripts\Discord-Mini-Bot\mini_storage.py", line 47, in store_submission
+    c.execute('''
+    ~~~~~~~~~^^^^
+        INSERT INTO miniatures
+        ^^^^^^^^^^^^^^^^^^^^^^
+        (user_id, message_id, image_url, stl_name, bundle_name, tags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        VALUES (?, ?, ?, ?, ?, ?)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ''', (user_id, message_id, image_url, stl_name, bundle_name, tags))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: table miniatures has no column named tags
+2025-03-25 16:42:57,447 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 16:42:57,447 - INFO - Cleaning up tasks.
+2025-03-25 16:42:57,448 - INFO - Cleaning up after 1 tasks.
+2025-03-25 16:42:57,449 - INFO - All tasks finished cancelling.
+2025-03-25 16:42:57,449 - INFO - Closing the event loop.
+2025-03-25 17:26:37,009 - INFO - logging in using static token
+2025-03-25 17:26:37,632 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 17:26:37,903 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-bvjm",{"micros":143086,"calls":["id_created",{"micros":1261,"calls":[]},"session_lookup_time",{"micros":520,"calls":[]},"session_lookup_finished",{"micros":19,"calls":[]},"discord-sessions-prd-1-8",{"micros":140690,"calls":["start_session",{"micros":118176,"calls":["discord-api-prd-canary-rpc-6c4988d885-gzb9h",{"micros":89303,"calls":["get_user",{"micros":19742},"get_guilds",{"micros":31229},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":7},"pending_payments",{"micros":1409}]}]},"starting_guild_connect",{"micros":35,"calls":[]},"presence_started",{"micros":4443,"calls":[]},"guilds_started",{"micros":141,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":17854,"calls":[]},"connect_finished",{"micros":17861,"calls":[]},"build_ready",{"micros":28,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: cb48fa223df2825ea349cfeac1326bec).
+2025-03-25 17:28:50,965 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 17:28:50,965 - INFO - Cleaning up tasks.
+2025-03-25 17:28:50,966 - INFO - Cleaning up after 1 tasks.
+2025-03-25 17:28:50,966 - INFO - All tasks finished cancelling.
+2025-03-25 17:28:50,967 - INFO - Closing the event loop.
+2025-03-25 17:59:41,046 - INFO - logging in using static token
+2025-03-25 17:59:41,637 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 17:59:41,862 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-zm9v",{"micros":93369,"calls":["id_created",{"micros":1322,"calls":[]},"session_lookup_time",{"micros":9023,"calls":[]},"session_lookup_finished",{"micros":27,"calls":[]},"discord-sessions-prd-1-184",{"micros":82438,"calls":["start_session",{"micros":43864,"calls":["discord-api-rpc-7b5b6d7cb4-5p958",{"micros":36109,"calls":["get_user",{"micros":6039},"get_guilds",{"micros":2957},"send_scheduled_deletion_message",{"micros":8},"guild_join_requests",{"micros":874},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":388}]}]},"starting_guild_connect",{"micros":35,"calls":[]},"presence_started",{"micros":20032,"calls":[]},"guilds_started",{"micros":130,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":18350,"calls":[]},"connect_finished",{"micros":18356,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 9d6eb246ef60f27975e35ed1c9c32a2b).
+2025-03-25 18:00:24,260 - INFO - Pending submissions updated: {1354137857681395782: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354137855848353864/1.png?ex=67e432a7&is=67e2e127&hm=57cfa417efe52501457ee9069ef07e7967c52348dcd95781a970f1044ab766c5&', 'original_msg_id': 1354137856225968338, 'prompt_id': 1354137857681395782, 'channel_id': 1354032257425342524}}
+2025-03-25 18:01:01,914 - INFO - Pending submissions before processing: {1354137857681395782: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354137855848353864/1.png?ex=67e432a7&is=67e2e127&hm=57cfa417efe52501457ee9069ef07e7967c52348dcd95781a970f1044ab766c5&', 'original_msg_id': 1354137856225968338, 'prompt_id': 1354137857681395782, 'channel_id': 1354032257425342524}}
+2025-03-25 18:02:43,655 - INFO - Pending submissions updated: {1354138442434482247: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354138440379269120/1.png?ex=67e43332&is=67e2e1b2&hm=3a6a500e12ce8389efb8aed16bf5073b5a045dfba7f2b72b27829c46053e4557&', 'original_msg_id': 1354138440798830636, 'prompt_id': 1354138442434482247, 'channel_id': 1354032257425342524}}
+2025-03-25 18:03:10,977 - INFO - Pending submissions before processing: {1354138442434482247: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354138440379269120/1.png?ex=67e43332&is=67e2e1b2&hm=3a6a500e12ce8389efb8aed16bf5073b5a045dfba7f2b72b27829c46053e4557&', 'original_msg_id': 1354138440798830636, 'prompt_id': 1354138442434482247, 'channel_id': 1354032257425342524}}
+2025-03-25 18:18:07,705 - INFO - Timed out receiving packet. Attempting a reconnect.
+2025-03-25 18:18:07,706 - INFO - Got a request to RESUME the websocket.
+2025-03-25 18:18:08,553 - INFO - Shard ID None has sent the RESUME payload.
+2025-03-25 18:18:08,705 - INFO - Shard ID None session has been invalidated.
+2025-03-25 18:18:08,839 - INFO - Got a request to IDENTIFY the websocket.
+2025-03-25 18:18:14,249 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 18:18:15,482 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-vs26",{"micros":1103096,"calls":["id_created",{"micros":800,"calls":[]},"session_lookup_time",{"micros":306,"calls":[]},"session_lookup_finished",{"micros":17,"calls":[]},"discord-sessions-prd-1-60",{"micros":1100992,"calls":["start_session",{"micros":1085101,"calls":["discord-api-rpc-7b5b6d7cb4-kxx7v",{"micros":59539,"calls":["get_user",{"micros":21395},"get_guilds",{"micros":3847},"send_scheduled_deletion_message",{"micros":5},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":416}]}]},"starting_guild_connect",{"micros":39,"calls":[]},"presence_started",{"micros":4596,"calls":[]},"guilds_started",{"micros":141,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":11092,"calls":[]},"connect_finished",{"micros":11096,"calls":[]},"build_ready",{"micros":16,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 4ed5d502646edeb74ea3437a57557320).
+2025-03-25 18:27:26,813 - INFO - Timed out receiving packet. Attempting a reconnect.
+2025-03-25 18:27:26,814 - INFO - Got a request to RESUME the websocket.
+2025-03-25 18:27:27,851 - INFO - Shard ID None has sent the RESUME payload.
+2025-03-25 18:27:28,141 - INFO - Shard ID None session has been invalidated.
+2025-03-25 18:27:28,366 - INFO - Got a request to IDENTIFY the websocket.
+2025-03-25 18:27:33,939 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 18:27:34,432 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-b3dg",{"micros":244220,"calls":["id_created",{"micros":1067,"calls":[]},"session_lookup_time",{"micros":851,"calls":[]},"session_lookup_finished",{"micros":8,"calls":[]},"discord-sessions-prd-1-158",{"micros":242040,"calls":["start_session",{"micros":235777,"calls":["discord-api-rpc-7b5b6d7cb4-5zdm7",{"micros":187633,"calls":["get_user",{"micros":16727},"get_guilds",{"micros":28634},"send_scheduled_deletion_message",{"micros":8},"guild_join_requests",{"micros":427},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":29942}]}]},"starting_guild_connect",{"micros":52,"calls":[]},"presence_started",{"micros":338,"calls":[]},"guilds_started",{"micros":130,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":5712,"calls":[]},"connect_finished",{"micros":5718,"calls":[]},"build_ready",{"micros":21,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 79e16f5b0a41c44c1e1d8bb7ecd3b880).
+2025-03-25 18:35:32,749 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 18:35:32,751 - INFO - Cleaning up tasks.
+2025-03-25 18:35:32,751 - INFO - Cleaning up after 1 tasks.
+2025-03-25 18:35:32,753 - INFO - All tasks finished cancelling.
+2025-03-25 18:35:32,754 - INFO - Closing the event loop.
+2025-03-25 18:35:35,794 - INFO - logging in using static token
+2025-03-25 18:35:36,388 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 18:35:36,578 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-n0ps",{"micros":62710,"calls":["id_created",{"micros":935,"calls":[]},"session_lookup_time",{"micros":239,"calls":[]},"session_lookup_finished",{"micros":20,"calls":[]},"discord-sessions-prd-1-316",{"micros":61255,"calls":["start_session",{"micros":46752,"calls":["discord-api-rpc-7b5b6d7cb4-n82sl",{"micros":35545,"calls":["get_user",{"micros":5472},"get_guilds",{"micros":4135},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":359}]}]},"starting_guild_connect",{"micros":34,"calls":[]},"presence_started",{"micros":7095,"calls":[]},"guilds_started",{"micros":129,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":7213,"calls":[]},"connect_finished",{"micros":7219,"calls":[]},"build_ready",{"micros":21,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 6a0a6a082dc610c1b25f40044133f553).
+2025-03-25 18:39:55,773 - INFO - Websocket closed with 1006, attempting a reconnect.
+2025-03-25 18:39:55,774 - INFO - Got a request to RESUME the websocket.
+2025-03-25 18:39:56,598 - INFO - Shard ID None has sent the RESUME payload.
+2025-03-25 18:39:56,755 - INFO - Shard ID None has successfully RESUMED session 6a0a6a082dc610c1b25f40044133f553 under trace ["gateway-prd-us-east1-d-t6g7",{"micros":561,"calls":["id_created",{"micros":0,"calls":[]},"session_lookup_time",{"micros":279,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-316",{"micros":27}]}].
+2025-03-25 18:40:39,807 - INFO - Pending submissions updated: {1354147987378667673: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032258075590707/1354147964406468719/1.png?ex=67e43c11&is=67e2ea91&hm=f5998906e33eaa84f1943e02a71414da13a11ad41f35982df992cb1dd2e71c19&', 'original_msg_id': 1354147964540551302, 'prompt_id': 1354147987378667673, 'channel_id': 1354032258075590707}}
+2025-03-25 18:41:18,185 - INFO - Pending submissions before processing: {1354147987378667673: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032258075590707/1354147964406468719/1.png?ex=67e43c11&is=67e2ea91&hm=f5998906e33eaa84f1943e02a71414da13a11ad41f35982df992cb1dd2e71c19&', 'original_msg_id': 1354147964540551302, 'prompt_id': 1354147987378667673, 'channel_id': 1354032258075590707}}
+2025-03-25 18:45:23,685 - INFO - Timed out receiving packet. Attempting a reconnect.
+2025-03-25 18:45:23,685 - INFO - Got a request to RESUME the websocket.
+2025-03-25 18:45:24,762 - INFO - Shard ID None has sent the RESUME payload.
+2025-03-25 18:45:24,912 - INFO - Shard ID None has successfully RESUMED session 6a0a6a082dc610c1b25f40044133f553 under trace ["gateway-prd-us-east1-b-4bmz",{"micros":4596,"calls":["id_created",{"micros":0,"calls":[]},"session_lookup_time",{"micros":4349,"calls":[]},"session_lookup_finished",{"micros":11,"calls":[]},"discord-sessions-prd-1-316",{"micros":26}]}].
+2025-03-25 18:46:53,179 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 18:46:53,180 - INFO - Cleaning up tasks.
+2025-03-25 18:46:53,180 - INFO - Cleaning up after 1 tasks.
+2025-03-25 18:46:53,181 - INFO - All tasks finished cancelling.
+2025-03-25 18:46:53,182 - INFO - Closing the event loop.
+2025-03-25 18:46:55,675 - INFO - logging in using static token
+2025-03-25 18:46:56,501 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 18:46:56,833 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-rt9l",{"micros":117920,"calls":["id_created",{"micros":1342,"calls":[]},"session_lookup_time",{"micros":1182,"calls":[]},"session_lookup_finished",{"micros":19,"calls":[]},"discord-sessions-prd-1-128",{"micros":115047,"calls":["start_session",{"micros":96760,"calls":["discord-api-rpc-7b5b6d7cb4-z4v27",{"micros":81841,"calls":["get_user",{"micros":6908},"get_guilds",{"micros":3647},"send_scheduled_deletion_message",{"micros":5},"guild_join_requests",{"micros":304},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":5210}]}]},"starting_guild_connect",{"micros":88,"calls":[]},"presence_started",{"micros":7285,"calls":[]},"guilds_started",{"micros":69,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":10810,"calls":[]},"connect_finished",{"micros":10816,"calls":[]},"build_ready",{"micros":25,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: f04d79d9df4b6c770335e67a80fb8607).
+2025-03-25 18:47:12,236 - INFO - Pending submissions updated: {1354149635333161021: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354149633634336790/1.png?ex=67e43d9f&is=67e2ec1f&hm=b464d5108b3af7dfb22b959e5dbf41c71e9a8cd51aa8bce3cc2c12cabbeac9f4&', 'original_msg_id': 1354149634020216863, 'prompt_id': 1354149635333161021, 'channel_id': 1354032257425342524}}
+2025-03-25 18:47:56,156 - INFO - Pending submissions before processing: {1354149635333161021: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354149633634336790/1.png?ex=67e43d9f&is=67e2ec1f&hm=b464d5108b3af7dfb22b959e5dbf41c71e9a8cd51aa8bce3cc2c12cabbeac9f4&', 'original_msg_id': 1354149634020216863, 'prompt_id': 1354149635333161021, 'channel_id': 1354032257425342524}}
+2025-03-25 18:48:40,948 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 18:48:40,949 - INFO - Cleaning up tasks.
+2025-03-25 18:48:40,949 - INFO - Cleaning up after 1 tasks.
+2025-03-25 18:48:40,950 - INFO - All tasks finished cancelling.
+2025-03-25 18:48:40,950 - INFO - Closing the event loop.
+2025-03-25 18:48:42,639 - INFO - logging in using static token
+2025-03-25 18:48:44,340 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 18:48:44,717 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-t2nr",{"micros":170943,"calls":["id_created",{"micros":1584,"calls":[]},"session_lookup_time",{"micros":2548,"calls":[]},"session_lookup_finished",{"micros":21,"calls":[]},"discord-sessions-prd-1-313",{"micros":165991,"calls":["start_session",{"micros":144823,"calls":["discord-api-rpc-7b5b6d7cb4-xds5v",{"micros":134467,"calls":["get_user",{"micros":14280},"get_guilds",{"micros":5437},"send_scheduled_deletion_message",{"micros":5},"guild_join_requests",{"micros":509},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":591}]}]},"starting_guild_connect",{"micros":129,"calls":[]},"presence_started",{"micros":573,"calls":[]},"guilds_started",{"micros":96,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":20344,"calls":[]},"connect_finished",{"micros":20349,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: b0e0e1143cd32f660d27c22c8ed44af6).
+2025-03-25 18:48:58,590 - INFO - Pending submissions updated: {1354150080872976404: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354150078973214761/1.png?ex=67e43e09&is=67e2ec89&hm=f512161d2a100c0b7d2ced45e235de19d3c9697a728a20efb053f7bdeefcf666&', 'original_msg_id': 1354150079283597333, 'prompt_id': 1354150080872976404, 'channel_id': 1354032257425342524}}
+2025-03-25 18:49:32,760 - INFO - Pending submissions before processing: {1354150080872976404: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354150078973214761/1.png?ex=67e43e09&is=67e2ec89&hm=f512161d2a100c0b7d2ced45e235de19d3c9697a728a20efb053f7bdeefcf666&', 'original_msg_id': 1354150079283597333, 'prompt_id': 1354150080872976404, 'channel_id': 1354032257425342524}}
+2025-03-25 18:54:11,332 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 18:54:11,332 - INFO - Cleaning up tasks.
+2025-03-25 18:54:11,333 - INFO - Cleaning up after 1 tasks.
+2025-03-25 18:54:11,333 - INFO - All tasks finished cancelling.
+2025-03-25 18:54:11,334 - INFO - Closing the event loop.
+2025-03-25 18:54:13,055 - INFO - logging in using static token
+2025-03-25 18:54:13,963 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-25 18:54:14,263 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-1bsw",{"micros":87906,"calls":["id_created",{"micros":1600,"calls":[]},"session_lookup_time",{"micros":307,"calls":[]},"session_lookup_finished",{"micros":17,"calls":[]},"discord-sessions-prd-1-141",{"micros":85630,"calls":["start_session",{"micros":67266,"calls":["discord-api-rpc-7b5b6d7cb4-975n7",{"micros":56857,"calls":["get_user",{"micros":5555},"get_guilds",{"micros":5810},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":16},"pending_payments",{"micros":595}]}]},"starting_guild_connect",{"micros":42,"calls":[]},"presence_started",{"micros":317,"calls":[]},"guilds_started",{"micros":78,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":17873,"calls":[]},"connect_finished",{"micros":17879,"calls":[]},"build_ready",{"micros":20,"calls":[]},"clean_ready",{"micros":23,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 6637b271e688af933543e087620d8386).
+2025-03-25 18:54:30,910 - INFO - Pending submissions updated: {1354151474908889120: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354151472635314360/1.png?ex=67e43f55&is=67e2edd5&hm=bd75aeb70fff4c29a16f336cf3432cebc44834035759725996c6d22d628349ed&', 'original_msg_id': 1354151472874651722, 'prompt_id': 1354151474908889120, 'channel_id': 1354032257425342524}}
+2025-03-25 18:54:51,778 - INFO - Pending submissions before processing: {1354151474908889120: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354151472635314360/1.png?ex=67e43f55&is=67e2edd5&hm=bd75aeb70fff4c29a16f336cf3432cebc44834035759725996c6d22d628349ed&', 'original_msg_id': 1354151472874651722, 'prompt_id': 1354151474908889120, 'channel_id': 1354032257425342524}}
+2025-03-25 18:57:11,376 - INFO - Pending submissions updated: {1354152148207669349: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354152146018500748/2.png?ex=67e43ff6&is=67e2ee76&hm=8866c540cf082e44937cdbf9fb099c299951cf5658895322f16bbecfbfc98d3b&', 'original_msg_id': 1354152146206982299, 'prompt_id': 1354152148207669349, 'channel_id': 1354032257425342524}}
+2025-03-25 18:57:32,776 - INFO - Pending submissions before processing: {1354152148207669349: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354152146018500748/2.png?ex=67e43ff6&is=67e2ee76&hm=8866c540cf082e44937cdbf9fb099c299951cf5658895322f16bbecfbfc98d3b&', 'original_msg_id': 1354152146206982299, 'prompt_id': 1354152148207669349, 'channel_id': 1354032257425342524}}
+2025-03-25 19:01:41,754 - INFO - Received signal to terminate bot and event loop.
+2025-03-25 19:01:41,754 - INFO - Cleaning up tasks.
+2025-03-25 19:01:41,754 - INFO - Cleaning up after 1 tasks.
+2025-03-25 19:01:41,755 - INFO - All tasks finished cancelling.
+2025-03-25 19:01:41,756 - INFO - Closing the event loop.
+2025-03-26 07:57:39,977 - INFO - logging in using static token
+2025-03-26 07:57:40,892 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 07:57:41,224 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-w3tg",{"micros":121167,"calls":["id_created",{"micros":923,"calls":[]},"session_lookup_time",{"micros":3434,"calls":[]},"session_lookup_finished",{"micros":12,"calls":[]},"discord-sessions-prd-1-157",{"micros":116433,"calls":["start_session",{"micros":73173,"calls":["discord-api-rpc-6bdd7c786d-5ljfn",{"micros":62298,"calls":["get_user",{"micros":9447},"get_guilds",{"micros":4111},"send_scheduled_deletion_message",{"micros":9},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":11},"pending_payments",{"micros":508}]}]},"starting_guild_connect",{"micros":71,"calls":[]},"presence_started",{"micros":329,"calls":[]},"guilds_started",{"micros":78,"calls":[]},"lobbies_started",{"micros":0,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":42740,"calls":[]},"connect_finished",{"micros":42745,"calls":[]},"build_ready",{"micros":34,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: d8517899c67dfe4d1626285e741a335f).
+2025-03-26 07:57:58,219 - INFO - Pending submissions before processing: {}
+2025-03-26 07:57:58,220 - ERROR - No submission found for message 1354152490857402428
+2025-03-26 07:58:08,525 - INFO - Pending submissions before processing: {}
+2025-03-26 07:58:08,526 - ERROR - No submission found for message 1354152146206982299
+2025-03-26 08:01:21,859 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:01:21,859 - INFO - Cleaning up tasks.
+2025-03-26 08:01:21,859 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:01:21,862 - INFO - All tasks finished cancelling.
+2025-03-26 08:01:21,862 - INFO - Closing the event loop.
+2025-03-26 08:01:44,949 - INFO - logging in using static token
+2025-03-26 08:01:45,618 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:01:45,844 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-x2m7",{"micros":96530,"calls":["id_created",{"micros":798,"calls":[]},"session_lookup_time",{"micros":290,"calls":[]},"session_lookup_finished",{"micros":15,"calls":[]},"discord-sessions-prd-1-296",{"micros":95151,"calls":["start_session",{"micros":46613,"calls":["discord-api-rpc-6bdd7c786d-h6598",{"micros":39737,"calls":["get_user",{"micros":4767},"get_guilds",{"micros":5190},"send_scheduled_deletion_message",{"micros":8},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":7},"pending_payments",{"micros":431}]}]},"starting_guild_connect",{"micros":79,"calls":[]},"presence_started",{"micros":3929,"calls":[]},"guilds_started",{"micros":88,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":44396,"calls":[]},"connect_finished",{"micros":44402,"calls":[]},"build_ready",{"micros":37,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 28a0c1cae7e554c23cc0533cd637174c).
+2025-03-26 08:01:50,801 - INFO - Pending submissions before processing: {}
+2025-03-26 08:01:50,801 - ERROR - No submission found for message 1354348722959683636
+2025-03-26 08:02:00,976 - INFO - Pending submissions before processing: {}
+2025-03-26 08:02:00,977 - ERROR - No submission found for message 1354152146206982299
+2025-03-26 08:06:58,412 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:06:58,412 - INFO - Cleaning up tasks.
+2025-03-26 08:06:58,413 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:06:58,414 - INFO - All tasks finished cancelling.
+2025-03-26 08:06:58,414 - INFO - Closing the event loop.
+2025-03-26 08:07:27,147 - INFO - logging in using static token
+2025-03-26 08:07:28,040 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:07:28,368 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-ksbj",{"micros":109998,"calls":["id_created",{"micros":495,"calls":[]},"session_lookup_time",{"micros":328,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-293",{"micros":108836,"calls":["start_session",{"micros":91151,"calls":["discord-api-rpc-6bdd7c786d-lzrzw",{"micros":83599,"calls":["get_user",{"micros":13360},"get_guilds",{"micros":21570},"send_scheduled_deletion_message",{"micros":15},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":5},"pending_payments",{"micros":663}]}]},"starting_guild_connect",{"micros":70,"calls":[]},"presence_started",{"micros":4496,"calls":[]},"guilds_started",{"micros":92,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":13003,"calls":[]},"connect_finished",{"micros":13009,"calls":[]},"build_ready",{"micros":14,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 639d86294027cf663c7d4830644d8b68).
+2025-03-26 08:07:37,165 - INFO - Pending submissions before processing: {}
+2025-03-26 08:07:37,166 - ERROR - No submission found for message 1354349741835812917
+2025-03-26 08:08:18,429 - INFO - Pending submissions before processing: {}
+2025-03-26 08:08:18,429 - ERROR - No submission found for message 1354121710734934197
+2025-03-26 08:08:35,045 - INFO - Pending submissions before processing: {}
+2025-03-26 08:08:35,045 - ERROR - No submission found for message 1354121651708493894
+2025-03-26 08:08:44,584 - INFO - Pending submissions before processing: {}
+2025-03-26 08:08:44,585 - ERROR - No submission found for message 1354121123675242676
+2025-03-26 08:08:53,679 - INFO - Pending submissions before processing: {}
+2025-03-26 08:08:53,679 - ERROR - No submission found for message 1354120884868354099
+2025-03-26 08:09:04,994 - INFO - Pending submissions before processing: {}
+2025-03-26 08:09:04,995 - ERROR - No submission found for message 1354116930591654020
+2025-03-26 08:09:43,668 - INFO - Pending submissions updated: {1354351594392780892: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354351592505344112/46059659-d683-46b7-9742-4743c207e3ee.jpg?ex=67e4f9b6&is=67e3a836&hm=83064d333f5b783a5d218ce7a5fda27b12c2ecacb6803044a8f9adc101d5f1f1&', 'original_msg_id': 1354351592958201866, 'prompt_id': 1354351594392780892, 'channel_id': 1354032257425342524}}
+2025-03-26 08:10:03,605 - INFO - Pending submissions before processing: {1354351594392780892: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354351592505344112/46059659-d683-46b7-9742-4743c207e3ee.jpg?ex=67e4f9b6&is=67e3a836&hm=83064d333f5b783a5d218ce7a5fda27b12c2ecacb6803044a8f9adc101d5f1f1&', 'original_msg_id': 1354351592958201866, 'prompt_id': 1354351594392780892, 'channel_id': 1354032257425342524}}
+2025-03-26 08:10:31,810 - INFO - Pending submissions before processing: {}
+2025-03-26 08:10:31,811 - ERROR - No submission found for message 1354351592958201866
+2025-03-26 08:14:55,580 - INFO - Pending submissions before processing: {}
+2025-03-26 08:14:55,581 - ERROR - No submission found for message 1354349741835812917
+2025-03-26 08:17:35,152 - INFO - Pending submissions updated: {1354353572472426639: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354353570140389396/46059659-d683-46b7-9742-4743c207e3ee.jpg?ex=67e4fb8d&is=67e3aa0d&hm=d9d61506da6e0443fb600fa0c487317b4237263a246ff7f03d967deb43c2bff1&', 'original_msg_id': 1354353570115489833, 'prompt_id': 1354353572472426639, 'channel_id': 1354032257425342524}}
+2025-03-26 08:17:54,059 - INFO - Pending submissions before processing: {1354353572472426639: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354353570140389396/46059659-d683-46b7-9742-4743c207e3ee.jpg?ex=67e4fb8d&is=67e3aa0d&hm=d9d61506da6e0443fb600fa0c487317b4237263a246ff7f03d967deb43c2bff1&', 'original_msg_id': 1354353570115489833, 'prompt_id': 1354353572472426639, 'channel_id': 1354032257425342524}}
+2025-03-26 08:27:46,519 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:27:46,520 - INFO - Cleaning up tasks.
+2025-03-26 08:27:46,520 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:27:46,521 - INFO - All tasks finished cancelling.
+2025-03-26 08:27:46,521 - INFO - Closing the event loop.
+2025-03-26 08:27:47,752 - INFO - logging in using static token
+2025-03-26 08:27:48,603 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:27:48,969 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-g595",{"micros":151773,"calls":["id_created",{"micros":650,"calls":[]},"session_lookup_time",{"micros":4271,"calls":[]},"session_lookup_finished",{"micros":18,"calls":[]},"discord-sessions-prd-1-141",{"micros":145575,"calls":["start_session",{"micros":101693,"calls":["discord-api-rpc-6bdd7c786d-gplqm",{"micros":71826,"calls":["get_user",{"micros":8628},"get_guilds",{"micros":3874},"send_scheduled_deletion_message",{"micros":4},"guild_join_requests",{"micros":2147},"authorized_ip_coro",{"micros":6},"pending_payments",{"micros":2473}]}]},"starting_guild_connect",{"micros":77,"calls":[]},"presence_started",{"micros":244,"calls":[]},"guilds_started",{"micros":71,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":43435,"calls":[]},"connect_finished",{"micros":43442,"calls":[]},"build_ready",{"micros":43,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 4d2db8cf18954526171c0851692a31e4).
+2025-03-26 08:28:00,525 - INFO - Pending submissions before processing: {}
+2025-03-26 08:28:00,526 - ERROR - No submission found for message 1354353777519362130
+2025-03-26 08:35:24,733 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:35:24,734 - INFO - Cleaning up tasks.
+2025-03-26 08:35:24,734 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:35:24,735 - INFO - All tasks finished cancelling.
+2025-03-26 08:35:24,735 - INFO - Closing the event loop.
+2025-03-26 08:35:25,992 - INFO - logging in using static token
+2025-03-26 08:35:26,627 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:35:26,936 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-ps0x",{"micros":178357,"calls":["id_created",{"micros":972,"calls":[]},"session_lookup_time",{"micros":1959,"calls":[]},"session_lookup_finished",{"micros":19,"calls":[]},"discord-sessions-prd-1-235",{"micros":175109,"calls":["start_session",{"micros":163698,"calls":["discord-api-rpc-6bdd7c786d-wbl6p",{"micros":154979,"calls":["get_user",{"micros":25202},"get_guilds",{"micros":19077},"send_scheduled_deletion_message",{"micros":11},"guild_join_requests",{"micros":2},"authorized_ip_coro",{"micros":11},"pending_payments",{"micros":499}]}]},"starting_guild_connect",{"micros":95,"calls":[]},"presence_started",{"micros":254,"calls":[]},"guilds_started",{"micros":93,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":10902,"calls":[]},"connect_finished",{"micros":10907,"calls":[]},"build_ready",{"micros":54,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 68d54cb46992cb45970c7d16bf406770).
+2025-03-26 08:36:57,584 - INFO - Pending submissions before processing: {}
+2025-03-26 08:36:57,585 - ERROR - No submission found for message 1354353777519362130
+2025-03-26 08:37:32,607 - INFO - Pending submissions before processing: {}
+2025-03-26 08:37:32,608 - ERROR - No submission found for message 1354353777519362130
+2025-03-26 08:37:47,570 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:37:47,570 - INFO - Cleaning up tasks.
+2025-03-26 08:37:47,571 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:37:47,571 - INFO - All tasks finished cancelling.
+2025-03-26 08:37:47,571 - INFO - Closing the event loop.
+2025-03-26 08:37:48,749 - INFO - logging in using static token
+2025-03-26 08:37:49,390 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:37:49,654 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-sst5",{"micros":136524,"calls":["id_created",{"micros":784,"calls":[]},"session_lookup_time",{"micros":253,"calls":[]},"session_lookup_finished",{"micros":12,"calls":[]},"discord-sessions-prd-1-130",{"micros":135157,"calls":["start_session",{"micros":100060,"calls":["discord-api-rpc-6bdd7c786d-bltq4",{"micros":85161,"calls":["get_user",{"micros":12773},"get_guilds",{"micros":7976},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":560}]}]},"starting_guild_connect",{"micros":59,"calls":[]},"presence_started",{"micros":8039,"calls":[]},"guilds_started",{"micros":84,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":26893,"calls":[]},"connect_finished",{"micros":26899,"calls":[]},"build_ready",{"micros":13,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 648de89967b1fd717d8a8e42ae211c60).
+2025-03-26 08:37:55,264 - INFO - Pending submissions before processing: {}
+2025-03-26 08:37:55,265 - ERROR - No submission found for message 1354353777519362130
+2025-03-26 08:38:44,375 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:38:44,375 - INFO - Cleaning up tasks.
+2025-03-26 08:38:44,376 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:38:44,377 - INFO - All tasks finished cancelling.
+2025-03-26 08:38:44,377 - INFO - Closing the event loop.
+2025-03-26 08:38:45,550 - INFO - logging in using static token
+2025-03-26 08:38:46,181 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:38:46,479 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-htnn",{"micros":165390,"calls":["id_created",{"micros":776,"calls":[]},"session_lookup_time",{"micros":9728,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-300",{"micros":154576,"calls":["start_session",{"micros":105799,"calls":["discord-api-rpc-6bdd7c786d-2dknz",{"micros":87360,"calls":["get_user",{"micros":30010},"get_guilds",{"micros":5811},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":2529}]}]},"starting_guild_connect",{"micros":77,"calls":[]},"presence_started",{"micros":203,"calls":[]},"guilds_started",{"micros":74,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":48365,"calls":[]},"connect_finished",{"micros":48370,"calls":[]},"build_ready",{"micros":48,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: f36242ffca0294d0f3123d4fa45edc09).
+2025-03-26 08:38:51,248 - INFO - Pending submissions before processing: {}
+2025-03-26 08:38:51,248 - ERROR - No submission found for message 1354353777519362130
+2025-03-26 08:38:51,572 - ERROR - Error deleting message: cannot access local variable 'referenced_message' where it is not associated with a value
+2025-03-26 08:40:23,453 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:40:23,454 - INFO - Cleaning up tasks.
+2025-03-26 08:40:23,454 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:40:23,455 - INFO - All tasks finished cancelling.
+2025-03-26 08:40:23,456 - INFO - Closing the event loop.
+2025-03-26 08:40:24,510 - INFO - logging in using static token
+2025-03-26 08:40:25,414 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:40:25,698 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-4ljp",{"micros":53740,"calls":["id_created",{"micros":885,"calls":[]},"session_lookup_time",{"micros":291,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-29",{"micros":52234,"calls":["start_session",{"micros":43434,"calls":["discord-api-rpc-6bdd7c786d-7mn6w",{"micros":36443,"calls":["get_user",{"micros":4986},"get_guilds",{"micros":2891},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":841},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":420}]}]},"starting_guild_connect",{"micros":75,"calls":[]},"presence_started",{"micros":394,"calls":[]},"guilds_started",{"micros":70,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":8212,"calls":[]},"connect_finished",{"micros":8218,"calls":[]},"build_ready",{"micros":39,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: fa7ea1bbf7f150880a5b27fc524ff83a).
+2025-03-26 08:40:30,359 - INFO - Pending submissions before processing: {}
+2025-03-26 08:40:30,360 - ERROR - No submission found for message 1354353777519362130
+2025-03-26 08:42:14,211 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:42:14,211 - INFO - Cleaning up tasks.
+2025-03-26 08:42:14,212 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:42:14,212 - INFO - All tasks finished cancelling.
+2025-03-26 08:42:14,213 - INFO - Closing the event loop.
+2025-03-26 08:42:15,255 - INFO - logging in using static token
+2025-03-26 08:42:16,125 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:42:16,495 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-25lz",{"micros":156707,"calls":["id_created",{"micros":804,"calls":[]},"session_lookup_time",{"micros":359,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-77",{"micros":153012,"calls":["start_session",{"micros":79900,"calls":["discord-api-rpc-6bdd7c786d-2qkxm",{"micros":67778,"calls":["get_user",{"micros":5056},"get_guilds",{"micros":3423},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":398},"authorized_ip_coro",{"micros":5},"pending_payments",{"micros":2536}]}]},"starting_guild_connect",{"micros":113,"calls":[]},"presence_started",{"micros":46675,"calls":[]},"guilds_started",{"micros":104,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":26173,"calls":[]},"connect_finished",{"micros":26177,"calls":[]},"build_ready",{"micros":39,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: f2dc7d0f69cbe4d681ef1a98cc949f0c).
+2025-03-26 08:42:30,145 - ERROR - Show command failed: too many values to unpack (expected 3)
+2025-03-26 08:44:18,476 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:44:18,476 - INFO - Cleaning up tasks.
+2025-03-26 08:44:18,477 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:44:18,479 - INFO - All tasks finished cancelling.
+2025-03-26 08:44:18,480 - INFO - Closing the event loop.
+2025-03-26 08:45:22,730 - INFO - logging in using static token
+2025-03-26 08:45:23,976 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:45:24,305 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-l6s8",{"micros":103314,"calls":["id_created",{"micros":802,"calls":[]},"session_lookup_time",{"micros":257,"calls":[]},"session_lookup_finished",{"micros":15,"calls":[]},"discord-sessions-prd-1-232",{"micros":99490,"calls":["start_session",{"micros":70829,"calls":["discord-api-rpc-6bdd7c786d-2zpxx",{"micros":60878,"calls":["get_user",{"micros":8722},"get_guilds",{"micros":3526},"send_scheduled_deletion_message",{"micros":8},"guild_join_requests",{"micros":20727},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":1705}]}]},"starting_guild_connect",{"micros":103,"calls":[]},"presence_started",{"micros":271,"calls":[]},"guilds_started",{"micros":81,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":28155,"calls":[]},"connect_finished",{"micros":28161,"calls":[]},"build_ready",{"micros":41,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 7be0e0fe949a5ad6f9a572e258951827).
+2025-03-26 08:45:58,329 - INFO - Pending submissions before processing: {}
+2025-03-26 08:45:58,330 - ERROR - No submission found for message 1354349741835812917
+2025-03-26 08:46:18,923 - INFO - Pending submissions updated: {1354360802034847837: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354360800705384550/46059659-d683-46b7-9742-4743c207e3ee.jpg?ex=67e50249&is=67e3b0c9&hm=a1b7522154f746f1365f2f4ccde4bb971c98fc983e5298a8e9e389050a080a42&', 'original_msg_id': 1354360801053376512, 'prompt_id': 1354360802034847837, 'channel_id': 1354032257425342524}}
+2025-03-26 08:46:35,361 - INFO - Pending submissions before processing: {1354360802034847837: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354360800705384550/46059659-d683-46b7-9742-4743c207e3ee.jpg?ex=67e50249&is=67e3b0c9&hm=a1b7522154f746f1365f2f4ccde4bb971c98fc983e5298a8e9e389050a080a42&', 'original_msg_id': 1354360801053376512, 'prompt_id': 1354360802034847837, 'channel_id': 1354032257425342524}}
+2025-03-26 08:47:35,116 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:47:35,116 - INFO - Cleaning up tasks.
+2025-03-26 08:47:35,116 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:47:35,117 - INFO - All tasks finished cancelling.
+2025-03-26 08:47:35,117 - INFO - Closing the event loop.
+2025-03-26 08:47:36,670 - INFO - logging in using static token
+2025-03-26 08:47:37,252 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:47:37,481 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-srbc",{"micros":92620,"calls":["id_created",{"micros":544,"calls":[]},"session_lookup_time",{"micros":269,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-70",{"micros":91477,"calls":["start_session",{"micros":44163,"calls":["discord-api-rpc-6bdd7c786d-dltd4",{"micros":36318,"calls":["get_user",{"micros":5457},"get_guilds",{"micros":3494},"send_scheduled_deletion_message",{"micros":8},"guild_join_requests",{"micros":964},"authorized_ip_coro",{"micros":3494},"pending_payments",{"micros":428}]}]},"starting_guild_connect",{"micros":86,"calls":[]},"presence_started",{"micros":313,"calls":[]},"guilds_started",{"micros":72,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":46797,"calls":[]},"connect_finished",{"micros":46803,"calls":[]},"build_ready",{"micros":37,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 95214186a2ef18c9e9f8838f603ce13f).
+2025-03-26 08:48:34,653 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:48:34,654 - INFO - Cleaning up tasks.
+2025-03-26 08:48:34,655 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:48:34,655 - INFO - All tasks finished cancelling.
+2025-03-26 08:48:34,656 - INFO - Closing the event loop.
+2025-03-26 08:48:35,945 - INFO - logging in using static token
+2025-03-26 08:48:36,834 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:48:37,157 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-q99t",{"micros":117869,"calls":["id_created",{"micros":555,"calls":[]},"session_lookup_time",{"micros":272,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-117",{"micros":115856,"calls":["start_session",{"micros":50018,"calls":["discord-api-rpc-6bdd7c786d-h6598",{"micros":42355,"calls":["get_user",{"micros":9628},"get_guilds",{"micros":3145},"send_scheduled_deletion_message",{"micros":9},"guild_join_requests",{"micros":857},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":413}]}]},"starting_guild_connect",{"micros":61,"calls":[]},"presence_started",{"micros":23653,"calls":[]},"guilds_started",{"micros":81,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":42017,"calls":[]},"connect_finished",{"micros":42022,"calls":[]},"build_ready",{"micros":17,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 69d50e530cac13c9015c507af185076b).
+2025-03-26 08:50:13,796 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:50:13,796 - INFO - Cleaning up tasks.
+2025-03-26 08:50:13,796 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:50:13,797 - INFO - All tasks finished cancelling.
+2025-03-26 08:50:13,797 - INFO - Closing the event loop.
+2025-03-26 08:50:14,754 - INFO - logging in using static token
+2025-03-26 08:50:15,336 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:50:15,656 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-rdb5",{"micros":192724,"calls":["id_created",{"micros":743,"calls":[]},"session_lookup_time",{"micros":5057,"calls":[]},"session_lookup_finished",{"micros":12,"calls":[]},"discord-sessions-prd-1-59",{"micros":186589,"calls":["start_session",{"micros":140429,"calls":["discord-api-rpc-6bdd7c786d-lzrzw",{"micros":132121,"calls":["get_user",{"micros":10445},"get_guilds",{"micros":41564},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":6},"pending_payments",{"micros":659}]}]},"starting_guild_connect",{"micros":74,"calls":[]},"presence_started",{"micros":13292,"calls":[]},"guilds_started",{"micros":78,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":32665,"calls":[]},"connect_finished",{"micros":32670,"calls":[]},"build_ready",{"micros":41,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 72b2b74fe336927c9c48c59ebe0f8901).
+2025-03-26 08:51:48,125 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:51:48,125 - INFO - Cleaning up tasks.
+2025-03-26 08:51:48,125 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:51:48,126 - INFO - All tasks finished cancelling.
+2025-03-26 08:51:48,126 - INFO - Closing the event loop.
+2025-03-26 08:51:49,137 - INFO - logging in using static token
+2025-03-26 08:51:49,745 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:51:50,028 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-ltlg",{"micros":141441,"calls":["id_created",{"micros":898,"calls":[]},"session_lookup_time",{"micros":15375,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-90",{"micros":123374,"calls":["start_session",{"micros":83380,"calls":["discord-api-rpc-6bdd7c786d-stbh5",{"micros":57173,"calls":["get_user",{"micros":6474},"get_guilds",{"micros":3589},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":294},"authorized_ip_coro",{"micros":6},"pending_payments",{"micros":13436}]}]},"starting_guild_connect",{"micros":61,"calls":[]},"presence_started",{"micros":6411,"calls":[]},"guilds_started",{"micros":80,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":33400,"calls":[]},"connect_finished",{"micros":33406,"calls":[]},"build_ready",{"micros":32,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 8f6488052723abb07190cf9cfe583626).
+2025-03-26 08:51:55,242 - ERROR - Show command failed: near "FROM": syntax error
+2025-03-26 08:53:55,344 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:53:55,345 - INFO - Cleaning up tasks.
+2025-03-26 08:53:55,345 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:53:55,346 - INFO - All tasks finished cancelling.
+2025-03-26 08:53:55,346 - INFO - Closing the event loop.
+2025-03-26 08:53:56,437 - INFO - logging in using static token
+2025-03-26 08:53:57,012 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:53:57,285 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-bkb4",{"micros":130307,"calls":["id_created",{"micros":679,"calls":[]},"session_lookup_time",{"micros":9640,"calls":[]},"session_lookup_finished",{"micros":12,"calls":[]},"discord-sessions-prd-1-40",{"micros":118907,"calls":["start_session",{"micros":64798,"calls":["discord-api-prd-canary-rpc-77fdcdc87-vcbgt",{"micros":49769,"calls":["get_user",{"micros":7461},"get_guilds",{"micros":2968},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":514},"authorized_ip_coro",{"micros":5},"pending_payments",{"micros":867}]}]},"starting_guild_connect",{"micros":74,"calls":[]},"presence_started",{"micros":11464,"calls":[]},"guilds_started",{"micros":70,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":42456,"calls":[]},"connect_finished",{"micros":42461,"calls":[]},"build_ready",{"micros":37,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 6219cebb7119dbbcaac6280fb556eeaf).
+2025-03-26 08:54:59,654 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:54:59,654 - INFO - Cleaning up tasks.
+2025-03-26 08:54:59,654 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:54:59,655 - INFO - All tasks finished cancelling.
+2025-03-26 08:54:59,655 - INFO - Closing the event loop.
+2025-03-26 08:55:04,941 - INFO - logging in using static token
+2025-03-26 08:55:05,894 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:55:06,246 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-4k81",{"micros":126855,"calls":["id_created",{"micros":1236,"calls":[]},"session_lookup_time",{"micros":10202,"calls":[]},"session_lookup_finished",{"micros":20,"calls":[]},"discord-sessions-prd-1-127",{"micros":114166,"calls":["start_session",{"micros":55644,"calls":["discord-api-rpc-6bdd7c786d-5ljfn",{"micros":45565,"calls":["get_user",{"micros":6044},"get_guilds",{"micros":3922},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":4327},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":1996}]}]},"starting_guild_connect",{"micros":65,"calls":[]},"presence_started",{"micros":316,"calls":[]},"guilds_started",{"micros":82,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":58002,"calls":[]},"connect_finished",{"micros":58007,"calls":[]},"build_ready",{"micros":48,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 8d18bc265fe56e3c0797ef3259da0812).
+2025-03-26 08:57:31,431 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 08:57:31,432 - INFO - Cleaning up tasks.
+2025-03-26 08:57:31,432 - INFO - Cleaning up after 1 tasks.
+2025-03-26 08:57:31,432 - INFO - All tasks finished cancelling.
+2025-03-26 08:57:31,433 - INFO - Closing the event loop.
+2025-03-26 08:57:32,392 - INFO - logging in using static token
+2025-03-26 08:57:33,999 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 08:57:34,451 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-bqlb",{"micros":222390,"calls":["id_created",{"micros":955,"calls":[]},"session_lookup_time",{"micros":216,"calls":[]},"session_lookup_finished",{"micros":19,"calls":[]},"discord-sessions-prd-1-53",{"micros":220968,"calls":["start_session",{"micros":175575,"calls":["discord-api-rpc-6bdd7c786d-9sfxp",{"micros":111357,"calls":["get_user",{"micros":28586},"get_guilds",{"micros":2900},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":2981},"authorized_ip_coro",{"micros":39},"pending_payments",{"micros":47425}]}]},"starting_guild_connect",{"micros":65,"calls":[]},"presence_started",{"micros":335,"calls":[]},"guilds_started",{"micros":74,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":44880,"calls":[]},"connect_finished",{"micros":44886,"calls":[]},"build_ready",{"micros":29,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: c1b052e06d1eff16761d2512e8af1b7a).
+2025-03-26 08:57:49,711 - INFO - Pending submissions before processing: {}
+2025-03-26 08:57:49,712 - ERROR - No submission found for message 1354363658272112703
+2025-03-26 08:59:19,508 - INFO - Pending submissions updated: {1354364076280512553: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354364074338684988/46059659-d683-46b7-9742-4743c207e3ee.jpg?ex=67e50556&is=67e3b3d6&hm=e002d86e429112e84d829ef13bcc41e7ee75632ea7b8942618016d7564455383&', 'original_msg_id': 1354364074808574054, 'prompt_id': 1354364076280512553, 'channel_id': 1354032257425342524}}
+2025-03-26 08:59:32,064 - INFO - Pending submissions before processing: {1354364076280512553: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354364074338684988/46059659-d683-46b7-9742-4743c207e3ee.jpg?ex=67e50556&is=67e3b3d6&hm=e002d86e429112e84d829ef13bcc41e7ee75632ea7b8942618016d7564455383&', 'original_msg_id': 1354364074808574054, 'prompt_id': 1354364076280512553, 'channel_id': 1354032257425342524}}
+2025-03-26 09:01:09,462 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 09:01:09,463 - INFO - Cleaning up tasks.
+2025-03-26 09:01:09,463 - INFO - Cleaning up after 1 tasks.
+2025-03-26 09:01:09,465 - INFO - All tasks finished cancelling.
+2025-03-26 09:01:09,466 - INFO - Closing the event loop.
+2025-03-26 09:01:10,632 - INFO - logging in using static token
+2025-03-26 09:01:11,479 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 09:01:11,867 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-85c8",{"micros":183408,"calls":["id_created",{"micros":877,"calls":[]},"session_lookup_time",{"micros":294,"calls":[]},"session_lookup_finished",{"micros":14,"calls":[]},"discord-sessions-prd-1-281",{"micros":181885,"calls":["start_session",{"micros":62779,"calls":["discord-api-rpc-6bdd7c786d-5ljfn",{"micros":53890,"calls":["get_user",{"micros":7958},"get_guilds",{"micros":4845},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":576},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":509}]}]},"starting_guild_connect",{"micros":49,"calls":[]},"presence_started",{"micros":36431,"calls":[]},"guilds_started",{"micros":80,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":82516,"calls":[]},"connect_finished",{"micros":82522,"calls":[]},"build_ready",{"micros":19,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: a8f170b46a6bc2f2218c8a7a039744d8).
+2025-03-26 09:13:18,283 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 09:13:18,284 - INFO - Cleaning up tasks.
+2025-03-26 09:13:18,284 - INFO - Cleaning up after 1 tasks.
+2025-03-26 09:13:18,285 - INFO - All tasks finished cancelling.
+2025-03-26 09:13:18,285 - INFO - Closing the event loop.
+2025-03-26 09:27:47,663 - INFO - logging in using static token
+2025-03-26 09:27:48,213 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 09:27:48,439 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-wptc",{"micros":91702,"calls":["id_created",{"micros":823,"calls":[]},"session_lookup_time",{"micros":318,"calls":[]},"session_lookup_finished",{"micros":12,"calls":[]},"discord-sessions-prd-1-198",{"micros":90241,"calls":["start_session",{"micros":41025,"calls":["discord-api-rpc-6bdd7c786d-q5sdf",{"micros":33792,"calls":["get_user",{"micros":4429},"get_guilds",{"micros":3068},"send_scheduled_deletion_message",{"micros":10},"guild_join_requests",{"micros":701},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":479}]}]},"starting_guild_connect",{"micros":73,"calls":[]},"presence_started",{"micros":260,"calls":[]},"guilds_started",{"micros":75,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":48749,"calls":[]},"connect_finished",{"micros":48755,"calls":[]},"build_ready",{"micros":49,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: c6270c9add7490c42ba442af12f137b6).
+2025-03-26 09:38:17,403 - INFO - Pending submissions updated: {1354373882223788174: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370438515523725/1354373879572729966/20250301_212538.jpg?ex=67e50e77&is=67e3bcf7&hm=d2229038945d94154cfc5c35ade6ec3678338df380416f67a5d6192a4b443d52&', 'original_msg_id': 1354373879937896508, 'prompt_id': 1354373882223788174, 'channel_id': 1354370438515523725}}
+2025-03-26 09:38:27,337 - INFO - Pending submissions before processing: {1354373882223788174: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370438515523725/1354373879572729966/20250301_212538.jpg?ex=67e50e77&is=67e3bcf7&hm=d2229038945d94154cfc5c35ade6ec3678338df380416f67a5d6192a4b443d52&', 'original_msg_id': 1354373879937896508, 'prompt_id': 1354373882223788174, 'channel_id': 1354370438515523725}}
+2025-03-26 09:39:15,913 - INFO - Pending submissions before processing: {1354373882223788174: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370438515523725/1354373879572729966/20250301_212538.jpg?ex=67e50e77&is=67e3bcf7&hm=d2229038945d94154cfc5c35ade6ec3678338df380416f67a5d6192a4b443d52&', 'original_msg_id': 1354373879937896508, 'prompt_id': 1354373882223788174, 'channel_id': 1354370438515523725}}
+2025-03-26 09:39:39,358 - INFO - Pending submissions before processing: {}
+2025-03-26 09:39:39,359 - ERROR - No submission found for message 1354374166383689769
+2025-03-26 09:40:39,781 - INFO - Pending submissions updated: {1354374479551397961: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354374477231816714/20250301_212538.jpg?ex=67e50f06&is=67e3bd86&hm=447dbefa468c6d0671879ae5e74d406a9e7f949a187d425d61e132b97c3cc213&', 'original_msg_id': 1354374477366165588, 'prompt_id': 1354374479551397961, 'channel_id': 1354370366973415589}}
+2025-03-26 09:48:32,831 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 09:48:32,831 - INFO - Cleaning up tasks.
+2025-03-26 09:48:32,832 - INFO - Cleaning up after 1 tasks.
+2025-03-26 09:48:32,833 - INFO - All tasks finished cancelling.
+2025-03-26 09:48:32,833 - INFO - Closing the event loop.
+2025-03-26 09:48:34,003 - INFO - logging in using static token
+2025-03-26 09:48:34,941 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 09:48:35,539 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-50v5",{"micros":370993,"calls":["id_created",{"micros":755,"calls":[]},"session_lookup_time",{"micros":295,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-73",{"micros":369581,"calls":["start_session",{"micros":311016,"calls":["discord-api-rpc-6bdd7c786d-2zxb7",{"micros":273734,"calls":["get_user",{"micros":114215},"get_guilds",{"micros":22113},"send_scheduled_deletion_message",{"micros":8},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":11},"pending_payments",{"micros":554}]}]},"starting_guild_connect",{"micros":84,"calls":[]},"presence_started",{"micros":12133,"calls":[]},"guilds_started",{"micros":148,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":46174,"calls":[]},"connect_finished",{"micros":46179,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: eab1f03c407c86fd0eabd313563a6653).
+2025-03-26 09:52:51,493 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 09:52:51,494 - INFO - Cleaning up tasks.
+2025-03-26 09:52:51,494 - INFO - Cleaning up after 1 tasks.
+2025-03-26 09:52:51,495 - INFO - All tasks finished cancelling.
+2025-03-26 09:52:51,496 - INFO - Closing the event loop.
+2025-03-26 09:52:52,696 - INFO - logging in using static token
+2025-03-26 09:52:53,567 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 09:52:53,880 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-sst5",{"micros":100587,"calls":["id_created",{"micros":947,"calls":[]},"session_lookup_time",{"micros":7098,"calls":[]},"session_lookup_finished",{"micros":16,"calls":[]},"discord-sessions-prd-1-175",{"micros":91430,"calls":["start_session",{"micros":69662,"calls":["discord-api-prd-canary-rpc-77fdcdc87-vcbgt",{"micros":61723,"calls":["get_user",{"micros":4796},"get_guilds",{"micros":14717},"send_scheduled_deletion_message",{"micros":10},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":423}]}]},"starting_guild_connect",{"micros":74,"calls":[]},"presence_started",{"micros":355,"calls":[]},"guilds_started",{"micros":122,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":21189,"calls":[]},"connect_finished",{"micros":21195,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 433d8bbfe89a6b76f3925dabe6cb3b9e).
+2025-03-26 09:56:43,708 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 09:56:43,708 - INFO - Cleaning up tasks.
+2025-03-26 09:56:43,708 - INFO - Cleaning up after 1 tasks.
+2025-03-26 09:56:43,709 - INFO - All tasks finished cancelling.
+2025-03-26 09:56:43,709 - INFO - Closing the event loop.
+2025-03-26 09:56:44,666 - INFO - logging in using static token
+2025-03-26 09:56:45,241 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 09:56:46,832 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-l2m0",{"micros":1463538,"calls":["id_created",{"micros":974,"calls":[]},"session_lookup_time",{"micros":350,"calls":[]},"session_lookup_finished",{"micros":31,"calls":[]},"discord-sessions-prd-1-205",{"micros":1461013,"calls":["start_session",{"micros":1434555,"calls":["discord-api-rpc-6bdd7c786d-lfmzf",{"micros":1411748,"calls":["get_user",{"micros":1281358},"get_guilds",{"micros":5517},"send_scheduled_deletion_message",{"micros":5},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":533}]}]},"starting_guild_connect",{"micros":94,"calls":[]},"presence_started",{"micros":284,"calls":[]},"guilds_started",{"micros":131,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":25919,"calls":[]},"connect_finished",{"micros":25925,"calls":[]},"build_ready",{"micros":19,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 76a05a5a22fbbcbab94a78a132a67936).
+2025-03-26 09:57:45,315 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 09:57:45,315 - INFO - Cleaning up tasks.
+2025-03-26 09:57:45,316 - INFO - Cleaning up after 1 tasks.
+2025-03-26 09:57:45,316 - INFO - All tasks finished cancelling.
+2025-03-26 09:57:45,317 - INFO - Closing the event loop.
+2025-03-26 09:57:46,207 - INFO - logging in using static token
+2025-03-26 09:57:46,775 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 09:57:47,129 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-90bf",{"micros":229840,"calls":["id_created",{"micros":1176,"calls":[]},"session_lookup_time",{"micros":287,"calls":[]},"session_lookup_finished",{"micros":12,"calls":[]},"discord-sessions-prd-1-213",{"micros":228024,"calls":["start_session",{"micros":167635,"calls":["discord-api-rpc-6bdd7c786d-bw7d8",{"micros":148778,"calls":["get_user",{"micros":15009},"get_guilds",{"micros":3620},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1467},"authorized_ip_coro",{"micros":11},"pending_payments",{"micros":3177}]}]},"starting_guild_connect",{"micros":78,"calls":[]},"presence_started",{"micros":24317,"calls":[]},"guilds_started",{"micros":126,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":35842,"calls":[]},"connect_finished",{"micros":35851,"calls":[]},"build_ready",{"micros":14,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 78c8a71539e6314915f3fcce49e93df9).
+2025-03-26 09:59:28,568 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 09:59:28,568 - INFO - Cleaning up tasks.
+2025-03-26 09:59:28,568 - INFO - Cleaning up after 1 tasks.
+2025-03-26 09:59:28,569 - INFO - All tasks finished cancelling.
+2025-03-26 09:59:28,569 - INFO - Closing the event loop.
+2025-03-26 09:59:29,678 - INFO - logging in using static token
+2025-03-26 09:59:30,293 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 09:59:30,574 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-xmkz",{"micros":131387,"calls":["id_created",{"micros":836,"calls":[]},"session_lookup_time",{"micros":18788,"calls":[]},"session_lookup_finished",{"micros":12,"calls":[]},"discord-sessions-prd-1-70",{"micros":111048,"calls":["start_session",{"micros":90926,"calls":["discord-api-rpc-6bdd7c786d-bltq4",{"micros":74558,"calls":["get_user",{"micros":5939},"get_guilds",{"micros":5356},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":7},"pending_payments",{"micros":4288}]}]},"starting_guild_connect",{"micros":80,"calls":[]},"presence_started",{"micros":18615,"calls":[]},"guilds_started",{"micros":145,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":1249,"calls":[]},"connect_finished",{"micros":1259,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 0fe587785d80e1969ddab615f69db309).
+2025-03-26 10:04:13,974 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 10:04:13,975 - INFO - Cleaning up tasks.
+2025-03-26 10:04:13,975 - INFO - Cleaning up after 1 tasks.
+2025-03-26 10:04:13,976 - INFO - All tasks finished cancelling.
+2025-03-26 10:04:13,977 - INFO - Closing the event loop.
+2025-03-26 10:04:15,008 - INFO - logging in using static token
+2025-03-26 10:04:15,909 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 10:04:16,227 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-ktzr",{"micros":96350,"calls":["id_created",{"micros":851,"calls":[]},"session_lookup_time",{"micros":6576,"calls":[]},"session_lookup_finished",{"micros":17,"calls":[]},"discord-sessions-prd-1-142",{"micros":88108,"calls":["start_session",{"micros":34542,"calls":["discord-api-rpc-6bdd7c786d-tzg67",{"micros":27706,"calls":["get_user",{"micros":5196},"get_guilds",{"micros":2485},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":714},"authorized_ip_coro",{"micros":6},"pending_payments",{"micros":548}]}]},"starting_guild_connect",{"micros":78,"calls":[]},"presence_started",{"micros":256,"calls":[]},"guilds_started",{"micros":128,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":53080,"calls":[]},"connect_finished",{"micros":53085,"calls":[]},"build_ready",{"micros":16,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: b5a2833e1daae288d764ff7039b86647).
+2025-03-26 10:05:25,720 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 10:05:25,720 - INFO - Cleaning up tasks.
+2025-03-26 10:05:25,721 - INFO - Cleaning up after 1 tasks.
+2025-03-26 10:05:25,721 - INFO - All tasks finished cancelling.
+2025-03-26 10:05:25,721 - INFO - Closing the event loop.
+2025-03-26 10:05:26,567 - INFO - logging in using static token
+2025-03-26 10:05:27,185 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 10:05:27,617 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-s8px",{"micros":296404,"calls":["id_created",{"micros":1158,"calls":[]},"session_lookup_time",{"micros":4743,"calls":[]},"session_lookup_finished",{"micros":14,"calls":[]},"discord-sessions-prd-1-48",{"micros":289347,"calls":["start_session",{"micros":228714,"calls":["discord-api-rpc-6bdd7c786d-jb8vt",{"micros":210528,"calls":["get_user",{"micros":14226},"get_guilds",{"micros":59520},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":42007},"authorized_ip_coro",{"micros":7},"pending_payments",{"micros":2784}]}]},"starting_guild_connect",{"micros":65,"calls":[]},"presence_started",{"micros":40460,"calls":[]},"guilds_started",{"micros":121,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":19960,"calls":[]},"connect_finished",{"micros":19966,"calls":[]},"build_ready",{"micros":17,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 09429800b1112b52021bc23257b9bf9a).
+2025-03-26 10:06:21,417 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 10:06:21,417 - INFO - Cleaning up tasks.
+2025-03-26 10:06:21,417 - INFO - Cleaning up after 1 tasks.
+2025-03-26 10:06:21,418 - INFO - All tasks finished cancelling.
+2025-03-26 10:06:21,418 - INFO - Closing the event loop.
+2025-03-26 10:06:26,323 - INFO - logging in using static token
+2025-03-26 10:06:26,929 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 10:06:27,117 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-4h7d",{"micros":57605,"calls":["id_created",{"micros":720,"calls":[]},"session_lookup_time",{"micros":319,"calls":[]},"session_lookup_finished",{"micros":11,"calls":[]},"discord-sessions-prd-1-21",{"micros":55352,"calls":["start_session",{"micros":38850,"calls":["discord-api-rpc-6bdd7c786d-nrtfd",{"micros":31777,"calls":["get_user",{"micros":4599},"get_guilds",{"micros":4781},"send_scheduled_deletion_message",{"micros":5},"guild_join_requests",{"micros":0},"authorized_ip_coro",{"micros":6},"pending_payments",{"micros":354}]}]},"starting_guild_connect",{"micros":82,"calls":[]},"presence_started",{"micros":190,"calls":[]},"guilds_started",{"micros":127,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":16074,"calls":[]},"connect_finished",{"micros":16079,"calls":[]},"build_ready",{"micros":18,"calls":[]},"clean_ready",{"micros":3,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 81c8de8684c2c30bdc5e5c05922bd3ba).
+2025-03-26 10:06:40,199 - INFO - Pending submissions updated: {1354381023915540571: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370438515523725/1354381021616799754/20250301_212538.jpg?ex=67e5151e&is=67e3c39e&hm=f6b55eca74509c29f0b8b17cfcdab0ca75e58b58baf3e88c1af32278359569d1&', 'original_msg_id': 1354381022367715412, 'prompt_id': 1354381023915540571, 'channel_id': 1354370438515523725}}
+2025-03-26 10:07:03,088 - INFO - Pending submissions updated: {1354381023915540571: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370438515523725/1354381021616799754/20250301_212538.jpg?ex=67e5151e&is=67e3c39e&hm=f6b55eca74509c29f0b8b17cfcdab0ca75e58b58baf3e88c1af32278359569d1&', 'original_msg_id': 1354381022367715412, 'prompt_id': 1354381023915540571, 'channel_id': 1354370438515523725}, 1354381120380211220: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354381117238546432/20250301_212538.jpg?ex=67e51535&is=67e3c3b5&hm=1afc3391d5ef80ab4cfb864061f2a47aeae2ee4449e0de27193032ecc218fc01&', 'original_msg_id': 1354381117477879850, 'prompt_id': 1354381120380211220, 'channel_id': 1354370366973415589}}
+2025-03-26 10:17:54,204 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 10:17:54,205 - INFO - Cleaning up tasks.
+2025-03-26 10:17:54,205 - INFO - Cleaning up after 1 tasks.
+2025-03-26 10:17:54,207 - INFO - All tasks finished cancelling.
+2025-03-26 10:17:54,207 - INFO - Closing the event loop.
+2025-03-26 10:26:31,558 - INFO - logging in using static token
+2025-03-26 10:26:32,434 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 10:26:32,863 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-fl2v",{"micros":216328,"calls":["id_created",{"micros":752,"calls":[]},"session_lookup_time",{"micros":267,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-39",{"micros":215012,"calls":["start_session",{"micros":166434,"calls":["discord-api-rpc-6bdd7c786d-gplqm",{"micros":139544,"calls":["get_user",{"micros":15258},"get_guilds",{"micros":5132},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":437},"authorized_ip_coro",{"micros":6},"pending_payments",{"micros":7307}]}]},"starting_guild_connect",{"micros":73,"calls":[]},"presence_started",{"micros":42812,"calls":[]},"guilds_started",{"micros":150,"calls":[]},"lobbies_started",{"micros":2,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":5516,"calls":[]},"connect_finished",{"micros":5521,"calls":[]},"build_ready",{"micros":17,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: e311478c1f3f1cacab30135ea44c85e0).
+2025-03-26 10:30:30,788 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 10:30:30,789 - INFO - Cleaning up tasks.
+2025-03-26 10:30:30,789 - INFO - Cleaning up after 1 tasks.
+2025-03-26 10:30:30,790 - INFO - All tasks finished cancelling.
+2025-03-26 10:30:30,790 - INFO - Closing the event loop.
+2025-03-26 10:30:31,811 - INFO - logging in using static token
+2025-03-26 10:30:32,674 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 10:30:33,149 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-f0zf",{"micros":261343,"calls":["id_created",{"micros":1051,"calls":[]},"session_lookup_time",{"micros":1849,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-237",{"micros":258130,"calls":["start_session",{"micros":213653,"calls":["discord-api-rpc-6bdd7c786d-47g88",{"micros":182861,"calls":["get_user",{"micros":16379},"get_guilds",{"micros":16921},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":9},"pending_payments",{"micros":11589}]}]},"starting_guild_connect",{"micros":95,"calls":[]},"presence_started",{"micros":15317,"calls":[]},"guilds_started",{"micros":134,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":28907,"calls":[]},"connect_finished",{"micros":28911,"calls":[]},"build_ready",{"micros":16,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: f02e395246367ea99fe380d4765ec51c).
+2025-03-26 10:34:04,389 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 10:34:04,389 - INFO - Cleaning up tasks.
+2025-03-26 10:34:04,389 - INFO - Cleaning up after 1 tasks.
+2025-03-26 10:34:04,390 - INFO - All tasks finished cancelling.
+2025-03-26 10:34:04,390 - INFO - Closing the event loop.
+2025-03-26 10:34:05,366 - INFO - logging in using static token
+2025-03-26 10:34:05,974 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 10:34:06,379 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-25lz",{"micros":270214,"calls":["id_created",{"micros":994,"calls":[]},"session_lookup_time",{"micros":3400,"calls":[]},"session_lookup_finished",{"micros":13,"calls":[]},"discord-sessions-prd-1-257",{"micros":265489,"calls":["start_session",{"micros":210065,"calls":["discord-api-continuous-canary-rpc-865d7d9799-jsjr5",{"micros":149623,"calls":["get_user",{"micros":4621},"get_guilds",{"micros":12866},"send_scheduled_deletion_message",{"micros":6},"guild_join_requests",{"micros":2053},"authorized_ip_coro",{"micros":5},"pending_payments",{"micros":38630}]}]},"starting_guild_connect",{"micros":74,"calls":[]},"presence_started",{"micros":267,"calls":[]},"guilds_started",{"micros":136,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":54926,"calls":[]},"connect_finished",{"micros":54931,"calls":[]},"build_ready",{"micros":13,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: c9c0720e3bd10938cd5282b34a76eaf6).
+2025-03-26 10:34:29,954 - INFO - Pending submissions updated: {1354388027161579533: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354388024229888040/20250301_212538.jpg?ex=67e51ba4&is=67e3ca24&hm=f4d2211193fb1133b1b5921ccfb17fa681a6c2ba182fa380875d55f57cc9b2ad&', 'original_msg_id': 1354388024594665544, 'prompt_id': 1354388027161579533, 'channel_id': 1354370366973415589}}
+2025-03-26 10:36:41,428 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 10:36:41,428 - INFO - Cleaning up tasks.
+2025-03-26 10:36:41,428 - INFO - Cleaning up after 1 tasks.
+2025-03-26 10:36:41,429 - INFO - All tasks finished cancelling.
+2025-03-26 10:36:41,429 - INFO - Closing the event loop.
+2025-03-26 10:36:42,412 - INFO - logging in using static token
+2025-03-26 10:36:43,059 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 10:36:43,274 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-57s9",{"micros":82063,"calls":["id_created",{"micros":1381,"calls":[]},"session_lookup_time",{"micros":3846,"calls":[]},"session_lookup_finished",{"micros":19,"calls":[]},"discord-sessions-prd-1-76",{"micros":76530,"calls":["start_session",{"micros":60799,"calls":["discord-api-rpc-6bdd7c786d-2zxb7",{"micros":51051,"calls":["get_user",{"micros":4666},"get_guilds",{"micros":7330},"send_scheduled_deletion_message",{"micros":8},"guild_join_requests",{"micros":534},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":2424}]}]},"starting_guild_connect",{"micros":77,"calls":[]},"presence_started",{"micros":7123,"calls":[]},"guilds_started",{"micros":156,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":8351,"calls":[]},"connect_finished",{"micros":8356,"calls":[]},"build_ready",{"micros":16,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: 96c09d6774b91514731023a379ccd800).
+2025-03-26 10:37:01,443 - INFO - Pending submissions updated: {1354388663164862535: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354388659683463178/20250301_212538.jpg?ex=67e51c3b&is=67e3cabb&hm=da4ef263768f6be57d57476cb5ad2fa09c9ea8354e9ed172cc1a086e95cc7a98&', 'original_msg_id': 1354388660178653284, 'prompt_id': 1354388663164862535, 'channel_id': 1354370366973415589}}
+2025-03-26 10:38:10,081 - INFO - Pending submissions updated: {1354388663164862535: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354388659683463178/20250301_212538.jpg?ex=67e51c3b&is=67e3cabb&hm=da4ef263768f6be57d57476cb5ad2fa09c9ea8354e9ed172cc1a086e95cc7a98&', 'original_msg_id': 1354388660178653284, 'prompt_id': 1354388663164862535, 'channel_id': 1354370366973415589}, 1354388950772482119: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370438515523725/1354388947471699968/20250301_212538.jpg?ex=67e51c80&is=67e3cb00&hm=6b8e810681c84d4ea2ac55546dd9ca0c4aa910306a38ccf77c8ca0afc0f99f94&', 'original_msg_id': 1354388947853250581, 'prompt_id': 1354388950772482119, 'channel_id': 1354370438515523725}}
+2025-03-26 10:38:22,717 - INFO - Pending submissions updated: {1354388663164862535: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354388659683463178/20250301_212538.jpg?ex=67e51c3b&is=67e3cabb&hm=da4ef263768f6be57d57476cb5ad2fa09c9ea8354e9ed172cc1a086e95cc7a98&', 'original_msg_id': 1354388660178653284, 'prompt_id': 1354388663164862535, 'channel_id': 1354370366973415589}, 1354388950772482119: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370438515523725/1354388947471699968/20250301_212538.jpg?ex=67e51c80&is=67e3cb00&hm=6b8e810681c84d4ea2ac55546dd9ca0c4aa910306a38ccf77c8ca0afc0f99f94&', 'original_msg_id': 1354388947853250581, 'prompt_id': 1354388950772482119, 'channel_id': 1354370438515523725}, 1354389003431968840: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354389000881963118/20250301_212538.jpg?ex=67e51c8d&is=67e3cb0d&hm=f004e6652ae52839b2cae25a9e50d74fa521f6f3aee7e6873cc6d150407526bb&', 'original_msg_id': 1354389001175437432, 'prompt_id': 1354389003431968840, 'channel_id': 1354370366973415589}}
+2025-03-26 10:39:24,305 - INFO - Pending submissions updated: {1354388663164862535: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354388659683463178/20250301_212538.jpg?ex=67e51c3b&is=67e3cabb&hm=da4ef263768f6be57d57476cb5ad2fa09c9ea8354e9ed172cc1a086e95cc7a98&', 'original_msg_id': 1354388660178653284, 'prompt_id': 1354388663164862535, 'channel_id': 1354370366973415589}, 1354388950772482119: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370438515523725/1354388947471699968/20250301_212538.jpg?ex=67e51c80&is=67e3cb00&hm=6b8e810681c84d4ea2ac55546dd9ca0c4aa910306a38ccf77c8ca0afc0f99f94&', 'original_msg_id': 1354388947853250581, 'prompt_id': 1354388950772482119, 'channel_id': 1354370438515523725}, 1354389003431968840: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354389000881963118/20250301_212538.jpg?ex=67e51c8d&is=67e3cb0d&hm=f004e6652ae52839b2cae25a9e50d74fa521f6f3aee7e6873cc6d150407526bb&', 'original_msg_id': 1354389001175437432, 'prompt_id': 1354389003431968840, 'channel_id': 1354370366973415589}, 1354389262287769747: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354389260605587569/20250301_212538.jpg?ex=67e51ccb&is=67e3cb4b&hm=a4c1cee8c5f7a3f1db7ee897ca3db335b7141d677191a897a600a6f3f445facf&', 'original_msg_id': 1354389260912037928, 'prompt_id': 1354389262287769747, 'channel_id': 1354032257425342524}}
+2025-03-26 10:39:36,774 - INFO - Pending submissions updated: {1354388663164862535: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354388659683463178/20250301_212538.jpg?ex=67e51c3b&is=67e3cabb&hm=da4ef263768f6be57d57476cb5ad2fa09c9ea8354e9ed172cc1a086e95cc7a98&', 'original_msg_id': 1354388660178653284, 'prompt_id': 1354388663164862535, 'channel_id': 1354370366973415589}, 1354388950772482119: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370438515523725/1354388947471699968/20250301_212538.jpg?ex=67e51c80&is=67e3cb00&hm=6b8e810681c84d4ea2ac55546dd9ca0c4aa910306a38ccf77c8ca0afc0f99f94&', 'original_msg_id': 1354388947853250581, 'prompt_id': 1354388950772482119, 'channel_id': 1354370438515523725}, 1354389003431968840: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354389000881963118/20250301_212538.jpg?ex=67e51c8d&is=67e3cb0d&hm=f004e6652ae52839b2cae25a9e50d74fa521f6f3aee7e6873cc6d150407526bb&', 'original_msg_id': 1354389001175437432, 'prompt_id': 1354389003431968840, 'channel_id': 1354370366973415589}, 1354389262287769747: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354389260605587569/20250301_212538.jpg?ex=67e51ccb&is=67e3cb4b&hm=a4c1cee8c5f7a3f1db7ee897ca3db335b7141d677191a897a600a6f3f445facf&', 'original_msg_id': 1354389260912037928, 'prompt_id': 1354389262287769747, 'channel_id': 1354032257425342524}, 1354389314527694983: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/202773931562762241/1354389313126793387/20250301_212538.jpg?ex=67e51cd7&is=67e3cb57&hm=7e752a6f2dc4d8b9ed0dafcc1c53613aa37fec73063390b11402359198e71565&', 'original_msg_id': 1354389313449885757, 'prompt_id': 1354389314527694983, 'channel_id': 202773931562762241}}
+2025-03-26 10:41:12,160 - INFO - Pending submissions updated: {1354388663164862535: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354388659683463178/20250301_212538.jpg?ex=67e51c3b&is=67e3cabb&hm=da4ef263768f6be57d57476cb5ad2fa09c9ea8354e9ed172cc1a086e95cc7a98&', 'original_msg_id': 1354388660178653284, 'prompt_id': 1354388663164862535, 'channel_id': 1354370366973415589}, 1354388950772482119: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370438515523725/1354388947471699968/20250301_212538.jpg?ex=67e51c80&is=67e3cb00&hm=6b8e810681c84d4ea2ac55546dd9ca0c4aa910306a38ccf77c8ca0afc0f99f94&', 'original_msg_id': 1354388947853250581, 'prompt_id': 1354388950772482119, 'channel_id': 1354370438515523725}, 1354389003431968840: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354389000881963118/20250301_212538.jpg?ex=67e51c8d&is=67e3cb0d&hm=f004e6652ae52839b2cae25a9e50d74fa521f6f3aee7e6873cc6d150407526bb&', 'original_msg_id': 1354389001175437432, 'prompt_id': 1354389003431968840, 'channel_id': 1354370366973415589}, 1354389262287769747: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354389260605587569/20250301_212538.jpg?ex=67e51ccb&is=67e3cb4b&hm=a4c1cee8c5f7a3f1db7ee897ca3db335b7141d677191a897a600a6f3f445facf&', 'original_msg_id': 1354389260912037928, 'prompt_id': 1354389262287769747, 'channel_id': 1354032257425342524}, 1354389314527694983: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/202773931562762241/1354389313126793387/20250301_212538.jpg?ex=67e51cd7&is=67e3cb57&hm=7e752a6f2dc4d8b9ed0dafcc1c53613aa37fec73063390b11402359198e71565&', 'original_msg_id': 1354389313449885757, 'prompt_id': 1354389314527694983, 'channel_id': 202773931562762241}, 1354389714781864007: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354370366973415589/1354389712441442437/20250301_212538.jpg?ex=67e51d36&is=67e3cbb6&hm=8dfcb959b62fef780c10a7b2bd79cfcc69d3ad7457d3664aac0eaa06f32c2e8d&', 'original_msg_id': 1354389712462151692, 'prompt_id': 1354389714781864007, 'channel_id': 1354370366973415589}}
+2025-03-26 10:41:17,589 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 10:41:17,590 - INFO - Cleaning up tasks.
+2025-03-26 10:41:17,590 - INFO - Cleaning up after 1 tasks.
+2025-03-26 10:41:17,591 - INFO - All tasks finished cancelling.
+2025-03-26 10:41:17,591 - INFO - Closing the event loop.
+2025-03-26 10:41:18,538 - INFO - logging in using static token
+2025-03-26 10:41:19,167 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 10:41:19,476 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-g595",{"micros":179969,"calls":["id_created",{"micros":1345,"calls":[]},"session_lookup_time",{"micros":7909,"calls":[]},"session_lookup_finished",{"micros":12,"calls":[]},"discord-sessions-prd-1-261",{"micros":169668,"calls":["start_session",{"micros":164621,"calls":["discord-api-rpc-6bdd7c786d-stbh5",{"micros":150839,"calls":["get_user",{"micros":43200},"get_guilds",{"micros":5438},"send_scheduled_deletion_message",{"micros":10},"guild_join_requests",{"micros":2686},"authorized_ip_coro",{"micros":10},"pending_payments",{"micros":383}]}]},"starting_guild_connect",{"micros":80,"calls":[]},"presence_started",{"micros":217,"calls":[]},"guilds_started",{"micros":156,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":4569,"calls":[]},"connect_finished",{"micros":4575,"calls":[]},"build_ready",{"micros":15,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 6ea81609556040f84e3891c54947e328).
+2025-03-26 10:43:34,745 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 10:43:34,745 - INFO - Cleaning up tasks.
+2025-03-26 10:43:34,746 - INFO - Cleaning up after 2 tasks.
+2025-03-26 10:43:34,748 - INFO - All tasks finished cancelling.
+2025-03-26 10:43:34,748 - INFO - Closing the event loop.
+2025-03-26 10:43:35,834 - INFO - logging in using static token
+2025-03-26 10:43:36,435 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-26 10:43:36,704 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-b-w3tg",{"micros":142603,"calls":["id_created",{"micros":737,"calls":[]},"session_lookup_time",{"micros":5511,"calls":[]},"session_lookup_finished",{"micros":15,"calls":[]},"discord-sessions-prd-1-280",{"micros":136014,"calls":["start_session",{"micros":81424,"calls":["discord-api-rpc-6bdd7c786d-sncxm",{"micros":69287,"calls":["get_user",{"micros":14577},"get_guilds",{"micros":6190},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":435},"authorized_ip_coro",{"micros":7},"pending_payments",{"micros":4625}]}]},"starting_guild_connect",{"micros":74,"calls":[]},"presence_started",{"micros":281,"calls":[]},"guilds_started",{"micros":130,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":54073,"calls":[]},"connect_finished",{"micros":54080,"calls":[]},"build_ready",{"micros":21,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: bd61a9625a0212ce69a82e6c2572eda2).
+2025-03-26 10:44:16,851 - INFO - Pending submissions updated: {1354390489155239978: {'user_id': 152009862438584320, 'image_url': 'https://cdn.discordapp.com/attachments/1354032257425342524/1354390487603347508/20250301_212538.jpg?ex=67e51def&is=67e3cc6f&hm=8467f6cf2411b0c1127a1827a7038b6dc8d2de6a99aa96d64377e96c47e76ed1&', 'original_msg_id': 1354390488060264488, 'prompt_id': 1354390489155239978, 'channel_id': 1354032257425342524}}
+2025-03-26 10:46:35,064 - INFO - Received signal to terminate bot and event loop.
+2025-03-26 10:46:35,065 - INFO - Cleaning up tasks.
+2025-03-26 10:46:35,066 - INFO - Cleaning up after 1 tasks.
+2025-03-26 10:46:35,067 - INFO - All tasks finished cancelling.
+2025-03-26 10:46:35,068 - INFO - Closing the event loop.
