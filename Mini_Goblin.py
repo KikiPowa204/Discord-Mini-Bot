@@ -52,6 +52,13 @@ async def on_ready():
 @commands.has_permissions(administrator=True)
 async def setup(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
+    print ('in setup')
+    # Check if the bot has the necessary permissions
+    bot_member = ctx.guild.get_member(bot.user.id)
+    if not bot_member.guild_permissions.manage_channels:
+        await ctx.send("❌ I need the 'Manage Channels' permission to set up channels.")
+        return
+
     def check(m):
         return m.author == ctx.author and m.channel == ctx.channel
 
@@ -63,15 +70,7 @@ async def setup(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
         await ctx.send("❌ Setup timed out. Please try again.")
         return
 
-    await ctx.send("Please enter the name of the gallery channel (or type 'default' to create a new one):")
-    try:
-        gallery_response = await bot.wait_for('message', check=check, timeout=60)
-        gallery_channel_name = gallery_response.content.strip()
-    except asyncio.TimeoutError:
-        await ctx.send("❌ Setup timed out. Please try again.")
-        return
-
-    # Handle submissions channel
+    # Handle submissions and gallery channels (existing logic remains unchanged)
     if submit_channel_name.lower() == 'default':
         bot.submit_chan = await ctx.guild.create_text_channel(
             DEFAULTS['submissions_chan'],
@@ -84,10 +83,9 @@ async def setup(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
             return
 
     # Handle gallery channel
-    if gallery_channel_name.lower() == 'default':
-        bot.gallery_chan = await ctx.guild.create_text_channel(
-            DEFAULTS['gallery_chan'],
-            topic="Bot-generated painting examples"
+    bot.gallery_chan = await ctx.guild.create_text_channel(
+        DEFAULTS['gallery_chan'],
+        topic="Bot-generated painting examples"
         )
 
     # Set permissions
@@ -110,20 +108,27 @@ async def on_message(message):
     try:
         if message.author == bot.user:
             return
-            
+
+        # Allow commands like !setup to bypass the channel restriction
+        if message.content.startswith('!'):
+            await bot.process_commands(message)
+            return
+
+        # Ensure the message is in the submissions channel
+        if bot.submit_chan and message.channel != bot.submit_chan:
+            return
+
         # Handle image submissions
         if message.attachments and any(
-            att.filename.lower().endswith(('.png','.jpg','.jpeg','.gif'))
+            att.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))
             for att in message.attachments
         ):
             await process_image_submission(message)
-        
+
         # Handle metadata replies
         elif message.reference:
             await handle_metadata_reply(message)
-            
-        await bot.process_commands(message)
-        
+
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)
 async def handle_metadata_reply(message):
@@ -383,6 +388,9 @@ async def delete_entry(ctx):
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
     """Display miniatures matching the search term"""
+    if ctx.channel != bot.gallery_chan:
+        await ctx.send(f"❌ This command can only be used in {bot.gallery_chan.mention}.", delete_after=10)
+        return
     try:
         # Parse query (allow optional count like "lucian 3")
         parts = search_query.split()
