@@ -485,5 +485,5 @@ async def debug_db(ctx):
         f"Pending: {len(pending_submissions)}"
     )
 if __name__ == "__main__":
-
+    bot.run(os.getenv("DISCORD_TOKEN"))
 # Last updated 03/25/2025 14:17:34
