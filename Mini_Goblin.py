@@ -7,6 +7,7 @@ from pathlib import Path
 import sqlite3
 from mini_storage import store_submission, is_duplicate
 import logging
+import asyncio
 
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
@@ -24,6 +25,7 @@ DEFAULTS = {
     'submissions_chan': 'miniature-submissions',
     'gallery_chan': 'miniature-gallery'
 }
+
 
 # Runtime storage
 intents = discord.Intents.default()
@@ -50,20 +52,48 @@ async def on_ready():
 @commands.has_permissions(administrator=True)
 async def setup(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
-    # Create channels
-    bot.submit_chan = await ctx.guild.create_text_channel(
-        DEFAULTS['submissions_chan'],
-        topic="Post your painted miniatures here"
-    )
-    bot.gallery_chan = await ctx.guild.create_text_channel(
-        DEFAULTS['gallery_chan'],
-        topic="Bot-generated painting examples"
-    )
-    
+    def check(m):
+        return m.author == ctx.author and m.channel == ctx.channel
+
+    await ctx.send("Please enter the name of the submissions channel (or type 'default' to create a new one):")
+    try:
+        submit_response = await bot.wait_for('message', check=check, timeout=60)
+        submit_channel_name = submit_response.content.strip()
+    except asyncio.TimeoutError:
+        await ctx.send("❌ Setup timed out. Please try again.")
+        return
+
+    await ctx.send("Please enter the name of the gallery channel (or type 'default' to create a new one):")
+    try:
+        gallery_response = await bot.wait_for('message', check=check, timeout=60)
+        gallery_channel_name = gallery_response.content.strip()
+    except asyncio.TimeoutError:
+        await ctx.send("❌ Setup timed out. Please try again.")
+        return
+
+    # Handle submissions channel
+    if submit_channel_name.lower() == 'default':
+        bot.submit_chan = await ctx.guild.create_text_channel(
+            DEFAULTS['submissions_chan'],
+            topic="Post your painted miniatures here"
+        )
+    else:
+        bot.submit_chan = discord.utils.get(ctx.guild.channels, name=submit_channel_name)
+        if not bot.submit_chan:
+            await ctx.send(f"❌ Channel '{submit_channel_name}' not found. Please try again.")
+            return
+
+    # Handle gallery channel
+    if gallery_channel_name.lower() == 'default':
+        bot.gallery_chan = await ctx.guild.create_text_channel(
+            DEFAULTS['gallery_chan'],
+            topic="Bot-generated painting examples"
+        )
+
     # Set permissions
     await bot.submit_chan.set_permissions(ctx.guild.default_role, send_messages=True)
     await bot.gallery_chan.set_permissions(ctx.guild.default_role, send_messages=False)
-    
+
     await ctx.send(
         f"✅ Setup complete!\n"
         f"- Submissions: {bot.submit_chan.mention}\n"
@@ -304,30 +334,52 @@ async def handle_submission(message):
     except Exception as e:
         await message.channel.send("❌ Something went wrong - please check your input")
         print(f"Unexpected error: {e}")  # Log for debugging
-        @bot.command(name='del')
-        @commands.has_permissions(administrator=True)
-        async def delete_entry(ctx):
-            """Remove an entry from the database by replying to the post"""
-            if not ctx.message.reference:
-                await ctx.send("❌ Please reply to the message you want to delete.", delete_after=10)
-                return
 
-            try:
-            # Get the referenced message
-                referenced_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-                message_id = referenced_message.id
+@bot.command(name='del')
+@commands.has_permissions(administrator=True)
+async def delete_entry(ctx):
+    """Remove an entry from the database by replying to the post"""
+    if not ctx.message.reference:
+        await ctx.send("❌ Please reply to the message you want to delete.", delete_after=10)
+        return
 
+    try:
+    # Get the referenced message
+        if ctx.message.reference:
+            # If the command is a reply to a message, fetch the referenced message
+            referenced_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            message_id = referenced_message.id
+            
+        if referenced_message.author == bot.user and referenced_message.embeds:
+            embed = referenced_message.embeds[0]
+            if embed.image and embed.image.url:
+                image_url = embed.image.url
                 with sqlite3.connect(DB_FILE) as conn:
                     c = conn.cursor()
-                    c.execute("DELETE FROM miniatures WHERE message_id = ?", (message_id,))
-                    if c.rowcount == 0:
-                        await ctx.send(f"❌ No entry found for the referenced message.", delete_after=10)
+                    c.execute("SELECT message_id FROM miniatures WHERE image_url = ?", (image_url,))
+                    result = c.fetchone()
+                    if result:
+                        message_id = result[0]
+                    else:
+                        await ctx.send("❌ o entry found for the referenced image.", delete_after=10)
                         return
-                    conn.commit()
+            
+        else:
+            # If not a reply, assume the user provides the message ID directly
+            if not ctx.message.content.strip().split(" ")[1:]:
+                await ctx.send("❌ Please provide a message ID or reply to a message.", delete_after=10)
+                return
+        with sqlite3.connect(DB_FILE) as conn:
+            c = conn.cursor()
+            c.execute("DELETE FROM miniatures WHERE message_id = ?", (message_id,))
+            if c.rowcount == 0:
+                await ctx.send(f"❌ No entry found for the referenced message.", delete_after=10)
+                return
+            conn.commit()
 
-                await ctx.send(f"✅ Entry for the referenced message has been removed.", delete_after=10)
-            except Exception as e:
-                logging.error(f"Error deleting message: {e}")
+        await ctx.send(f"✅ Entry for the referenced message has been removed.", delete_after=10)
+    except Exception as e:
+        logging.error(f"Error deleting message: {e}")
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
     """Display miniatures matching the search term"""
@@ -341,7 +393,7 @@ async def show_examples(ctx, *, search_query: str):
         with sqlite3.connect(DB_FILE) as conn:
             c = conn.cursor()
             c.execute('''
-                SELECT image_url, stl_name, bundle_name 
+                SELECT image_url, user_id, stl_name, bundle_name
                 FROM miniatures
                 WHERE stl_name LIKE ?
                 ORDER BY RANDOM()
@@ -353,16 +405,19 @@ async def show_examples(ctx, *, search_query: str):
         if not results:
             return await ctx.send(f"No examples found for '{name}'", delete_after=15)
 
-        for image_url, stl_name, bundle_name in results:
+        for image_url, user_id, stl_name, bundle_name in results:
             try:
                 embed = discord.Embed(
-                    title=f"{stl_name}",
-                    description=f"From {bundle_name}" if bundle_name else "",
-                    color=0x3498db
-                )
+                title=f"{stl_name}",
+                description=f"From {bundle_name}" if bundle_name else "No bundle name provided",
+                color=0x3498db
+            )
                 embed.set_image(url=image_url)
+                user = await bot.fetch_user(user_id)
+                user_display_name = str(user) if user else f"User ID: {user_id}"
+                embed.set_footer(text=f"Submitted by: {user_display_name}")
                 await ctx.send(embed=embed)
-                
+            
             except Exception as e:
                 print(f"Error showing {stl_name}: {e}")
                 await ctx.send(f"🖼️ **{stl_name}** (Image unavailable)")
@@ -381,6 +436,20 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+# to always keep the gallery channel empty
+def gallery_janitor():
+    async def cleanup_gallery():
+        if not bot.gallery_chan:  # Ensure the gallery channel exists
+            return
+        try:
+            async for message in bot.gallery_chan.history(limit=200):
+                if message.author == bot.user:
+                    await message.delete(delay=600)  # Deletes the bot's message after 10 minutes
+                else:
+                    await message.delete(delay=3600)  # Deletes other messages after 1 hour
+        except Exception as e:
+            logging.error(f"Gallery cleanup error: {e}")
+        return cleanup_gallery
 @bot.command()
 async def debug_pending(ctx):
     """Show current pending submissions"""
