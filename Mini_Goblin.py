@@ -8,6 +8,16 @@ import sqlite3
 from mini_storage import store_submission, is_duplicate
 import logging
 import asyncio
+from dotenv import load_dotenv
+
+# Load environment variables first
+load_dotenv()  # This loads from .env file
+TOKEN = os.getenv('DISCORD_TOKEN')
+
+if __name__ == "__main__":
+    if not TOKEN:
+        raise ValueError("No Discord token found! Check your .env file")
+    bot.run(TOKEN)
 
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
