@@ -304,7 +304,30 @@ async def handle_submission(message):
     except Exception as e:
         await message.channel.send("❌ Something went wrong - please check your input")
         print(f"Unexpected error: {e}")  # Log for debugging
+        @bot.command(name='del')
+        @commands.has_permissions(administrator=True)
+        async def delete_entry(ctx):
+            """Remove an entry from the database by replying to the post"""
+            if not ctx.message.reference:
+                await ctx.send("❌ Please reply to the message you want to delete.", delete_after=10)
+                return
 
+            try:
+            # Get the referenced message
+                referenced_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+                message_id = referenced_message.id
+
+                with sqlite3.connect(DB_FILE) as conn:
+                    c = conn.cursor()
+                    c.execute("DELETE FROM miniatures WHERE message_id = ?", (message_id,))
+                    if c.rowcount == 0:
+                        await ctx.send(f"❌ No entry found for the referenced message.", delete_after=10)
+                        return
+                    conn.commit()
+
+                await ctx.send(f"✅ Entry for the referenced message has been removed.", delete_after=10)
+            except Exception as e:
+                logging.error(f"Error deleting message: {e}")
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
     """Display miniatures matching the search term"""
