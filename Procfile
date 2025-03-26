@@ -1,1 +1,1 @@
-worker: python Mini_Goblin.py
+bot: python Mini_Goblin.py
