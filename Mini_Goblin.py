@@ -11,13 +11,6 @@ import asyncio
 from dotenv import load_dotenv
 
 # Load environment variables first
-load_dotenv()  # This loads from .env file
-TOKEN = os.getenv('DISCORD_TOKEN')
-
-if __name__ == "__main__":
-    if not TOKEN:
-        raise ValueError("No Discord token found! Check your .env file")
-    bot.run(TOKEN)
 
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
@@ -492,6 +485,5 @@ async def debug_db(ctx):
         f"Pending: {len(pending_submissions)}"
     )
 if __name__ == "__main__":
-    bot.run(os.getenv('DISCORD_TOKEN'))
 
 # Last updated 03/25/2025 14:17:34
