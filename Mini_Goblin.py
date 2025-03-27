@@ -277,31 +277,33 @@ async def handle_metadata_reply(message):
 
 async def process_image_submission(message):
     # Add guild_id but make it optional
-    try:
-        image = message.attachments[0:]
-        submission_id = f"{message.id}-{message.author.id}"  # Unique ID
-        
-        bot.pending_subs[submission_id] = {
-            'user_id': message.author.id,
-            'guild_id': str(message.guild.id),
-            'channel_id': message.channel.id,
-            'image_url': image.url,
-            'original_msg_id': message.id,
-            }
-        
-        # Send prompt and store prompt message ID
-        prompt_msg = await message.channel.send(f"{message.author.mention}\n STL: ModelName\nBundle: BundleName\nTags: optional", delete_after=300)
-        bot.pending_subs[submission_id]['prompt_msg_id'] = prompt_msg.id
-        
-        # Add timeout cleanup
-        asyncio.create_task(
-            clear_pending_submission(submission_id, timeout=3600)  # 1 hour timeout
-        )
-        
-    except Exception as e:
-        logging.error(f"Submission processing error: {e}")
-        await message.channel.send("❌ Failed to process submission", delete_after=10)
+    if not message.attachments:
+        await message.channel.send("❌ No attachments found", delete_after=10)
+        return
 
+    for attachment in message.attachments:  # Direct iteration
+        try:
+            if not attachment.filename.lower().endswith(('.png','.jpg','.jpeg','.webp')):
+                continue  # Skip non-image files
+
+            submission_id = f"{message.id}-{message.author.id}-{attachment.id}"
+            
+            bot.pending_subs[submission_id] = {
+                'user_id': message.author.id,
+                'guild_id': str(message.guild.id),
+                'channel_id': message.channel.id,
+                'image_url': attachment.url,
+                'original_msg_id': message.id,
+                'attachment_id': attachment.id
+            }
+
+            # Process each attachment individually
+            await handle_attachment(attachment)
+
+        except Exception as e:
+            logging.error(f"Failed to process attachment {attachment.filename}: {e}")
+
+    await message.channel.send(f"✅ Processed {len(message.attachments)} attachment(s)", delete_after=10)
 async def clear_pending_submission(submission_id, timeout):
     await asyncio.sleep(timeout)
     if submission_id in bot.pending_subs:
