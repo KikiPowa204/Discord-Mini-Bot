@@ -5,11 +5,10 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 import sqlite3
-#from mini_storage import mini_storage  # Import the instance
-from mini_storage import mini_storager, guild_manager
+from mini_storage import store_submission, is_duplicate
 import logging
-import asyncio  
-
+import asyncio
+import guild_manager
 # Load environment variables first
 
 # Initialize global variables
@@ -40,47 +39,59 @@ def get_server_db(guild_id):
 intents=discord.Intents.all()
 intents.message_content = True
 intents.messages = True  # Needed for message history
+intents.guild = True
 
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def setup_DB(ctx):
-    """Initialize database for this server"""
+    """Initialize database for this server (explicit admin command)"""
     guild_id = ctx.guild.id
-    print(dir(mini_storager))  # Shows available functions
-    mini_storager.init_db(guild_id)
+    guild_manager.get_guild_db(guild_id)  # This creates if doesn't exist
     await ctx.send("✅ Server database initialized!")
 
-bot.pending_subs = {}  # Single source for pending submissions
+@bot.event
+async def on_guild_join(guild):
+    """Automatically initialize storage for new guilds"""
+    db_path = guild_manager.get_guild_db(guild.id)
+    print(f"Initialized storage for new guild: {guild.name} ({guild.id}) at {db_path}")
+    
+    # Optional: Send welcome message to system channel
+    if guild.system_channel:
+        await guild.system_channel.send(
+            "Thanks for adding me! Use `!setup_DB` to configure submission channels."
+        )
+@bot.command()
+async def check_db(ctx):
+    """Verify database is working"""
+    guild_id = ctx.guild.id
+    db_path = guild_manager.get_guild_db(guild_id)
+    await ctx.send(f"✅ Guild database active at: `{db_path}`")
 @bot.event
 async def on_ready():
-    for guild in bot.guilds:
-        print(dir(mini_storager))  # Shows available functions
-        mini_storager.init_db(guild.id)
-    """Bot startup handler"""
+    """Bot startup initialization"""
     print(f'{bot.user.name} online in {len(bot.guilds)} guilds!')
-    # Initialize database
-    bot.pending_subs.clear() 
+    bot.pending_subs = {}  # Reset pending submissions
     
+    # Initialize databases for all current guilds
     for guild in bot.guilds:
-        print(dir(mini_storager))  # Shows available functions
-        mini_storager.init_db(guild.id)  # Guild-specific DB
-        print(f"Initialized DB for guild: {guild.name} ({guild.id})")
-    # mini_storage.init_db() # Single DB mode for future use
-
-    # Find existing channels
+        guild_manager.get_guild_db(guild.id)
+        
+    # Find existing channels (first guild with both channels wins)
     for guild in bot.guilds:
         bot.submit_chan = discord.utils.get(guild.channels, name=DEFAULTS['submissions_chan'])
         bot.gallery_chan = discord.utils.get(guild.channels, name=DEFAULTS['gallery_chan'])
         if bot.submit_chan and bot.gallery_chan:
+            print(f"Found channels in {guild.name}")
             break
-    print(f'{bot.user.name} ready! Servers: {len(bot.guilds)}')
-@bot.command(name='setup_chan')
+    else:
+        print("Warning: No submission/gallery channels found")
+
+@bot.command(name='setup')
 @commands.has_permissions(administrator=True)
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
-    print(dir(mini_storager))  # Shows available functions
-    mini_storager.init_db(ctx.guild.id)
+    mini_storage.init_db(ctx.guild.id)
     # Check if the bot has the necessary permissions
     bot_member = ctx.guild.get_member(bot.user.id)
     if not bot_member.guild_permissions.manage_channels:
@@ -208,7 +219,7 @@ async def handle_metadata_reply(message):
             return
         
         # Store submission
-        mini_storager.store_submission(
+        mini_storage.store_submission(
             user_id=submission['user_id'],
             message_id=submission['original_msg_id'],
             image_url=submission['image_url'],
@@ -249,9 +260,6 @@ async def handle_metadata_reply(message):
         )
 async def process_image_submission(message):
     # Add guild_id but make it optional
-    guild_id = message.guild.id if message.guild else None
-    mini_storager.store_submission(
-        guild_id)
     try:
         image = message.attachments[0]
         image_url = image.url
@@ -275,8 +283,6 @@ async def process_image_submission(message):
         }
         
         # Log the pending submissions
-        logging.info(f"Pending submissions updated: {bot.pending_subs}")
-        
     except Exception as e:
         logging.error(f"Image processing error: {e}")
         await message.channel.send("❌ Failed to process image", delete_after=5)    
@@ -307,7 +313,7 @@ class TaggingModal(discord.ui.Modal):
             await interaction.response.send_message("Submission expired", ephemeral=True)
             return
         
-        mini_storager.store_submission(
+        store_submission(
         user_id=submission['user_id'],
         message_id=submission['original_msg_id'],
         image_url=submission['image_url'],
@@ -355,7 +361,7 @@ async def handle_submission(message):
             return
             
         # Store in database
-        mini_storager.store_submission(
+        store_submission(
             user_id=message.author.id,
             message_id=message.id,
             image_url=image_url,
@@ -421,7 +427,7 @@ async def delete_entry(ctx):
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
     # Automatically handles both single-DB and multi-DB modes
-    db_path = mini_storager.db_path(ctx.guild.id if ctx.guild else None)
+    db_path = mini_storage.get_db_path(ctx.guild.id if ctx.guild else None)
     
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
