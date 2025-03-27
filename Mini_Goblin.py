@@ -65,7 +65,7 @@ async def on_ready():
 
 @bot.command(name='setup_db')
 @commands.has_permissions(administrator=True)
-async def setup(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
+async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
     mini_storage.init_db(ctx.guild.id)
