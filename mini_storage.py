@@ -82,7 +82,7 @@ class MiniStorage:
             return False
 
 # Singleton instance for easy import
-mini_storage = MiniStorage()
+mini_storage = MiniStorage(guild_manager)
 
 # Test when run directly
 if __name__ == "__main__":
