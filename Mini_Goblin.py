@@ -282,7 +282,7 @@ async def process_image_submission(message):
         }
         
         # Send prompt and store prompt message ID
-        prompt_msg = await message.channel.send(f"{message.author.mention} Please reply with your model details...")
+        prompt_msg = await message.channel.send(f"{message.author.mention} STL: ModelName\nBundle: BundleName\nTags: optional," delete_after=15)
         bot.pending_subs[submission_id]['prompt_msg_id'] = prompt_msg.id
         
         # Add timeout cleanup
