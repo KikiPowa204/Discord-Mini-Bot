@@ -27,6 +27,17 @@ DEFAULTS = {
     'gallery_chan': 'miniature-gallery'
 }
 
+def get_guild_info(guild):
+    """Safe extraction of guild information"""
+    try:
+        return {
+            'id': guild_id,
+            'name': guild_name,
+            'channel': guild.system_channel.id if guild.system_channel else None
+        }
+    except AttributeError:
+        return None
+    
 def get_server_db(guild_id):
     """Get a database connection for a specific server"""
     db_dir = Path("server_dbs")
@@ -43,15 +54,24 @@ intents.messages = True  # Needed for message history
 @commands.has_permissions(administrator=True)
 async def setup_DB(ctx):
     """Initialize database for this server (explicit admin command)"""
-    guild_id = ctx.guild.id
+    guild_id = ctx.guild_id
     guild_manager.get_guild_db(guild_id)  # This creates if doesn't exist
     await ctx.send("✅ Server database initialized!")
 
 @bot.event
 async def on_guild_join(guild):
-    """Automatically initialize storage for new guilds"""
-    db_path = guild_manager.get_guild_db(guild.id)
-    print(f"Initialized storage for new guild: {guild.name} ({guild.id}) at {db_path}")
+    """Auto-initialize for new guilds"""
+    try:
+        db_path = guild_manager.init_guild_db(guild)
+        print(f"Initialized DB for {guild_id}")
+        
+        # Optional welcome message
+        if guild.system_channel:
+            await guild.system_channel.send(
+        "Little Goblin is ready to steal your pics! Start with a !setup_Chan command!"
+        )    
+    except Exception as e:
+        print(f"Failed to init DB for new guild: {str(e)}")
     
     # Optional: Send welcome message to system channel
     if guild.system_channel:
@@ -61,7 +81,7 @@ async def on_guild_join(guild):
 @bot.command()
 async def check_db(ctx):
     """Verify database is working"""
-    guild_id = ctx.guild.id
+    guild_id = ctx.guild_id
     db_path = guild_manager.get_guild_db(guild_id)
     await ctx.send(f"✅ Guild database active at: `{db_path}`")
 @bot.event
@@ -72,7 +92,7 @@ async def on_ready():
     
     # Initialize databases for all current guilds
     for guild in bot.guilds:
-        guild_manager.get_guild_db(guild.id)
+        guild_manager.get_guild_db(guild_id)
         
     # Find existing channels (first guild with both channels wins)
     for guild in bot.guilds:
@@ -89,7 +109,7 @@ async def on_ready():
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
-    mini_storager.init_db(ctx.guild.id)
+    mini_storager.init_db(ctx.guild_id)
     # Check if the bot has the necessary permissions
     bot_member = ctx.guild.get_member(bot.user.id)
     if not bot_member.guild_permissions.manage_channels:
@@ -169,7 +189,7 @@ async def on_message(message):
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)
 async def handle_metadata_reply(message):
-    guild_id = message.guild.id
+    guild_id = message.guild_id
     if not message.reference:
         logging.error("No message reference found")
         return
@@ -397,7 +417,7 @@ async def delete_entry(ctx):
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
     # Automatically handles both single-DB and multi-DB modes
-    db_path = mini_storager.get_db_path(ctx.guild.id if ctx.guild else None)
+    db_path = mini_storager.get_db_path(ctx.guild_id if ctx.guild else None)
     
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
