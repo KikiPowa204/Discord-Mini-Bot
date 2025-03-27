@@ -257,7 +257,7 @@ async def handle_metadata_reply(message):
             await message.channel.send("❌ Both STL and Bundle names are required")
             return
         success = mysql_storage.store_submission(
-            guild_id=str(submission['guild_id']),
+            #guild_id=str(submission['guild_id']),
             user_id=str(submission['user_id']),
             message_id=str(submission['original_msg_id']),
             image_url=submission['image_url'],
