@@ -59,7 +59,8 @@ async def on_ready():
     
     for guild in bot.guilds:
         mini_storage.init_db(guild.id)  # Guild-specific DB
-    mini_storage.init_db()
+        print(f"Initialized DB for guild: {guild.name} ({guild.id})")
+    # mini_storage.init_db() # Single DB mode for future use
 
     # Find existing channels
     for guild in bot.guilds:
@@ -67,7 +68,7 @@ async def on_ready():
         bot.gallery_chan = discord.utils.get(guild.channels, name=DEFAULTS['gallery_chan'])
         if bot.submit_chan and bot.gallery_chan:
             break
-
+    print(f'{bot.user.name} ready! Servers: {len(bot.guilds)}')
 @bot.command(name='setup_chan')
 @commands.has_permissions(administrator=True)
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
