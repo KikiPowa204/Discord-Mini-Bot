@@ -297,18 +297,15 @@ async def process_image_submission(message):
         )
         
         # Store in bot.pending_subs
-        bot.pending_subs[prompt.id] = {
+        image = message.attachments[0]
+        bot.pending_subs[message.id] = {
             'user_id': message.author.id,
-            'image_url': image_url,
-            'original_msg_id': message.id,
-            'prompt_id': prompt.id,
-            'channel_id': message.channel.id
+            'image_url': image.url,
+            'guild_id': str(message.guild.id)  # Critical for MySQL
         }
-        
-        # Log the pending submissions
+        await message.add_reaction('🔄')  # Processing reaction
     except Exception as e:
-        logging.error(f"Image processing error: {e}")
-        await message.channel.send("❌ Failed to process image", delete_after=5)    
+        await message.channel.send(f"❌ Image processing failed: {str(e)}", delete_after=5)    
 class SubmissionButtons(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=3600)  # 1 hour timeout
@@ -325,18 +322,35 @@ class TaggingModal(discord.ui.Modal):
         self.add_item(discord.ui.TextInput(label="Tags (optional)", placeholder="NMM, OSL, freehand", required=False))
     
     async def on_submit(self, interaction):
-        # Find the submission in bot.pending_subs
         submission = next(
             (v for k,v in bot.pending_subs.items() 
             if v['prompt_id'] == interaction.message.id),
             None
-    )
+            )
     
         if not submission:
-            await interaction.response.send_message("Submission expired", ephemeral=True)
-            return
+            return await interaction.response.send_message("❌ Submission expired", ephemeral=True)
     
-        await interaction.response.send_message("✅ Tagged successfully!", ephemeral=True)
+        try:
+            success = mysql_storage.store_submission(
+                guild_id=submission['guild_id'],
+                user_id=submission['user_id'],
+                message_id=submission['original_msg_id'],
+                image_url=submission['image_url'],
+                stl_name=self.children[0].value,  # From STL input
+                bundle_name=self.children[1].value,  # From Bundle input
+                tags=self.children[2].value  # From Tags input
+        )
+        
+            if success:
+                await interaction.response.send_message("✅ Saved to database!", ephemeral=True)
+                await interaction.message.add_reaction('✅')
+            else:
+                await interaction.response.send_message("❌ Failed to save", ephemeral=True)
+            
+        except Exception as e:
+            logging.error(f"Storage failed: {e}")
+            await interaction.response.send_message("⚠️ Database error occurred", ephemeral=True)
     
     # Cleanup
         try:
@@ -351,8 +365,10 @@ async def handle_submission(message):
     print (message)
     try:
         # Validate input
-        if not message.attachments:
-            await message.channel.send("❌ Please attach an image!")
+        if not message.attachments or not any(
+            message.attachments[0].filename.lower().endswith(ext) for ext in ('.jpg', '.jpeg', '.png', '.gif')
+        ):
+            await message.channel.send("❌ Please attach a valid image file (jpg, jpeg, png, gif)!")
             return
             
         stl_name = None
