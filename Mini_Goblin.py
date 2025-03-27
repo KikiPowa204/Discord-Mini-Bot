@@ -46,6 +46,7 @@ intents.messages = True  # Needed for message history
 async def setup_DB(ctx):
     """Initialize database for this server"""
     guild_id = ctx.guild.id
+    print(dir(mini_storage))  # Shows available functions
     mini_storage.init_db(guild_id)
     await ctx.send("✅ Server database initialized!")
 
