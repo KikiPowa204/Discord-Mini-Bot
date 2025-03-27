@@ -231,14 +231,16 @@ async def handle_metadata_reply(message):
         
         # Create metadata dictionary with all required fields
         metadata = {
-            'guild_id': submission['guild_id'],  # From pending submission
-            'user_id': submission['user_id'],    # From pending submission
-            'message_id': submission['original_msg_id'],  # From pending submission
-            'image_url': submission['image_url'],  # From pending submission
+            #'guild_id': submission['guild_id'],  # From pending submission
+            #'user_id': submission['user_id'],    # From pending submission
+            #'message_id': submission['original_msg_id'],  # From pending submission
+            #'image_url': submission['image_url'],  # From pending submission
             'stl_name': None,    # To be filled from user input
             'bundle_name': None, # To be filled from user input
             'tags': None         # To be filled from user input (optional)
         }
+
+
         success = mysql_storage.store_submission(**metadata)
         # Parse user input to fill the metadata
         for line in message.content.split('\n'):
@@ -254,7 +256,15 @@ async def handle_metadata_reply(message):
         if not all([metadata['stl_name'], metadata['bundle_name']]):
             await message.channel.send("❌ Both STL and Bundle names are required")
             return
-
+        success = mysql_storage.store_submission(
+            guild_id=str(submission['guild_id']),
+            user_id=str(submission['user_id']),
+            message_id=str(submission['original_msg_id']),
+            image_url=submission['image_url'],
+            stl_name=metadata['stl_name'],
+            bundle_name=metadata['bundle_name'],
+            tags=metadata.get('tags', '')
+        )
         # Store with dictionary unpacking
         if success:
             await message.add_reaction('✅')
