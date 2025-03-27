@@ -5,7 +5,7 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 import sqlite3
-from mini_storage import store_submission, is_duplicate
+from mini_storage import MiniStorage
 import logging
 import asyncio
 
