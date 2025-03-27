@@ -8,14 +8,26 @@ from typing import Dict, Optional  # Add this import
 import guild_manager
 #new version of mini_storage.py to upload
 
+# First define the GuildManager (was missing)
+class GuildManager:
+    def __init__(self):
+        self.server_dbs = Path("server_databases")
+        self.server_dbs.mkdir(exist_ok=True)
+    
+    def get_guild_db(self, guild_id=None):
+        return self.server_dbs / f"guild_{guild_id}.db" if guild_id else Path("miniatures.db")
+
+# Initialize the manager singleton
+guild_manager = GuildManager()
+
 class MiniStorage:
-    def __init__(self, guild_id=None):
+    def __init__(self):
         self.guild_manager = guild_manager  # Make sure guild_manager is imported/defined
     
     def init_db(self, guild_id=None):
-        self.guild_manager = guild_manager
         db_path = self.guild_manager.get_guild_db(guild_id)
         print(f"Using database file: {db_path}")
+        
         with sqlite3.connect(db_path) as conn:
             conn.execute('''
                 CREATE TABLE IF NOT EXISTS miniatures (
@@ -23,7 +35,7 @@ class MiniStorage:
                     guild_id INTEGER NOT NULL,
                     user_id INTEGER NOT NULL,
                     message_id INTEGER NOT NULL,
-                    image_url TEXT NOT NULL,
+                    image_hash TEXT UNIQUE,  # Added for duplicate checking
                     stl_name TEXT NOT NULL,
                     bundle_name TEXT NOT NULL,
                     tags TEXT,
@@ -31,6 +43,8 @@ class MiniStorage:
                 )
             ''')
         print(f"✅ Database initialized at: {db_path}")
+        return db_path
+    
     def store_submission(self, guild_id: int, **kwargs):
         """Store submission with proper guild handling"""
         db_path = self.guild_manager.get_guild_db(guild_id)
@@ -38,13 +52,14 @@ class MiniStorage:
             with sqlite3.connect(db_path) as conn:
                 conn.execute('''
                     INSERT INTO miniatures 
-                    (guild_id, user_id, message_id, image_url, stl_name, bundle_name, tags)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    (guild_id, user_id, message_id, image_url, image_hash, stl_name, bundle_name, tags)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     guild_id,
                     kwargs['user_id'],
                     kwargs['message_id'],
                     kwargs['image_url'],
+                    kwargs.get('image_hash'), 
                     kwargs['stl_name'],
                     kwargs['bundle_name'],
                     kwargs.get('tags')
@@ -73,15 +88,18 @@ mini_storage = MiniStorage()
 
 # Test when run directly
 if __name__ == "__main__":
-    # Initialize test guild DB
+    mini_storage.init_db()
+    
+    # Test guild DB
     TEST_GUILD = 12345
-    guild_manager.get_guild_db(TEST_GUILD)
+    db_path = mini_storage.init_db(TEST_GUILD)
     
     # Test storage
     test_data = {
         'user_id': 123,
         'message_id': 999,
         'image_url': "http://test.com/img.jpg",
+        'image_hash': "abc123",
         'stl_name': "Test Model",
         'bundle_name': "Test Bundle",
         'tags': "test,demo"
@@ -90,9 +108,6 @@ if __name__ == "__main__":
     if mini_storage.store_submission(TEST_GUILD, **test_data):
         print("✅ Test storage successful")
     
-    # Test duplicate check
-    test_hash = "abc123"  # Replace with actual hash
-    if mini_storage.is_duplicate(TEST_GUILD, test_hash):
-        print("⚠️ Test duplicate found")
-    else:
-        print("✅ No duplicates found")
+    # Verify duplicate check
+    if mini_storage.is_duplicate(TEST_GUILD, "abc123"):
+        print("✅ Duplicate check working")
