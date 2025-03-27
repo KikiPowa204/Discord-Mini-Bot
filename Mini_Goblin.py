@@ -29,11 +29,8 @@ print(result)
 
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
-DB_FILE = "miniatures.db"  # Database file path
-print(f"Using database file: {DB_FILE}")
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 # Custom database module
-import mini_storage  # Your database operations file
 #Update this bitch
 
 # Default settings
@@ -420,7 +417,7 @@ async def delete_entry(ctx):
             if not ctx.message.content.strip().split(" ")[1:]:
                 await ctx.send("❌ Please provide a message ID or reply to a message.", delete_after=10)
                 return
-        with connection.connect(DB_FILE) as conn:
+        with connection.connect() as conn:
             c = conn.cursor()
             c.execute("DELETE FROM miniatures WHERE message_id = ?", (message_id,))
             if c.rowcount == 0:
