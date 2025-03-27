@@ -230,7 +230,7 @@ async def handle_metadata_reply(message):
         'guild_id': str(message.guild.id),
         'user_id': str(message.author.id),
         'message_id': str(message.id),
-        'image_url': str(message.attachments[0].url),
+        'image_urls': [str(a.url) for a in message.attachments],
     
         # From user input
         'stl_name': None,
