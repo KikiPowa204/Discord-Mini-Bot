@@ -23,7 +23,7 @@ connection = mysql.connector.connect(
 
 # Use the connection to execute queries
 cursor = connection.cursor()
-cursor.execute("SELECT * FROM your_table")
+cursor.execute("SELECT * FROM miniatures")
 result = cursor.fetchall()
 print(result)
 
