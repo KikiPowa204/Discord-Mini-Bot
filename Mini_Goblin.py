@@ -238,7 +238,6 @@ async def handle_metadata_reply(message):
         'tags': None,
     
         # Generated/optional
-        'created_at': datetime.now(timezone.utc).isoformat(),
         'image_hash': None  # Could be generated later
         }
         
@@ -288,8 +287,7 @@ async def process_image_submission(message):
             'channel_id': message.channel.id,
             'image_url': image.url,
             'original_msg_id': message.id,
-            'created_at': datetime.now(datetime.timezone.utc).isoformat()  # Track submission time
-        }
+            }
         
         # Send prompt and store prompt message ID
         prompt_msg = await message.channel.send(f"{message.author.mention} STL: ModelName\nBundle: BundleName\nTags: optional", delete_after=15)
