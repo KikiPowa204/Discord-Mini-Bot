@@ -278,7 +278,7 @@ async def handle_metadata_reply(message):
 async def process_image_submission(message):
     # Add guild_id but make it optional
     try:
-        image = message.attachments[0]
+        image = message.attachments[0:]
         submission_id = f"{message.id}-{message.author.id}"  # Unique ID
         
         bot.pending_subs[submission_id] = {
