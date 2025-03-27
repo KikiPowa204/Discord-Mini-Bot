@@ -1,168 +1,172 @@
 from pathlib import Path
 from datetime import datetime
-import hashlib
 import os
-from typing import Dict, Optional  # Add this importS
-import mysql.connector
-# Remove: import sqlite3
 from mysql.connector import connect, Error  # Import MySQL connector
+import os
+from typing import Optional
+import mysql.connector
+from mysql.connector import Error
+class MySQLStorage:
+    def __init__(self):
+        self.connection = self._create_connection()
+        self.init_db()  # Initialize tables on startup
 
-
-connection = mysql.connector.connect(
-    host="gondola.proxy.rlwy.net",
-    user="root",
-    password="VFPUYdKKzWeFagKmSOPyINxNqFUnwIRt",
-    port=19512,
-    database="railway"
-)
-
-# Use the connection to execute queries
-cursor = connection.cursor()
-cursor.execute("SELECT * FROM your_table")
-result = cursor.fetchall()
-print(result)
-
-# Don't forget to close the connection when you're done
-cursor.close()
-connection.close()
-
-# Example: Querying the database
-cursor.execute("SELECT * FROM submissions;")
-rows = cursor.fetchall()
-for row in rows:
-    print(row)
-
-#new version of mini_storage.py to upload
-
-class GuildManager:
-    def __init__(self, host, user, password, database):
-        self.host = host
-        self.user = user
-        self.password = password
-        self.database = database
-        self.connection = None  # To store the connection to MySQL
-    
-    def connect(self):
-        """ Establish MySQL connection """
-        if not self.connection:
-            try:
-                self.connection = connect(
-                    host=self.host,
-                    user=self.user,
-                    password=self.password,
-                    database=self.database
-                )
-                print("✅ MySQL connected successfully")
-            except Error as e:
-                print(f"❌ MySQL connection failed: {e}")
-    
-    def close_connection(self):
-        """ Close MySQL connection """
-        if self.connection:
-            self.connection.close()
-            print("✅ MySQL connection closed.")
-    
-    def get_connection(self):
-        """ Returns the active connection """
-        if not self.connection:
-            self.connect()  # Connect if not already connected
-        return self.connection
-class MiniStorage:
-    def __init__(self, guild_manager):
-        self.guild_manager = guild_manager  # MySQL connection manager
-    
-    def init_db(self):
-        """ Initialize the database tables (only once) """
-        connection = self.guild_manager.get_connection()
-        cursor = connection.cursor()
+    def _create_connection(self):
+        """Create and return MySQL connection"""
         try:
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS miniatures (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    guild_id INT NOT NULL,
-                    user_id INT NOT NULL,
-                    message_id INT NOT NULL,
-                    image_url TEXT NOT NULL,
-                    image_hash TEXT UNIQUE,
-                    stl_name TEXT NOT NULL,
-                    bundle_name TEXT NOT NULL,
-                    tags TEXT,
-                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            connection.commit()  # Commit changes
-            print("✅ Database initialized (MySQL)")
+            return mysql.connector.connect(
+                host="gondola.proxy.rlwy.net",
+                user="root",
+                password="VFPUYdKKzWeFagKmSOPyINxNqFUnwIRt",
+                port=19512,
+                database="railway"
+            )
         except Error as e:
-            print(f"❌ Error initializing database: {e}")
-    
-    def store_submission(self, guild_id: int, **kwargs):
-        """ Store submission in the MySQL database """
-        connection = self.guild_manager.get_connection()
-        cursor = connection.cursor()
+            print(f"❌ MySQL connection failed: {e}")
+            raise
+
+    def init_db(self):
+        """Initialize database tables"""
         try:
-            cursor.execute('''
-                INSERT INTO miniatures 
-                (guild_id, user_id, message_id, image_url, image_hash, stl_name, bundle_name, tags)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            ''', (
-                guild_id,
-                kwargs['user_id'],
-                kwargs['message_id'],
-                kwargs['image_url'],
-                kwargs.get('image_hash'),
-                kwargs['stl_name'],
-                kwargs['bundle_name'],
-                kwargs.get('tags')
-            ))
-            connection.commit()  # Commit changes
-            print(f"✅ Stored: {kwargs['stl_name']} (Guild: {guild_id})")
+            with self.connection.cursor() as cursor:
+                # Create guilds table if not exists
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS guilds (
+                        guild_id VARCHAR(255) PRIMARY KEY,
+                        guild_name VARCHAR(255) NOT NULL,
+                        system_channel BIGINT NULL,
+                        last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        INDEX idx_last_seen (last_seen)
+                    )
+                ''')
+                
+                # Create miniatures table if not exists
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS miniatures (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        guild_id VARCHAR(255) NOT NULL,
+                        user_id VARCHAR(255) NOT NULL,
+                        message_id VARCHAR(255) NOT NULL,
+                        image_url TEXT NOT NULL,
+                        stl_name VARCHAR(255) NOT NULL,
+                        bundle_name VARCHAR(255) NOT NULL,
+                        tags TEXT,
+                        image_hash VARCHAR(255),
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        INDEX idx_guild (guild_id),
+                        INDEX idx_stl_name (stl_name),
+                        UNIQUE KEY unique_image (image_hash),
+                        FOREIGN KEY (guild_id) REFERENCES guilds(guild_id)
+                    )
+                ''')
+                
+            self.connection.commit()
+            print("✅ Database tables initialized")
+        except Error as e:
+            print(f"❌ Table creation failed: {e}")
+            raise
+
+    def store_guild_info(self, guild_id: str, guild_name: str, system_channel: Optional[int] = None):
+        """Store basic guild information"""
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute('''
+                    INSERT INTO guilds 
+                    (guild_id, guild_name, system_channel, last_seen)
+                    VALUES (%s, %s, %s, NOW())
+                    ON DUPLICATE KEY UPDATE
+                        guild_name = VALUES(guild_name),
+                        system_channel = VALUES(system_channel),
+                        last_seen = VALUES(last_seen)
+                ''', (guild_id, guild_name, system_channel))
+            self.connection.commit()
             return True
         except Error as e:
-            print(f"❌ Error storing submission: {e}")
+            print(f"❌ Failed to store guild info: {e}")
             return False
 
-    def is_duplicate(self, guild_id: int, image_hash: str) -> bool:
-        """ Check for duplicate image in the MySQL database """
-        connection = self.guild_manager.get_connection()
-        cursor = connection.cursor()
+    def store_submission(self, guild_id: str, **kwargs):
+        """Store submission in MySQL"""
         try:
-            cursor.execute('''
-                SELECT 1 FROM miniatures WHERE image_hash = %s
-            ''', (image_hash,))
-            result = cursor.fetchone()
-            return result is not None
+            # First ensure guild exists
+            self.store_guild_info(
+                guild_id=guild_id,
+                guild_name=kwargs.get('guild_name', 'Unknown Guild'),
+                system_channel=kwargs.get('system_channel')
+            )
+            
+            with self.connection.cursor() as cursor:
+                cursor.execute('''
+                    INSERT INTO miniatures 
+                    (guild_id, user_id, message_id, image_url, 
+                     stl_name, bundle_name, tags, image_hash)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                ''', (
+                    str(guild_id),
+                    str(kwargs['user_id']),
+                    str(kwargs['message_id']),
+                    kwargs['image_url'],
+                    kwargs['stl_name'],
+                    kwargs['bundle_name'],
+                    kwargs.get('tags'),
+                    kwargs.get('image_hash')
+                ))
+            self.connection.commit()
+            return True
         except Error as e:
-            print(f"❌ Error checking duplicates: {e}")
+            print(f"❌ Storage failed: {e}")
             return False
-# MySQL connection details
-host = "your-mysql-host"
-user = "your-mysql-user"
-password = "your-mysql-password"
-database = "your-mysql-database"
 
-# Initialize GuildManager and MiniStorage
-guild_manager = GuildManager(host, user, password, database)
-mini_storager = MiniStorage(guild_manager)
+    def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
+        """Retrieve submissions with search"""
+        try:
+            with self.connection.cursor(dictionary=True) as cursor:
+                cursor.execute('''
+                    SELECT m.*, g.guild_name 
+                    FROM miniatures m
+                    JOIN guilds g ON m.guild_id = g.guild_id
+                    WHERE m.guild_id = %s
+                    AND (m.stl_name LIKE %s OR m.bundle_name LIKE %s OR m.tags LIKE %s)
+                    ORDER BY m.created_at DESC
+                    LIMIT %s
+                ''', (
+                    str(guild_id),
+                    f'%{search_query}%',
+                    f'%{search_query}%',
+                    f'%{search_query}%',
+                    limit
+                ))
+                return cursor.fetchall()
+        except Error as e:
+            print(f"❌ Query failed: {e}")
+            return []
 
-# Initialize the database (creating tables if necessary)
-mini_storager.init_db()
+# Singleton instance
+mysql_storage = MySQLStorage()
 
-# Store and check for duplicates
-TEST_GUILD = 12345
-test_data = {
-    'user_id': 123,
-    'message_id': 999,
-    'image_url': "http://test.com/img.jpg",
-    'image_hash': "abc123",
-    'stl_name': "Test Model",
-    'bundle_name': "Test Bundle",
-    'tags': "test,demo"
-}
-
-if mini_storager.store_submission(TEST_GUILD, **test_data):
-    print("✅ Test storage successful")
-
-# Verify duplicate check
-if mini_storager.is_duplicate(TEST_GUILD, "abc123"):
-    print("✅ Duplicate check working")
-
+if __name__ == "__main__":
+    # Test guild info storage
+    mysql_storage.store_guild_info(
+        guild_id="12345",
+        guild_name="Test Guild",
+        system_channel=67890
+    )
+    
+    # Test submission storage
+    test_data = {
+        'user_id': 123,
+        'message_id': 999,
+        'image_url': "http://test.com/img.jpg",
+        'stl_name': "Test Model",
+        'bundle_name': "Test Bundle",
+        'tags': "test,demo",
+        'image_hash': "abc123",
+        'guild_name': "Test Guild"
+    }
+    
+    if mysql_storage.store_submission("12345", **test_data):
+        print("✅ Test storage successful")
+    
+    # Test retrieval
+    results = mysql_storage.get_submissions("12345", "Test")
+    print(f"Test results: {results}")

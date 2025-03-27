@@ -4,14 +4,14 @@ import os
 import hashlib
 from datetime import datetime
 from pathlib import Path
-from mini_storage import mini_storager
-from mini_storage import guild_manager
 import logging
 import asyncio
+from typing import Optional
 # Load environment variables first
 import mysql.connector
+from mysql.connector import Error
 # Remove: import sqlite3
-
+from mini_storage import mysql_storage
 
 connection = mysql.connector.connect(
     host="gondola.proxy.rlwy.net",
@@ -41,17 +41,18 @@ DEFAULTS = {
     'gallery_chan': 'miniature-gallery'
 }
 
-def get_guild_info(guild):
-    """Safe extraction of guild information"""
+def get_guild_info(guild) -> Optional[dict]:
+    """Safely extract guild information without GuildManager"""
     try:
         return {
-            'id': guild_manager.guild_id,
-            'name': guild_manager.guild_name,
-            'channel': guild.system_channel.id if guild.system_channel else None
+            'id': str(guild.id),  # Convert to string for MySQL compatibility
+            'name': guild.name,
+            'channel': guild.system_channel.id if guild.system_channel else None,
+            'member_count': guild.member_count
         }
-    except AttributeError:
+    except AttributeError as e:
+        print(f"⚠️ Failed to get guild info: {e}")
         return None
-
 # Runtime storage
 intents=discord.Intents.all()
 intents.message_content = True
@@ -62,14 +63,21 @@ intents.messages = True  # Needed for message history
 async def setup_DB(ctx):
     """Initialize database for this server (explicit admin command)"""
     guild_id = ctx.guild.id
-    guild_manager.get_guild_db()  # This creates if doesn't exist
-    await ctx.send("✅ Server database initialized!")
+    guild_name = ctx.guild.name
+    system_channel = ctx.guild.system_channel.id if ctx.guild.system_channel else None
+
+    # Initialize the database for the server
+    mysql_storage.store_guild_info(guild_id, guild_name, system_channel)
+
+    # Send confirmation message
+    await ctx.send(f"✅ Server database initialized for **{guild_name}**!")
+
 
 @bot.event
 async def on_guild_join(guild):
     """Auto-initialize for new guilds"""
     try:
-        db_path = guild_manager.init_guild_db(guild)
+        db_path = mysql_storage.store_guild_info(guild)
         print(f"Initialized DB for {guild.id}")
         
         # Optional welcome message
@@ -89,7 +97,7 @@ async def on_guild_join(guild):
 async def check_db(ctx):
     """Verify database is working"""
     guild_id = ctx.guild_id
-    db_path = guild_manager.get_guild_db()
+    db_path = mysql_storage.init_db()
     await ctx.send(f"✅ Guild database active at: `{db_path}`")
 @bot.event
 async def on_ready():
@@ -99,7 +107,7 @@ async def on_ready():
     
     # Initialize databases for all current guilds
     for guild in bot.guilds:
-        guild_manager.get_guild_db()
+        mysql_storage.init_db()
         
     # Find existing channels (first guild with both channels wins)
     for guild in bot.guilds:
@@ -116,7 +124,7 @@ async def on_ready():
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
-    mini_storager.init_db(ctx.guild_id)
+    mysql_storage.init_db(ctx.guild_id)
     # Check if the bot has the necessary permissions
     bot_member = ctx.guild.get_member(bot.user.id)
     if not bot_member.guild_permissions.manage_channels:
@@ -428,58 +436,24 @@ async def delete_entry(ctx):
         await ctx.send(f"✅ Entry for the referenced message has been removed.", delete_after=10)
         
 @bot.command(name='show')
-async def show_examples(ctx, *, search_query: str):
-    """Display examples matching the search query"""
-    try:
-        # Get the correct DB path
-        db_path = mini_storager.init_db(ctx.guild.id if ctx.guild else None)
-        
-        with connection.connect(db_path) as conn:
-            conn.row_factory = connection.Row  # Enable column name access
-            c = conn.cursor()
-            
-            # Improved query with case-insensitive search
-            c.execute('''
-                SELECT image_url, user_id, stl_name, bundle_name
-                FROM miniatures
-                WHERE LOWER(stl_name) LIKE LOWER(?)
-                ORDER BY RANDOM()
-                LIMIT 5
-            ''', (f'%{search_query}%',))
-            
-            results = c.fetchall()
-
-            if not results:
-                return await ctx.send(f"No examples found for '{search_query}'", delete_after=15)
-
-            for row in results:
-                try:
-                    embed = discord.Embed(
-                        title=row['stl_name'],
-                        description=f"From {row['bundle_name']}" if row['bundle_name'] else "No bundle info",
-                        color=0x3498db
-                    )
-                    embed.set_image(url=row['image_url'])
-                    
-                    try:
-                        user = await bot.fetch_user(row['user_id'])
-                        embed.set_footer(text=f"Submitted by: {user.display_name}")
-                    except:
-                        embed.set_footer(text=f"Submitted by: User ID {row['user_id']}")
-                    
-                    await ctx.send(embed=embed)
-                
-                except Exception as e:
-                    print(f"Error showing {row['stl_name']}: {e}")
-                    await ctx.send(
-                        f"**{row['stl_name']}** (from {row['bundle_name']})\n"
-                        f"{row['image_url']}"
-                    )
-
-    except Exception as e:
-        logging.error(f"Show command failed: {str(e)}")
-        await ctx.send("❌ Failed to search database", delete_after=10)
-
+async def show_examples(ctx, *, search_query: str = ""):
+    """Display examples from MySQL"""
+    submissions = mysql_storage.get_submissions(
+        guild_id=str(ctx.guild.id),
+        search_query=search_query.strip()
+    )
+    
+    if not submissions:
+        return await ctx.send(f"No results for '{search_query}'")
+    
+    for sub in submissions:
+        embed = discord.Embed(
+            title=sub['stl_name'],
+            description=f"From {sub['bundle_name']}",
+            color=0x3498db
+        )
+        embed.set_image(url=sub['image_url'])
+        await ctx.send(embed=embed)
 # Set up logging
 logging.basicConfig(
     level=logging.INFO,
@@ -513,19 +487,28 @@ async def debug_pending(ctx):
 @bot.command()
 async def debug_db(ctx):
     """Show database status"""
-    with connection.connect(DB_FILE) as conn:
-        c = conn.cursor()
-        c.execute("SELECT name FROM mysql WHERE type='table'")
-        tables = c.fetchall()
-        c.execute("SELECT COUNT(*) FROM miniatures")
-        count = c.fetchone()[0]
-        
-    await ctx.send(
+    try:
+        # Get the MySQL connection from mysql_storage
+        with mysql_storage.connection.cursor() as c:
+            # Show list of tables
+            c.execute("SHOW TABLES")
+            tables = c.fetchall()
+
+            # Get the count of records in the miniatures table
+            c.execute("SELECT COUNT(*) FROM miniatures")
+            count = c.fetchone()[0]
+
+        # Send the result back to Discord
+        await ctx.send(f"Tables in database: {tables}\nCount of miniatures: {count}")
+
+        await ctx.send(
         f"Database status:\n"
         f"Tables: {', '.join(t[0] for t in tables)}\n"
         f"Submissions: {count}\n"
         f"Pending: {len(pending_submissions)}"
     )
+    except Error as e:
+        await ctx.send(f"❌ Database error: {e}")
 if __name__ == "__main__":
     bot.run(os.getenv("DISCORD_TOKEN"))
 # Last updated 03/25/2025 14:17:34
