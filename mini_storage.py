@@ -4,7 +4,6 @@ import hashlib
 import os
 from typing import Dict, Optional  # Add this importS
 import mysql.connector
-import psycopg2
 # Remove: import sqlite3
 from mysql.connector import connect, Error  # Import MySQL connector
 

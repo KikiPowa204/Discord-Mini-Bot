@@ -10,9 +10,7 @@ import logging
 import asyncio
 # Load environment variables first
 import mysql.connector
-import psycopg2
 # Remove: import sqlite3
-from mysql.connector import connect, Error  # Import MySQL connector
 
 
 connection = mysql.connector.connect(
@@ -389,27 +387,34 @@ async def delete_entry(ctx):
         await ctx.send("❌ Please reply to the message you want to delete.", delete_after=10)
         return
 
-    try:
     # Get the referenced message
-        if ctx.message.reference:
-            # If the command is a reply to a message, fetch the referenced message
-            referenced_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-            message_id = referenced_message.id
+    if ctx.message.reference:
+        # If the command is a reply to a message, fetch the referenced message
+        referenced_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+        message_id = referenced_message.id
             
-        if referenced_message.author == bot.user and referenced_message.embeds:
-            embed = referenced_message.embeds[0]
-            if embed.image and embed.image.url:
-                image_url = embed.image.url
-                with connection.connect(DB_FILE) as conn:
-                    c = conn.cursor()
-                    c.execute("SELECT message_id FROM miniatures WHERE image_url = ?", (image_url,))
-                    result = c.fetchone()
-                    if result:
-                        message_id = result[0]
-                    else:
-                        await ctx.send("❌ o entry found for the referenced image.", delete_after=10)
-                        return
-            
+    if referenced_message.author == bot.user and referenced_message.embeds:
+        embed = referenced_message.embeds[0]
+    if embed.image and embed.image.url:
+        image_url = embed.image.url
+        try:
+            with mysql.connector.connect(
+                host="your_host",
+                user="your_username",
+                password="your_password",
+                database="your_database"
+            ) as conn:
+                c = conn.cursor()
+                c.execute("SELECT message_id FROM miniatures WHERE image_url = %s", (image_url,))
+                result = c.fetchone()
+                if result:
+                    message_id = result[0]
+                else:
+                    await ctx.send("❌ No entry found for the referenced image.", delete_after=10)
+                    return
+        except mysql.connector.Error as e:
+            await ctx.send(f"❌ Error accessing the database: {e}", delete_after=10)
+            return            
         else:
             # If not a reply, assume the user provides the message ID directly
             if not ctx.message.content.strip().split(" ")[1:]:
@@ -424,8 +429,7 @@ async def delete_entry(ctx):
             conn.commit()
 
         await ctx.send(f"✅ Entry for the referenced message has been removed.", delete_after=10)
-    except Exception as e:
-        logging.error(f"Error deleting message: {e}")
+        
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
     """Display examples matching the search query"""
