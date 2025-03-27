@@ -92,7 +92,7 @@ class MySQLStorage:
 
     def store_submission(self, guild_id: str, **kwargs):
         """Store submission with all required fields"""
-        required = ['user_id', 'message_id', 'image_url', 'stl_name', 'bundle_name']
+        required = ['guild_id', 'user_id', 'message_id', 'image_url', 'stl_name', 'bundle_name']
         if any(kwargs.get(k) is None for k in required):
             print(f"Missing required fields: {required}")
             return False

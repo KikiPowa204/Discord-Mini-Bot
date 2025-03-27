@@ -234,7 +234,7 @@ async def handle_metadata_reply(message):
             #'guild_id': submission['guild_id'],  # From pending submission
             #'user_id': submission['user_id'],    # From pending submission
             #'message_id': submission['original_msg_id'],  # From pending submission
-            'image_url': submission['image_url'],  # From pending submission
+            #'image_url': submission['image_url'],  # From pending submission
             'stl_name': None,    # To be filled from user input
             'bundle_name': None, # To be filled from user input
             'tags': None         # To be filled from user input (optional)
