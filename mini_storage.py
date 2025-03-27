@@ -91,6 +91,10 @@ class MySQLStorage:
             return False
 
     def store_submission(self, guild_id: str, **kwargs):
+        print("\n=== STORING SUBMISSION ===")
+        print(f"Guild ID: {guild_id}")
+        print("Submission data:", kwargs)
+
         """Store submission with all required fields"""
         required = ['guild_id', 'user_id', 'message_id', 'image_url', 'stl_name', 'bundle_name']
         if any(kwargs.get(k) is None for k in required):
@@ -99,36 +103,47 @@ class MySQLStorage:
 
         try:
             with self.connection.cursor() as cursor:
-                # Insert or update guild
+            # 1. Ensure guild exists
                 cursor.execute('''
-                    INSERT INTO guilds (guild_id, last_seen)
-                    VALUES (%s, NOW())
-                    ON DUPLICATE KEY UPDATE last_seen=NOW()
-                ''', (kwargs['guild_id'], f"Guild-{kwargs['guild_id']}"))
-                
-                # Then insert the submission
-                cursor.execute('''
-                    INSERT INTO miniatures (
-                        guild_id, user_id, message_id,
-                        image_url, stl_name, bundle_name, tags
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ''', (
-                    guild_id,
-                    str(kwargs['user_id']),
-                    str(kwargs['message_id']),
-                    kwargs['image_url'],
-                    kwargs['stl_name'],
-                    kwargs['bundle_name'],
-                    kwargs.get('tags', '')
-                ))
-                
+                INSERT INTO guilds (guild_id, guild_name, last_seen)
+                VALUES (%s, %s, NOW())
+                ON DUPLICATE KEY UPDATE last_seen=NOW()
+            ''', (guild_id, kwargs.get('guild_name', f"Guild-{guild_id}")))
+            print(f"✓ Guild {guild_id} ensured")
+
+            # 2. Prepare miniature data
+            miniature_data = (
+                guild_id,
+                str(kwargs['user_id']),
+                str(kwargs['message_id']),
+                kwargs['image_url'],
+                kwargs['stl_name'],
+                kwargs['bundle_name'],
+                kwargs.get('tags', ''),
+                kwargs.get('image_hash', None)  # Handle optional field
+            )
+            print("Miniature data prepared:", miniature_data)
+
+            # 3. Insert miniature
+            cursor.execute('''
+                INSERT INTO miniatures (
+                    guild_id, user_id, message_id,
+                    image_url, stl_name, bundle_name, tags, image_hash
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ''', miniature_data)
+            print(f"✓ Miniature inserted (ID: {cursor.lastrowid})")
+
             self.connection.commit()
+            print("✓ Transaction committed")
             return True
-        except Error as e:
-            print(f"Storage failed: {e}")
+
+        except mysql.connector.Error as e:
+            print(f"✗ Database error: {e}")
             self.connection.rollback()
             return False
-    
+        except Exception as e:
+            print(f"✗ Unexpected error: {e}")
+            return False    
     def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
         """Retrieve submissions with search"""
         try:
@@ -152,6 +167,13 @@ class MySQLStorage:
         except Error as e:
             print(f"❌ Query failed: {e}")
             return []
+
+def check_table_structure():
+    with mysql_storage.connection.cursor(dictionary=True) as cursor:
+        cursor.execute("DESCRIBE miniatures")
+        print("Miniatures table structure:")
+        for column in cursor.fetchall():
+            print(f"{column['Field']}: {column['Type']} {'NULL' if column['Null'] == 'YES' else 'NOT NULL'}")
 
 # Singleton instance
 mysql_storage = MySQLStorage()
