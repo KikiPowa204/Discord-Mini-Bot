@@ -79,8 +79,8 @@ async def on_ready():
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
-    print(dir(mini_storage))  # Shows available functions
-    mini_storage.init_db(ctx.guild.id)
+    print(dir(mini_storager))  # Shows available functions
+    mini_storager.init_db(ctx.guild.id)
     # Check if the bot has the necessary permissions
     bot_member = ctx.guild.get_member(bot.user.id)
     if not bot_member.guild_permissions.manage_channels:
@@ -208,7 +208,7 @@ async def handle_metadata_reply(message):
             return
         
         # Store submission
-        mini_storage.store_submission(
+        mini_storager.store_submission(
             user_id=submission['user_id'],
             message_id=submission['original_msg_id'],
             image_url=submission['image_url'],
@@ -250,7 +250,7 @@ async def handle_metadata_reply(message):
 async def process_image_submission(message):
     # Add guild_id but make it optional
     guild_id = message.guild.id if message.guild else None
-    mini_storage.store_submission(
+    mini_storager.store_submission(
         guild_id=guild_id)
     try:
         image = message.attachments[0]
@@ -306,6 +306,15 @@ class TaggingModal(discord.ui.Modal):
         if not submission:
             await interaction.response.send_message("Submission expired", ephemeral=True)
             return
+        
+        mini_storager.store_submission(
+        user_id=submission['user_id'],
+        message_id=submission['original_msg_id'],
+        image_url=submission['image_url'],
+        stl_name=self.children[0].value,
+        bundle_name=self.children[1].value,
+        tags=self.children[2].value if self.children[2].value else None
+    )
     
         await interaction.response.send_message("✅ Tagged successfully!", ephemeral=True)
     
@@ -344,7 +353,16 @@ async def handle_submission(message):
         if not stl_name:
             await message.channel.send("❌ Missing STL name (use 'STL: Model Name')")
             return
-
+            
+        # Store in database
+        mini_storager.store_submission(
+            user_id=message.author.id,
+            message_id=message.id,
+            image_url=image_url,
+            stl_name=stl_name,
+            bundle_name=bundle_name,
+        )
+        
         await message.add_reaction('✅')
         
     except sqlite3.Error as e:
@@ -403,7 +421,7 @@ async def delete_entry(ctx):
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
     # Automatically handles both single-DB and multi-DB modes
-    db_path = mini_storage.get_db_path(ctx.guild.id if ctx.guild else None)
+    db_path = mini_storager.db_path(ctx.guild.id if ctx.guild else None)
     
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
