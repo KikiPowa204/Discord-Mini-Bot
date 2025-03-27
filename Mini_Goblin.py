@@ -52,6 +52,8 @@ async def setup_DB(ctx):
 bot.pending_subs = {}  # Single source for pending submissions
 @bot.event
 async def on_ready():
+    for guild in bot.guilds:
+        mini_storage.init_db(guild.id)
     """Bot startup handler"""
     print(f'{bot.user.name} online in {len(bot.guilds)} guilds!')
     # Initialize database
