@@ -5,7 +5,7 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 import sqlite3
-from mini_storage import MiniStorage
+import mini_storage
 import logging
 import asyncio
 import guild_manager
