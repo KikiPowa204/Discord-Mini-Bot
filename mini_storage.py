@@ -33,6 +33,7 @@ class MiniStorage:
                     guild_id INTEGER NOT NULL,
                     user_id INTEGER NOT NULL,
                     message_id INTEGER NOT NULL,
+                    image_url TEXT NOT NULL,
                     image_hash TEXT UNIQUE,
                     stl_name TEXT NOT NULL,
                     bundle_name TEXT NOT NULL,
