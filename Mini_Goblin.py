@@ -5,7 +5,8 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 import sqlite3
-from mini_storage import MiniStorage, GuildManager
+from mini_storage import MiniStorage
+from mini_storage import GuildManager
 import logging
 import asyncio
 # Load environment variables first
