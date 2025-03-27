@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import os
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import logging
 import asyncio
@@ -225,11 +225,21 @@ async def handle_metadata_reply(message):
             
         submission = bot.pending_subs[submission_id]
         
-        # Parse metadata
         metadata = {
-            'stl_name': None,
-            'bundle_name': None,
-            'tags': None
+        # From message object
+        'guild_id': str(message.guild.id),
+        'user_id': str(message.author.id),
+        'message_id': str(message.id),
+        'image_url': str(message.attachments[0].url),
+    
+        # From user input
+        'stl_name': None,
+        'bundle_name': None,
+        'tags': None,
+    
+        # Generated/optional
+        'created_at': datetime.now(timezone.utc).isoformat(),
+        'image_hash': None  # Could be generated later
         }
         
         for line in message.content.split('\n'):
