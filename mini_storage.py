@@ -5,7 +5,7 @@ import hashlib
 import os
 # mini_storage.py
 from typing import Dict, Optional  # Add this import
-from guild_manager import guild_manager
+import guild_manager
 #new version of mini_storage.py to upload
 
 class MiniStorage:
