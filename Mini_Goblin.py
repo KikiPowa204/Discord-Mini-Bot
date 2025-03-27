@@ -5,7 +5,7 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 import sqlite3
-import mini_storage
+from mini_storage import mini_storage  # Import the instance
 import logging
 import asyncio
 import guild_manager
@@ -55,7 +55,7 @@ async def on_ready():
     bot.pending_subs = {}
     print(f'{bot.user.name} online!')
     # Initialize database
-    mini_storage.init_db()
+    mini_storage.init_db(ctx.guild.id) 
     
     # Find existing channels
     for guild in bot.guilds:
