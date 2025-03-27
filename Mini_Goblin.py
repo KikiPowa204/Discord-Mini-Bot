@@ -205,12 +205,11 @@ async def on_message(message):
         logging.error(f"Error: {str(e)}", exc_info=True)
 async def handle_metadata_reply(message):
     guild_id = message.guild.id
-    if not message.reference:
-        logging.error("No message reference found")
-        return
+    
     
     try:
         if not message.reference:
+            logging.error("No message reference found")
             return
             
         # Find the original submission
@@ -249,14 +248,6 @@ async def handle_metadata_reply(message):
                 metadata['bundle_name'] = line[7:].strip()
             elif line.startswith('tags:'):
                 metadata['tags'] = line[5:].strip()
-        
-        # Validate required fields
-        if not metadata['stl_name']:
-            return await message.channel.send("❌ STL name is required", delete_after=300)
-        if not metadata['bundle_name']:
-            return await message.channel.send("❌ Bundle name is required", delete_after=300)
-        
-        # Store in MySQL
         success = mysql_storage.store_submission(
             guild_id=submission['guild_id'],
             user_id=submission['user_id'],
@@ -264,6 +255,11 @@ async def handle_metadata_reply(message):
             image_url=submission['image_url'],
             **metadata
         )
+        # Validate required fields
+        if not metadata['stl_name']:
+            return await message.channel.send("❌ STL name is required", delete_after=300)
+        if not metadata['bundle_name']:
+            return await message.channel.send("❌ Bundle name is required", delete_after=300)
         
         if success:
             await message.add_reaction('✅')
