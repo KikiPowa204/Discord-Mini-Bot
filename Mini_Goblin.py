@@ -509,8 +509,6 @@ async def debug_db(ctx):
     )
     except Error as e:
         await ctx.send(f"❌ Database error: {e}")
-@bot.command()
-@commands.is_owner()
 
 if __name__ == "__main__":
     bot.run(os.getenv("DISCORD_TOKEN"))
