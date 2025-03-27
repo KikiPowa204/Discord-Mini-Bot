@@ -278,7 +278,7 @@ async def process_image_submission(message):
             'channel_id': message.channel.id,
             'image_url': image.url,
             'original_msg_id': message.id,
-            'created_at': datetime.utcnow().isoformat()  # Track submission time
+            'created_at': datetime.now(datetime.timezone.utc).isoformat()  # Track submission time
         }
         
         # Send prompt and store prompt message ID
