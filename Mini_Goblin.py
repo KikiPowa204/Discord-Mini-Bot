@@ -31,7 +31,7 @@ def get_guild_info(guild):
     """Safe extraction of guild information"""
     try:
         return {
-            'id': guild_id,
+            'id': guild_manager.guild_id,
             'name': guild_name,
             'channel': guild.system_channel.id if guild.system_channel else None
         }
@@ -55,7 +55,7 @@ intents.messages = True  # Needed for message history
 async def setup_DB(ctx):
     """Initialize database for this server (explicit admin command)"""
     guild_id = ctx.guild_id
-    guild_manager.get_guild_db(guild_id)  # This creates if doesn't exist
+    guild_manager.get_guild_db()  # This creates if doesn't exist
     await ctx.send("✅ Server database initialized!")
 
 @bot.event
@@ -82,7 +82,7 @@ async def on_guild_join(guild):
 async def check_db(ctx):
     """Verify database is working"""
     guild_id = ctx.guild_id
-    db_path = guild_manager.get_guild_db(guild_id)
+    db_path = guild_manager.get_guild_db()
     await ctx.send(f"✅ Guild database active at: `{db_path}`")
 @bot.event
 async def on_ready():
@@ -92,7 +92,7 @@ async def on_ready():
     
     # Initialize databases for all current guilds
     for guild in bot.guilds:
-        guild_manager.get_guild_db(guild_id)
+        guild_manager.get_guild_db()
         
     # Find existing channels (first guild with both channels wins)
     for guild in bot.guilds:
