@@ -48,7 +48,6 @@ async def setup(ctx):
     mini_storage.init_db(guild_id)
     await ctx.send("✅ Server database initialized!")
 
-bot = commands.Bot(command_prefix='!', intents=intents)
 bot.pending_subs = {}  # Single source for pending submissions
 @bot.event
 async def on_ready():
