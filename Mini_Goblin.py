@@ -34,7 +34,7 @@ def get_guild_info(guild):
     try:
         return {
             'id': guild_manager.guild_id,
-            'name': guild_name,
+            'name': guild_manager.guild_name,
             'channel': guild.system_channel.id if guild.system_channel else None
         }
     except AttributeError:
@@ -65,7 +65,7 @@ async def on_guild_join(guild):
     """Auto-initialize for new guilds"""
     try:
         db_path = guild_manager.init_guild_db(guild)
-        print(f"Initialized DB for {guild_id}")
+        print(f"Initialized DB for {guild.id}")
         
         # Optional welcome message
         if guild.system_channel:
