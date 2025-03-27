@@ -419,7 +419,7 @@ async def delete_entry(ctx):
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
     # Automatically handles both single-DB and multi-DB modes
-    db_path = mini_storager.get_db_path(ctx.guild_id if ctx.guild else None)
+    db_path = mini_storager.init_db(ctx.guild_id if ctx.guild else None)
     
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
