@@ -252,9 +252,9 @@ async def handle_metadata_reply(message):
         
         # Validate required fields
         if not metadata['stl_name']:
-            return await message.channel.send("❌ STL name is required", delete_after=10)
+            return await message.channel.send("❌ STL name is required", delete_after=300)
         if not metadata['bundle_name']:
-            return await message.channel.send("❌ Bundle name is required", delete_after=10)
+            return await message.channel.send("❌ Bundle name is required", delete_after=300)
         
         # Store in MySQL
         success = mysql_storage.store_submission(
@@ -290,7 +290,7 @@ async def process_image_submission(message):
             }
         
         # Send prompt and store prompt message ID
-        prompt_msg = await message.channel.send(f"{message.author.mention} STL: ModelName\nBundle: BundleName\nTags: optional", delete_after=15)
+        prompt_msg = await message.channel.send(f"{message.author.mention}\n STL: ModelName\nBundle: BundleName\nTags: optional", delete_after=300)
         bot.pending_subs[submission_id]['prompt_msg_id'] = prompt_msg.id
         
         # Add timeout cleanup
