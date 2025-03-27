@@ -223,6 +223,11 @@ async def handle_metadata_reply(message):
             return await message.channel.send("❌ No active submission found", delete_after=10)
             
         submission = bot.pending_subs[submission_id]
+        mysql_storage.store_guild_info(
+        guild_id=str(message.guild.id),
+        guild_name=message.guild.name,
+        system_channel=message.guild.system_channel.id if message.guild.system_channel else None
+)
         
         # Create metadata dictionary with all required fields
         metadata = {
@@ -234,7 +239,7 @@ async def handle_metadata_reply(message):
             'bundle_name': None, # To be filled from user input
             'tags': None         # To be filled from user input (optional)
         }
-
+        success = mysql_storage.store_submission(**metadata)
         # Parse user input to fill the metadata
         for line in message.content.split('\n'):
             line = line.strip().lower()
@@ -244,7 +249,7 @@ async def handle_metadata_reply(message):
                 metadata['bundle_name'] = line[7:].strip()
             elif line.startswith('tags:'):
                 metadata['tags'] = line[5:].strip()
-
+        
         # Validate required fields before storage
         if not all([metadata['stl_name'], metadata['bundle_name']]):
             await message.channel.send("❌ Both STL and Bundle names are required")

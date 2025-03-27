@@ -104,7 +104,7 @@ class MySQLStorage:
                     INSERT INTO guilds (guild_id, last_seen)
                     VALUES (%s, NOW())
                     ON DUPLICATE KEY UPDATE last_seen=NOW()
-                ''', (guild_id,))
+                ''', (kwargs['guild_id'], f"Guild-{kwargs['guild_id']}"))
                 
                 # Then insert the submission
                 cursor.execute('''
