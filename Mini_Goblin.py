@@ -418,44 +418,56 @@ async def delete_entry(ctx):
         logging.error(f"Error deleting message: {e}")
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
-    # Automatically handles both single-DB and multi-DB modes
-    db_path = mini_storager.init_db(ctx.guild.id if ctx.guild else None)
-    
-    with sqlite3.connect(db_path) as conn:
-        c = conn.cursor()
-        c.execute('''
-            SELECT image_url, user_id, stl_name, bundle_name
-            FROM miniatures
-            WHERE stl_name LIKE ?
-            ORDER BY RANDOM()
-            LIMIT ?
-        ''', (f'%{search_query}%', 5))
-        results = c.fetchall()
-
-        if not results:
-            return await ctx.send(f"No examples found for '{search_query}'", delete_after=15)
-
-        for image_url, user_id, stl_name, bundle_name in results:
-            await ctx.send(f"**{stl_name}** (from {bundle_name})\n{image_url}")
-            try:
-                embed = discord.Embed(
-                title=f"{stl_name}",
-                description=f"From {bundle_name}" if bundle_name else "No bundle name provided",
-                color=0x3498db
-            )
-                embed.set_image(url=image_url)
-                user = await bot.fetch_user(user_id)
-                user_display_name = str(user) if user else f"User ID: {user_id}"
-                embed.set_footer(text=f"Submitted by: {user_display_name}")
-                await ctx.send(embed=embed)
+    """Display examples matching the search query"""
+    try:
+        # Get the correct DB path
+        db_path = mini_storager.get_db_path(ctx.guild.id if ctx.guild else None)
+        
+        with sqlite3.connect(db_path) as conn:
+            conn.row_factory = sqlite3.Row  # Enable column name access
+            c = conn.cursor()
             
-            except Exception as e:
-                print(f"Error showing {stl_name}: {e}")
-                await ctx.send(f"🖼️ **{stl_name}** (Image unavailable)")
+            # Improved query with case-insensitive search
+            c.execute('''
+                SELECT image_url, user_id, stl_name, bundle_name
+                FROM miniatures
+                WHERE LOWER(stl_name) LIKE LOWER(?)
+                ORDER BY RANDOM()
+                LIMIT 5
+            ''', (f'%{search_query}%',))
+            
+            results = c.fetchall()
 
-    
+            if not results:
+                return await ctx.send(f"No examples found for '{search_query}'", delete_after=15)
+
+            for row in results:
+                try:
+                    embed = discord.Embed(
+                        title=row['stl_name'],
+                        description=f"From {row['bundle_name']}" if row['bundle_name'] else "No bundle info",
+                        color=0x3498db
+                    )
+                    embed.set_image(url=row['image_url'])
+                    
+                    try:
+                        user = await bot.fetch_user(row['user_id'])
+                        embed.set_footer(text=f"Submitted by: {user.display_name}")
+                    except:
+                        embed.set_footer(text=f"Submitted by: User ID {row['user_id']}")
+                    
+                    await ctx.send(embed=embed)
+                
+                except Exception as e:
+                    print(f"Error showing {row['stl_name']}: {e}")
+                    await ctx.send(
+                        f"**{row['stl_name']}** (from {row['bundle_name']})\n"
+                        f"{row['image_url']}"
+                    )
+
+    except Exception as e:
         logging.error(f"Show command failed: {str(e)}")
-import logging
+        await ctx.send("❌ Failed to search database", delete_after=10)
 
 # Set up logging
 logging.basicConfig(
