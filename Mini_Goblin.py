@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 import sqlite3
 #from mini_storage import mini_storage  # Import the instance
-from mini_storage import mini_storager
+from mini_storage import mini_storager, guild_manager
 import logging
 import asyncio  
 
@@ -251,7 +251,7 @@ async def process_image_submission(message):
     # Add guild_id but make it optional
     guild_id = message.guild.id if message.guild else None
     mini_storager.store_submission(
-        guild_id=guild_id)
+        guild_id)
     try:
         image = message.attachments[0]
         image_url = image.url
