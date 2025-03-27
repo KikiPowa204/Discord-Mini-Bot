@@ -36,13 +36,13 @@ def get_server_db(guild_id):
     return sqlite3.connect(db_path)
 
 # Runtime storage
-intents = discord.Intents.default()
+intents=discord.Intents.all()
 intents.message_content = True
 intents.messages = True  # Needed for message history
 
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def setup(ctx):
+async def setup_DB(ctx):
     """Initialize database for this server"""
     guild_id = ctx.guild.id
     mini_storage.init_db(guild_id)
@@ -63,7 +63,7 @@ async def on_ready():
         if bot.submit_chan and bot.gallery_chan:
             break
 
-@bot.command(name='setup_db')
+@bot.command(name='setup_Chan')
 @commands.has_permissions(administrator=True)
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
