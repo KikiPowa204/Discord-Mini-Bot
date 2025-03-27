@@ -13,7 +13,6 @@ class MySQLStorage:
         self.connection = self._create_connection()
         self.init_db()  # Initialize tables on startup
         print(f"Autocommit status: {self.connection.autocommit}")
-
     def _create_connection(self):
         """Create and return MySQL connection"""
         try:
@@ -167,6 +166,7 @@ class MySQLStorage:
         except Error as e:
             print(f"❌ Query failed: {e}")
             return []
+mysql_storage = MySQLStorage()
 
 def check_table_structure():
     with mysql_storage.connection.cursor(dictionary=True) as cursor:
@@ -215,7 +215,6 @@ def test_miniature_storage():
 check_table_structure()
 test_miniature_storage()
 # Singleton instance
-mysql_storage = MySQLStorage()
 
 if __name__ == "__main__":
     # Test guild info storage
