@@ -272,18 +272,18 @@ async def handle_metadata_reply(message):
         await message.channel.send("❌ Processing failed", delete_after=10)
 
 async def process_image_submission(message):
-    # Add guild_id but make it optional
     if not message.attachments:
         await message.channel.send("❌ No attachments found", delete_after=10)
         return
 
-    for attachment in message.attachments:  # Direct iteration
+    for attachment in message.attachments:
         try:
             if not attachment.filename.lower().endswith(('.png','.jpg','.jpeg','.webp')):
-                continue  # Skip non-image files
+                continue
 
             submission_id = f"{message.id}-{message.author.id}-{attachment.id}"
             
+            # Store pending submission
             bot.pending_subs[submission_id] = {
                 'user_id': message.author.id,
                 'guild_id': str(message.guild.id),
@@ -293,13 +293,32 @@ async def process_image_submission(message):
                 'attachment_id': attachment.id
             }
 
-            # Process each attachment individually
-            await handle_submission(attachment)
+            # First ensure guild exists
+            if not mysql_storage.store_guild_info(
+                guild_id=str(message.guild.id),
+                guild_name=message.guild.name,
+                system_channel=message.guild.system_channel.id if message.guild.system_channel else None
+            ):
+                raise Exception("Failed to store guild info")
 
+            # Send metadata prompt
+            prompt_msg = await message.channel.send(
+                f"{message.author.mention} Please reply with:\n"
+                "`STL: ModelName`\n"
+                "`Bundle: BundleName`\n"
+                "`Tags: optional,tags`",
+                delete_after=900
+            )
+            
+            bot.pending_subs[submission_id]['prompt_msg_id'] = prompt_msg.id
+            asyncio.create_task(clear_pending_submission(submission_id, timeout=900))
+
+        except mysql.connector.Error as e:
+            logging.error(f"Database error processing {attachment.filename}: {e}")
+            await message.channel.send("❌ Database error - please try again later", delete_after=10)
         except Exception as e:
-            logging.error(f"Failed to process attachment {attachment.filename}: {e}")
-
-    await message.channel.send(f"✅ Processed {len(message.attachments)} attachment(s)", delete_after=10)
+            logging.error(f"Failed to process {attachment.filename}: {e}")
+            await message.channel.send(f"❌ Failed to process {attachment.filename}", delete_after=10)
 async def clear_pending_submission(submission_id, timeout):
     await asyncio.sleep(timeout)
     if submission_id in bot.pending_subs:
