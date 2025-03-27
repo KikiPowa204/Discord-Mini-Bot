@@ -47,6 +47,24 @@ async def setup(ctx):
     guild_id = ctx.guild.id
     mini_storage.init_db(guild_id)
     await ctx.send("✅ Server database initialized!")
+
+bot.pending_subs = {}  # Single source for pending submissions
+@bot.event
+async def on_ready():
+    bot.pending_subs = {}
+    print(f'{bot.user.name} online!')
+    # Initialize database
+    mini_storage.init_db()
+    
+    # Find existing channels
+    for guild in bot.guilds:
+        bot.submit_chan = discord.utils.get(guild.channels, name=DEFAULTS['submissions_chan'])
+        bot.gallery_chan = discord.utils.get(guild.channels, name=DEFAULTS['gallery_chan'])
+        if bot.submit_chan and bot.gallery_chan:
+            break
+
+@bot.command(name='setup_db')
+@commands.has_permissions(administrator=True)
 async def setup(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
@@ -96,22 +114,6 @@ async def setup(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
         f"- Gallery: {bot.gallery_chan.mention}\n"
         f"- Auto-cleanup: {cleanup_mins} minutes"
     )
-
-bot.pending_subs = {}  # Single source for pending submissions
-@bot.event
-async def on_ready():
-    bot.pending_subs = {}
-    print(f'{bot.user.name} online!')
-    # Initialize database
-    mini_storage.init_db()
-    
-    # Find existing channels
-    for guild in bot.guilds:
-        bot.submit_chan = discord.utils.get(guild.channels, name=DEFAULTS['submissions_chan'])
-        bot.gallery_chan = discord.utils.get(guild.channels, name=DEFAULTS['gallery_chan'])
-        if bot.submit_chan and bot.gallery_chan:
-            break
-
 
 @bot.command()
 async def ping(ctx):
