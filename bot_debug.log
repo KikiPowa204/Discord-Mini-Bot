@@ -911,3 +911,11 @@ sqlite3.OperationalError: table miniatures has no column named tags
 2025-03-26 12:42:26,524 - INFO - Cleaning up after 1 tasks.
 2025-03-26 12:42:26,525 - INFO - All tasks finished cancelling.
 2025-03-26 12:42:26,526 - INFO - Closing the event loop.
+2025-03-27 13:28:29,475 - INFO - logging in using static token
+2025-03-27 13:28:30,314 - INFO - Shard ID None has sent the IDENTIFY payload.
+2025-03-27 13:28:30,610 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-c-mktt",{"micros":87482,"calls":["id_created",{"micros":691,"calls":[]},"session_lookup_time",{"micros":299,"calls":[]},"session_lookup_finished",{"micros":11,"calls":[]},"discord-sessions-prd-1-152",{"micros":85922,"calls":["start_session",{"micros":66278,"calls":["discord-api-rpc-794468895c-wg4sz",{"micros":33222,"calls":["get_user",{"micros":10987},"get_guilds",{"micros":3363},"send_scheduled_deletion_message",{"micros":5},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":5},"pending_payments",{"micros":17557}]}]},"starting_guild_connect",{"micros":34,"calls":[]},"presence_started",{"micros":10029,"calls":[]},"guilds_started",{"micros":85,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":9469,"calls":[]},"connect_finished",{"micros":9474,"calls":[]},"build_ready",{"micros":17,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 798de89980735665f7ca53be78d40652).
+2025-03-27 13:28:41,134 - INFO - Received signal to terminate bot and event loop.
+2025-03-27 13:28:41,135 - INFO - Cleaning up tasks.
+2025-03-27 13:28:41,135 - INFO - Cleaning up after 1 tasks.
+2025-03-27 13:28:41,136 - INFO - All tasks finished cancelling.
+2025-03-27 13:28:41,136 - INFO - Closing the event loop.

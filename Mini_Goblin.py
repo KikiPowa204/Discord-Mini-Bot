@@ -5,14 +5,12 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 import sqlite3
-from mini_storage import MiniStorage
-from mini_storage import GuildManager
+from mini_storage import mini_storager
+from mini_storage import guild_manager
 import logging
 import asyncio
 # Load environment variables first
 
-guild_manager = GuildManager()
-mini_storager = MiniStorage()
 
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
