@@ -8,6 +8,7 @@ import sqlite3
 from mini_storage import MiniStorage
 import logging
 import asyncio
+import guild_manager
 
 # Load environment variables first
 
