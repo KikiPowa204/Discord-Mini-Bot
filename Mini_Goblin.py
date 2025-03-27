@@ -39,7 +39,6 @@ def get_server_db(guild_id):
 intents=discord.Intents.all()
 intents.message_content = True
 intents.messages = True  # Needed for message history
-intents.guild = True
 
 @bot.command()
 @commands.has_permissions(administrator=True)
