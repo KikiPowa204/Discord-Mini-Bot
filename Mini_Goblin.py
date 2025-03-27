@@ -423,7 +423,7 @@ async def show_examples(ctx, *, search_query: str):
         results = c.fetchall()
 
         if not results:
-            return await ctx.send(f"No examples found for '{name}'", delete_after=15)
+            return await ctx.send(f"No examples found for '{search_query}'", delete_after=15)
 
         for image_url, user_id, stl_name, bundle_name in results:
             await ctx.send(f"**{stl_name}** (from {bundle_name})\n{image_url}")
