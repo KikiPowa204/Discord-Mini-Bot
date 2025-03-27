@@ -41,18 +41,6 @@ DEFAULTS = {
     'gallery_chan': 'miniature-gallery'
 }
 
-def get_guild_info(guild) -> Optional[dict]:
-    """Safely extract guild information without GuildManager"""
-    try:
-        return {
-            'id': str(guild.id),  # Convert to string for MySQL compatibility
-            'name': guild.name,
-            'channel': guild.system_channel.id if guild.system_channel else None,
-            'member_count': guild.member_count
-        }
-    except AttributeError as e:
-        print(f"⚠️ Failed to get guild info: {e}")
-        return None
 # Runtime storage
 intents=discord.Intents.all()
 intents.message_content = True

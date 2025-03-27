@@ -174,19 +174,9 @@ def check_table_structure():
         print("Miniatures table structure:")
         for column in cursor.fetchall():
             print(f"{column['Field']}: {column['Type']} {'NULL' if column['Null'] == 'YES' else 'NOT NULL'}")
-
-# Singleton instance
-mysql_storage = MySQLStorage()
-
-if __name__ == "__main__":
-    # Test guild info storage
-    mysql_storage.store_guild_info(
-        guild_id="12345",
-        guild_name="Test Guild",
-        system_channel=67890
-    )
+def test_miniature_storage():
+    print("\n=== TESTING MINIATURE STORAGE ===")
     
-    # Test submission storage
     test_data = {
         'user_id': 123,
         'message_id': 999,
@@ -198,9 +188,60 @@ if __name__ == "__main__":
         'guild_name': "Test Guild"
     }
     
-    if mysql_storage.store_submission("12345", **test_data):
-        print("✅ Test storage successful")
+    # Store test data
+    success = mysql_storage.store_submission("12345", **test_data)
+    print(f"Storage result: {'Success' if success else 'Failed'}")
     
+    # Immediate verification
+    with mysql_storage.connection.cursor(dictionary=True) as cursor:
+        cursor.execute("""
+            SELECT m.*, g.guild_name 
+            FROM miniatures m
+            JOIN guilds g ON m.guild_id = g.guild_id
+            WHERE m.message_id = '999'
+        """)
+        record = cursor.fetchone()
+        
+        if record:
+            print("\nFOUND STORED MINIATURE:")
+            for key, value in record.items():
+                print(f"{key}: {value}")
+        else:
+            print("\nNO MINIATURE FOUND WITH MESSAGE_ID 999")
+    
+    print("=== TEST COMPLETE ===\n")
+
+# Run the tests
+check_table_structure()
+test_miniature_storage()
+# Singleton instance
+mysql_storage = MySQLStorage()
+
+if __name__ == "__main__":
+    # Test guild info storage
+    mysql_storage.store_guild_info(
+        guild_id="12345",
+        guild_name="Test Guild",
+        system_channel=67890
+    )
+
+    mysql_storage.store_submission(
+        user_id="12345",
+        guild_name="Test Guild",
+        system_channel=67890
+    )
+    
+    test_data = {
+    'guild_id': "12345",  # Explicitly include even though passed separately
+    'user_id': "123",     # All IDs as strings
+    'message_id': "999",
+    'image_url': "http://test.com/img.jpg",
+    'stl_name': "Test Model",
+    'bundle_name': "Test Bundle", 
+    'tags': "test,demo",
+    'image_hash': "abc123"
+}
+    success = mysql_storage.store_submission(test_data['guild_id'], **test_data)
     # Test retrieval
-    results = mysql_storage.get_submissions("12345", "Test")
-    print(f"Test results: {results}")
+
+    print(f"Test results: {success}")
