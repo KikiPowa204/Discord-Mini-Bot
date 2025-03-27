@@ -4,13 +4,30 @@ import os
 import hashlib
 from datetime import datetime
 from pathlib import Path
-import sqlite3
 from mini_storage import mini_storager
 from mini_storage import guild_manager
 import logging
 import asyncio
 # Load environment variables first
+import mysql.connector
+import psycopg2
+# Remove: import sqlite3
+from mysql.connector import connect, Error  # Import MySQL connector
 
+
+connection = mysql.connector.connect(
+    host="gondola.proxy.rlwy.net",
+    user="root",
+    password="VFPUYdKKzWeFagKmSOPyINxNqFUnwIRt",
+    port=19512,
+    database="railway"
+)
+
+# Use the connection to execute queries
+cursor = connection.cursor()
+cursor.execute("SELECT * FROM your_table")
+result = cursor.fetchall()
+print(result)
 
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
@@ -39,13 +56,6 @@ def get_guild_info(guild):
         }
     except AttributeError:
         return None
-    
-def get_server_db(guild_id):
-    """Get a database connection for a specific server"""
-    db_dir = Path("server_dbs")
-    db_dir.mkdir(exist_ok=True)
-    db_path = db_dir / f"guild_{guild_id}.db"
-    return sqlite3.connect(db_path)
 
 # Runtime storage
 intents=discord.Intents.all()
@@ -363,7 +373,7 @@ async def handle_submission(message):
         
         await message.add_reaction('✅')
         
-    except sqlite3.Error as e:
+    except connection.Error as e:
         await message.channel.send("❌ Database error - please try again later")
         print(f"Database error: {e}")  # Log for debugging
         
@@ -390,7 +400,7 @@ async def delete_entry(ctx):
             embed = referenced_message.embeds[0]
             if embed.image and embed.image.url:
                 image_url = embed.image.url
-                with sqlite3.connect(DB_FILE) as conn:
+                with connection.connect(DB_FILE) as conn:
                     c = conn.cursor()
                     c.execute("SELECT message_id FROM miniatures WHERE image_url = ?", (image_url,))
                     result = c.fetchone()
@@ -405,7 +415,7 @@ async def delete_entry(ctx):
             if not ctx.message.content.strip().split(" ")[1:]:
                 await ctx.send("❌ Please provide a message ID or reply to a message.", delete_after=10)
                 return
-        with sqlite3.connect(DB_FILE) as conn:
+        with connection.connect(DB_FILE) as conn:
             c = conn.cursor()
             c.execute("DELETE FROM miniatures WHERE message_id = ?", (message_id,))
             if c.rowcount == 0:
@@ -423,8 +433,8 @@ async def show_examples(ctx, *, search_query: str):
         # Get the correct DB path
         db_path = mini_storager.init_db(ctx.guild.id if ctx.guild else None)
         
-        with sqlite3.connect(db_path) as conn:
-            conn.row_factory = sqlite3.Row  # Enable column name access
+        with connection.connect(db_path) as conn:
+            conn.row_factory = connection.Row  # Enable column name access
             c = conn.cursor()
             
             # Improved query with case-insensitive search
@@ -502,9 +512,9 @@ async def debug_pending(ctx):
 @bot.command()
 async def debug_db(ctx):
     """Show database status"""
-    with sqlite3.connect(DB_FILE) as conn:
+    with connection.connect(DB_FILE) as conn:
         c = conn.cursor()
-        c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        c.execute("SELECT name FROM mysql WHERE type='table'")
         tables = c.fetchall()
         c.execute("SELECT COUNT(*) FROM miniatures")
         count = c.fetchone()[0]
