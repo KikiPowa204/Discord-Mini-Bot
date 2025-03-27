@@ -9,7 +9,7 @@ import guild_manager
 #new version of mini_storage.py to upload
 
 class MiniStorage:
-    def __init__(self):
+    def init_db(self, guild_id=None):
         self.guild_manager = guild_manager
 
     def store_submission(self, guild_id: int, **kwargs):
