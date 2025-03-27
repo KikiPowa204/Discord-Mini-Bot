@@ -9,9 +9,28 @@ import guild_manager
 #new version of mini_storage.py to upload
 
 class MiniStorage:
+    def __init__(self, guild_id=None):
+        self.guild_manager = guild_manager  # Make sure guild_manager is imported/defined
+    
     def init_db(self, guild_id=None):
         self.guild_manager = guild_manager
-
+        db_path = self.guild_manager.get_guild_db(guild_id)
+        print(f"Using database file: {db_path}")
+        with sqlite3.connect(db_path) as conn:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS miniatures (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    guild_id INTEGER NOT NULL,
+                    user_id INTEGER NOT NULL,
+                    message_id INTEGER NOT NULL,
+                    image_url TEXT NOT NULL,
+                    stl_name TEXT NOT NULL,
+                    bundle_name TEXT NOT NULL,
+                    tags TEXT,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+        print(f"✅ Database initialized at: {db_path}")
     def store_submission(self, guild_id: int, **kwargs):
         """Store submission with proper guild handling"""
         db_path = self.guild_manager.get_guild_db(guild_id)
