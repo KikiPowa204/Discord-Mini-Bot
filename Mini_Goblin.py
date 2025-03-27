@@ -5,10 +5,9 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 import sqlite3
-from mini_storage import store_submission, is_duplicate
+from mini_storage import guild_manager, mini_storager
 import logging
 import asyncio
-import guild_manager
 # Load environment variables first
 
 # Initialize global variables
@@ -90,7 +89,7 @@ async def on_ready():
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
-    mini_storage.init_db(ctx.guild.id)
+    mini_storager.init_db(ctx.guild.id)
     # Check if the bot has the necessary permissions
     bot_member = ctx.guild.get_member(bot.user.id)
     if not bot_member.guild_permissions.manage_channels:
@@ -398,7 +397,7 @@ async def delete_entry(ctx):
 @bot.command(name='show')
 async def show_examples(ctx, *, search_query: str):
     # Automatically handles both single-DB and multi-DB modes
-    db_path = mini_storage.get_db_path(ctx.guild.id if ctx.guild else None)
+    db_path = mini_storager.get_db_path(ctx.guild.id if ctx.guild else None)
     
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
