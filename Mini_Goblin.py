@@ -231,10 +231,10 @@ async def handle_metadata_reply(message):
         
         # Create metadata dictionary with all required fields
         metadata = {
-            #'guild_id': submission['guild_id'],  # From pending submission
-            #'user_id': submission['user_id'],    # From pending submission
-            #'message_id': submission['original_msg_id'],  # From pending submission
-            #'image_url': submission['image_url'],  # From pending submission
+            'guild_id': submission['guild_id'],  # From pending submission
+            'user_id': submission['user_id'],    # From pending submission
+            'message_id': submission['original_msg_id'],  # From pending submission
+            'image_url': submission['image_url'],  # From pending submission
             'stl_name': None,    # To be filled from user input
             'bundle_name': None, # To be filled from user input
             'tags': None         # To be filled from user input (optional)
@@ -256,7 +256,6 @@ async def handle_metadata_reply(message):
             return
 
         # Store with dictionary unpacking
-        success = mysql_storage.store_submission(**metadata)
         if success:
             await message.add_reaction('✅')
             del bot.pending_subs[submission_id]  # Clean up
