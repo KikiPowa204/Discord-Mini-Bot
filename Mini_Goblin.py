@@ -18,7 +18,7 @@ print(f"Using database file: {DB_FILE}")
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 # Custom database module
 import mini_storage  # Your database operations file
-
+#Update this bitch
 
 # Default settings
 DEFAULTS = {
