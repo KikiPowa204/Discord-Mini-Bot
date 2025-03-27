@@ -54,6 +54,7 @@ bot.pending_subs = {}  # Single source for pending submissions
 @bot.event
 async def on_ready():
     for guild in bot.guilds:
+        print(dir(mini_storage))  # Shows available functions
         mini_storage.init_db(guild.id)
     """Bot startup handler"""
     print(f'{bot.user.name} online in {len(bot.guilds)} guilds!')
@@ -61,6 +62,7 @@ async def on_ready():
     bot.pending_subs.clear() 
     
     for guild in bot.guilds:
+        print(dir(mini_storage))  # Shows available functions
         mini_storage.init_db(guild.id)  # Guild-specific DB
         print(f"Initialized DB for guild: {guild.name} ({guild.id})")
     # mini_storage.init_db() # Single DB mode for future use
@@ -77,6 +79,7 @@ async def on_ready():
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
+    print(dir(mini_storage))  # Shows available functions
     mini_storage.init_db(ctx.guild.id)
     # Check if the bot has the necessary permissions
     bot_member = ctx.guild.get_member(bot.user.id)
