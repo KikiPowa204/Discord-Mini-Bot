@@ -4,7 +4,6 @@ from datetime import datetime
 import hashlib
 import os
 from typing import Dict, Optional  # Add this import
-import guild_manager
 #new version of mini_storage.py to upload
 
 # First define the GuildManager (was missing)
