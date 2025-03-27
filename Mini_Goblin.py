@@ -224,21 +224,18 @@ async def handle_metadata_reply(message):
             
         submission = bot.pending_subs[submission_id]
         
+        # Create metadata dictionary with all required fields
         metadata = {
-        # From message object
-        'user_id': str(message.author.id),
-        'message_id': str(message.id),
-        'image_urls': [str(a.url) for a in message.attachments],
-    
-        # From user input
-        'stl_name': None,
-        'bundle_name': None,
-        'tags': None,
-    
-        # Generated/optional
-        'image_hash': None  # Could be generated later
+            'guild_id': submission['guild_id'],  # From pending submission
+            'user_id': submission['user_id'],    # From pending submission
+            'message_id': submission['original_msg_id'],  # From pending submission
+            'image_url': submission['image_url'],  # From pending submission
+            'stl_name': None,    # To be filled from user input
+            'bundle_name': None, # To be filled from user input
+            'tags': None         # To be filled from user input (optional)
         }
-        
+
+        # Parse user input to fill the metadata
         for line in message.content.split('\n'):
             line = line.strip().lower()
             if line.startswith('stl:'):
@@ -247,19 +244,14 @@ async def handle_metadata_reply(message):
                 metadata['bundle_name'] = line[7:].strip()
             elif line.startswith('tags:'):
                 metadata['tags'] = line[5:].strip()
-        success = mysql_storage.store_submission(
-            guild_id=submission['guild_id'],
-            user_id=submission['user_id'],
-            message_id=submission['original_msg_id'],
-            image_url=submission['image_url'],
-            **metadata
-        )
-        # Validate required fields
-        if not metadata['stl_name']:
-            return await message.channel.send("❌ STL name is required", delete_after=300)
-        if not metadata['bundle_name']:
-            return await message.channel.send("❌ Bundle name is required", delete_after=300)
-        
+
+        # Validate required fields before storage
+        if not all([metadata['stl_name'], metadata['bundle_name']]):
+            await message.channel.send("❌ Both STL and Bundle names are required")
+            return
+
+        # Store with dictionary unpacking
+        success = mysql_storage.store_submission(**metadata)
         if success:
             await message.add_reaction('✅')
             del bot.pending_subs[submission_id]  # Clean up
