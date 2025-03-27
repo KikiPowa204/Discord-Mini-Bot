@@ -10,7 +10,9 @@ class MySQLStorage:
     def __init__(self):
         self.connection = self._create_connection()
         self.init_db()  # Initialize tables on startup
-
+        self.connection = self._create_connection()
+        print(f"Autocommit status: {self.connection.autocommit}")  # Should be False
+        self.init_db()
     def _create_connection(self):
         """Create and return MySQL connection"""
         try:
@@ -112,11 +114,40 @@ class MySQLStorage:
                     kwargs.get('image_hash')
                 ))
             self.connection.commit()
+
+            with self.connection.cursor() as cursor:
+                cursor.execute('''
+                INSERT INTO miniatures (...) 
+                VALUES (...)
+                ''', (...))
+            
+            # Verify rowcount
+            if cursor.rowcount == 0:
+                print("❌ No rows affected!")
+                return False
+            with self.connection.cursor() as cursor:
+            # Log the actual SQL to be executed
+                sql = '''
+                INSERT INTO miniatures 
+                (guild_id, user_id, message_id, image_url, 
+                 stl_name, bundle_name, tags, image_hash)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            '''
+            params = (...)
+            print(f"Executing:\n{sql}\nWith params: {params}")
+            
+            cursor.execute(sql, params)
+            self.connection.commit()
+            print(f"Inserted ID: {cursor.lastrowid}")    
+            # Explicit commit check
+            self.connection.commit()
+            print("✅ Commit succeeded")
             return True
+            
         except Error as e:
             print(f"❌ Storage failed: {e}")
+            self.connection.rollback()
             return False
-
     def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
         """Retrieve submissions with search"""
         try:

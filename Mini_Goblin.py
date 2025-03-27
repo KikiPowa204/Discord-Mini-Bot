@@ -509,6 +509,18 @@ async def debug_db(ctx):
     )
     except Error as e:
         await ctx.send(f"❌ Database error: {e}")
+@bot.command()
+@commands.is_owner()
+async def debug_db(ctx):
+    """Verify database connection and tables"""
+    try:
+        with mysql_storage.connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM miniatures")
+            count = cursor.fetchone()[0]
+            await ctx.send(f"✅ Database connection working. Miniatures count: {count}")
+    except Error as e:
+        await ctx.send(f"❌ Database error: {str(e)}")
 if __name__ == "__main__":
     bot.run(os.getenv("DISCORD_TOKEN"))
 # Last updated 03/25/2025 14:17:34
+
