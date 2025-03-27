@@ -218,16 +218,6 @@ async def handle_metadata_reply(message):
             await message.channel.send("❌ Missing Bundle name (use 'Bundle: BundleName')", delete_after=10)
             return
         
-        # Store submission
-        mini_storage.store_submission(
-            user_id=submission['user_id'],
-            message_id=submission['original_msg_id'],
-            image_url=submission['image_url'],
-            stl_name=stl_name,
-            bundle_name=bundle_name,
-            tags=tags
-        )
-        
         # Cleanup
         try:
             await message.delete()
@@ -312,15 +302,6 @@ class TaggingModal(discord.ui.Modal):
         if not submission:
             await interaction.response.send_message("Submission expired", ephemeral=True)
             return
-        
-        store_submission(
-        user_id=submission['user_id'],
-        message_id=submission['original_msg_id'],
-        image_url=submission['image_url'],
-        stl_name=self.children[0].value,
-        bundle_name=self.children[1].value,
-        tags=self.children[2].value if self.children[2].value else None
-    )
     
         await interaction.response.send_message("✅ Tagged successfully!", ephemeral=True)
     
@@ -359,15 +340,6 @@ async def handle_submission(message):
         if not stl_name:
             await message.channel.send("❌ Missing STL name (use 'STL: Model Name')")
             return
-            
-        # Store in database
-        store_submission(
-            user_id=message.author.id,
-            message_id=message.id,
-            image_url=image_url,
-            stl_name=stl_name,
-            bundle_name=bundle_name,
-        )
         
         await message.add_reaction('✅')
         
