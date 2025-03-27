@@ -33,7 +33,7 @@ class MiniStorage:
                     guild_id INTEGER NOT NULL,
                     user_id INTEGER NOT NULL,
                     message_id INTEGER NOT NULL,
-                    image_hash TEXT UNIQUE,  # Added for duplicate checking
+                    image_hash TEXT UNIQUE,
                     stl_name TEXT NOT NULL,
                     bundle_name TEXT NOT NULL,
                     tags TEXT,
@@ -82,15 +82,15 @@ class MiniStorage:
             return False
 
 # Singleton instance for easy import
-mini_storage = MiniStorage(guild_manager)
+mini_storager = MiniStorage()
 
 # Test when run directly
 if __name__ == "__main__":
-    mini_storage.init_db()
+    mini_storager.init_db()
     
     # Test guild DB
     TEST_GUILD = 12345
-    db_path = mini_storage.init_db(TEST_GUILD)
+    db_path = mini_storager.init_db(TEST_GUILD)
     
     # Test storage
     test_data = {
@@ -103,9 +103,9 @@ if __name__ == "__main__":
         'tags': "test,demo"
     }
     
-    if mini_storage.store_submission(TEST_GUILD, **test_data):
+    if mini_storager.store_submission(TEST_GUILD, **test_data):
         print("✅ Test storage successful")
     
     # Verify duplicate check
-    if mini_storage.is_duplicate(TEST_GUILD, "abc123"):
+    if mini_storager.is_duplicate(TEST_GUILD, "abc123"):
         print("✅ Duplicate check working")

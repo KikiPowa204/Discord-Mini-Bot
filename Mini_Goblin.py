@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 import sqlite3
 #from mini_storage import mini_storage  # Import the instance
-from mini_storage import mini_storage
+from mini_storage import mini_storager
 import logging
 import asyncio  
 
@@ -46,24 +46,24 @@ intents.messages = True  # Needed for message history
 async def setup_DB(ctx):
     """Initialize database for this server"""
     guild_id = ctx.guild.id
-    print(dir(mini_storage))  # Shows available functions
-    mini_storage.init_db(guild_id)
+    print(dir(mini_storager))  # Shows available functions
+    mini_storager.init_db(guild_id)
     await ctx.send("✅ Server database initialized!")
 
 bot.pending_subs = {}  # Single source for pending submissions
 @bot.event
 async def on_ready():
     for guild in bot.guilds:
-        print(dir(mini_storage))  # Shows available functions
-        mini_storage.init_db(guild.id)
+        print(dir(mini_storager))  # Shows available functions
+        mini_storager.init_db(guild.id)
     """Bot startup handler"""
     print(f'{bot.user.name} online in {len(bot.guilds)} guilds!')
     # Initialize database
     bot.pending_subs.clear() 
     
     for guild in bot.guilds:
-        print(dir(mini_storage))  # Shows available functions
-        mini_storage.init_db(guild.id)  # Guild-specific DB
+        print(dir(mini_storager))  # Shows available functions
+        mini_storager.init_db(guild.id)  # Guild-specific DB
         print(f"Initialized DB for guild: {guild.name} ({guild.id})")
     # mini_storage.init_db() # Single DB mode for future use
 
