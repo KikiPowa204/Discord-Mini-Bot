@@ -5,10 +5,10 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 import sqlite3
-from mini_storage import mini_storage  # Import the instance
+#from mini_storage import mini_storage  # Import the instance
+import mini_storage.MiniStorage.init_db
 import logging
-import asyncio
-import guild_manager
+import asyncio  
 
 # Load environment variables first
 
