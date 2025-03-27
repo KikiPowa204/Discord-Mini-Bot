@@ -421,7 +421,7 @@ async def show_examples(ctx, *, search_query: str):
     """Display examples matching the search query"""
     try:
         # Get the correct DB path
-        db_path = mini_storager.get_db_path(ctx.guild.id if ctx.guild else None)
+        db_path = mini_storager.init_db(ctx.guild.id if ctx.guild else None)
         
         with sqlite3.connect(db_path) as conn:
             conn.row_factory = sqlite3.Row  # Enable column name access
