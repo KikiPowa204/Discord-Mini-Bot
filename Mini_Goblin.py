@@ -226,7 +226,6 @@ async def handle_metadata_reply(message):
         
         metadata = {
         # From message object
-        'guild_id': str(message.guild.id),
         'user_id': str(message.author.id),
         'message_id': str(message.id),
         'image_urls': [str(a.url) for a in message.attachments],
