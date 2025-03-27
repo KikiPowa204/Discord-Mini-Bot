@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 import sqlite3
 #from mini_storage import mini_storage  # Import the instance
-import mini_storage
+from mini_storage import mini_storage, MiniStorage, __init__
 import logging
 import asyncio  
 
