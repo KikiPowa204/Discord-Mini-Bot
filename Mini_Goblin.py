@@ -56,7 +56,7 @@ intents.messages = True  # Needed for message history
 @commands.has_permissions(administrator=True)
 async def setup_DB(ctx):
     """Initialize database for this server (explicit admin command)"""
-    guild_id = ctx.guild_id
+    guild_id = ctx.guild.id
     guild_manager.get_guild_db()  # This creates if doesn't exist
     await ctx.send("✅ Server database initialized!")
 
@@ -191,7 +191,7 @@ async def on_message(message):
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)
 async def handle_metadata_reply(message):
-    guild_id = message.guild_id
+    guild_id = message.guild.id
     if not message.reference:
         logging.error("No message reference found")
         return
