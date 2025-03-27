@@ -298,7 +298,7 @@ async def process_image_submission(message):
             }
 
             # Process each attachment individually
-            await handle_attachment(attachment)
+            await handle_submission(attachment)
 
         except Exception as e:
             logging.error(f"Failed to process attachment {attachment.filename}: {e}")
