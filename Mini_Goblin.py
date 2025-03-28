@@ -22,7 +22,9 @@ connection = mysql.connector.connect(
 )
 
 # Use the connection to execute querie
-
+cursor = connection.cursor()
+cursor.execute("SELECT * FROM miniatures")
+result = cursor.fetchall()  # Close cursor after fetching data
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
