@@ -248,18 +248,19 @@ async def parse_metadata_lines(content: str) -> dict:
             result['tags'] = line[5:].strip()
     return result
 
-async def store_submission(data: dict) -> bool:
+async def store_submission(guild_id, data: dict) -> bool:
     """Database storage with connection handling"""
     query = """
         INSERT INTO miniatures 
         (guild_id, user_id, message_id, image_url, stl_name, bundle_name, tags)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
+
     try:
         async with mysql_storage.store_submission() as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute(query, (
-                    data['guild_id'],
+                    data[guild_id],
                     data['user_id'],
                     data['message_id'],
                     data['image_url'],
