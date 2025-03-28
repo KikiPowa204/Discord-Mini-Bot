@@ -48,31 +48,34 @@ class MySQLStorage:
                 
                 # Create miniatures table if not exists
                 cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS miniatures (
-            id INT NOT NULL AUTO_INCREMENT, 
-            guild_id VARCHAR(255) NOT NULL,
-            user_id VARCHAR(255) NOT NULL,
-            message_id VARCHAR(255) NOT NULL,
-            image_url TEXT NOT NULL,
-            stl_name VARCHAR(255) NOT NULL,
-            bundle_name VARCHAR(255) NOT NULL,
-            tags TEXT,
-            image_hash VARCHAR(255),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),  # Explicit PRIMARY KEY declaration
-            INDEX idx_guild (guild_id),
-            INDEX idx_stl_name (stl_name),
-            UNIQUE KEY unique_image (image_hash),
-            CONSTRAINT fk_guild FOREIGN KEY (guild_id) REFERENCES guilds(guild_id)
-)           ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-                ''')
+    CREATE TABLE IF NOT EXISTS miniatures (
+        id INT NOT NULL AUTO_INCREMENT,
+        guild_id VARCHAR(20) NOT NULL,  
+        user_id VARCHAR(20) NOT NULL,   
+        message_id VARCHAR(20) NOT NULL, 
+        image_url TEXT NOT NULL,
+        stl_name VARCHAR(100) NOT NULL,  
+        bundle_name VARCHAR(100) NOT NULL, 
+        image_hash CHAR(64),  
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        INDEX idx_guild (guild_id),
+        INDEX idx_stl_bundle (stl_name(20), bundle_name(20)),  
+        UNIQUE KEY uk_message (message_id),  
+        UNIQUE KEY uk_image_hash (image_hash),
+        CONSTRAINT fk_guild 
+            FOREIGN KEY (guild_id) 
+            REFERENCES guilds(guild_id)
+            ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+''')
                 
             self.connection.commit()
             print("✅ Database tables initialized")
         except Error as e:
             print(f"❌ Table creation failed: {e}")
             raise
-
+    #works. Don't touch
     def store_guild_info(self, guild_id: str, guild_name: str, system_channel: Optional[int] = None):
         """Store basic guild information"""
         try:
@@ -92,16 +95,9 @@ class MySQLStorage:
             print(f"❌ Failed to store guild info: {e}")
             return False
 
-    def store_submission(self, guild_id: str, **kwargs):
-        print("\n=== STORING SUBMISSION ===")
-        print(f"Guild ID: {guild_id}")
-        print("Submission data:", kwargs)
+    async def store_submission(self, guild_id, **kwargs):
+        """Store miniature submission"""
 
-        """Store submission with all required fields"""
-        required = ['guild_id', 'user_id', 'message_id', 'image_url', 'stl_name', 'bundle_name']
-        if any(kwargs.get(k) is None for k in required):
-            print(f"Missing required fields: {required}")
-            return False
 
         try:
             with self.connection.cursor() as cursor:
@@ -110,7 +106,7 @@ class MySQLStorage:
                 INSERT INTO guilds (guild_id, guild_name, last_seen)
                 VALUES (%s, %s, NOW())
                 ON DUPLICATE KEY UPDATE last_seen=NOW()
-            ''', (guild_id, kwargs.get('guild_name', f"Guild-{guild_id}")))
+            ''', (guild_id('guild_name', f"Guild-{guild_id}")))
             print(f"✓ Guild {guild_id} ensured")
 
             # 2. Prepare miniature data
@@ -122,15 +118,13 @@ class MySQLStorage:
                 kwargs['stl_name'],
                 kwargs['bundle_name'],
                 kwargs.get('tags', ''),
-                kwargs.get('image_hash', None)  # Handle optional field
-            )
+                kwargs.get('image_hash', None) ) #handle operational field
             print("Miniature data prepared:", miniature_data)
 
             # 3. Insert miniature
             cursor.execute('''
                 INSERT INTO miniatures (
-                    guild_id, user_id, message_id,
-                    image_url, stl_name, bundle_name, tags, image_hash
+                    guild_id, user_id, message_id, image_url, stl_name, bundle_name, tags, image_hash
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             ''', miniature_data)
             print(f"✓ Miniature inserted (ID: {cursor.lastrowid})")
