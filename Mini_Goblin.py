@@ -179,7 +179,9 @@ async def on_message(message):
     if message.content.startswith(bot.command_prefix):
         await bot.process_commands(message)
         return
-
+    if message.content.startswith('!'):
+            await bot.process_commands(message)
+            return
     # Handle metadata replies
     if (message.reference and 
         message.reference.message_id in 
