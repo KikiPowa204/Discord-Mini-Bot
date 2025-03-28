@@ -327,9 +327,9 @@ async def process_image_submission(message):
 
             # Store pending submission
             bot.pending_subs[submission_id] = {
-                'guild_id': str(message.guild.id),
                 'user_id': message.author.id,
                 'channel_id': message.channel.id,
+                'guild_id': str(message.guild.id),
                 'image_url': attachment.url,
                 'original_msg_id': message.id,
                 'attachment_id': attachment.id
