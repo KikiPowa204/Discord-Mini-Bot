@@ -200,7 +200,7 @@ async def on_message(message):
 
 async def handle_metadata_reply(message: discord.Message):
     """Process metadata replies with proper context handling"""
-    
+    print(f"Handling metadata reply from {message.author}")
     # Validate guild context
     if not message.guild:
         await message.channel.send("❌ This only works in servers", delete_after=10)
@@ -256,7 +256,7 @@ async def store_submission(data: dict) -> bool:
         VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
     try:
-        async with mysql_storage.init_db() as conn:
+        async with mysql_storage.store_submission() as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute(query, (
                     data['guild_id'],
