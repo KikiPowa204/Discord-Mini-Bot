@@ -7,7 +7,7 @@ from typing import Optional
 import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
-import aiomysql
+
 class MySQLStorage:
     def __init__(self):
         self.connection = self._create_connection()
