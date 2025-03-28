@@ -76,19 +76,19 @@ intents=discord.Intents.all()
 intents.message_content = True
 intents.messages = True  # Needed for message history
 
-#@bot.command()
-#@commands.has_permissions(administrator=True)
-#async def setup_DB(ctx):
-#    """Initialize database for this server (explicit admin command)"""
-#    guild_id = ctx.guild.id
-#    guild_name = ctx.guild.name
-#    system_channel = ctx.guild.system_channel.id if ctx.guild.system_channel else None
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def setup_DB(ctx):
+    """Initialize database for this server (explicit admin command)"""
+    guild_id = ctx.guild.id
+    guild_name = ctx.guild.name
+    system_channel = ctx.guild.system_channel.id if ctx.guild.system_channel else None
 
     # Initialize the database for the server
-#    mysql_storage.store_guild_info(guild_id, guild_name, system_channel)
+    mysql_storage.store_guild_info(guild_id, guild_name, system_channel)
 
     # Send confirmation message
-#    await ctx.send(f"✅ Server database initialized for **{guild_name}**!")
+    await ctx.send(f"✅ Server database initialized for **{guild_name}**!")
 
 
 @bot.event
@@ -124,10 +124,13 @@ async def on_ready():
     bot.pending_subs = {}  # Reset pending submissions
     
     # Initialize databases for all current guilds
-    for guild in bot.guilds:
-        mysql_storage.init_db()
-        
+    try:
+        for guild in bot.guilds:
+            mysql_storage.init_db()
+    except Exception as e:
+        print(f"Failed to init DB for guilds: {str(e)}")       
     # Find existing channels (first guild with both channels wins)
+    #COME BACK HERE! GUILD RETRIEVAL WORKS!
     for guild in bot.guilds:
         bot.submit_chan = discord.utils.get(guild.channels, name=DEFAULTS['submissions_chan'])
         bot.gallery_chan = discord.utils.get(guild.channels, name=DEFAULTS['gallery_chan'])
@@ -222,9 +225,11 @@ async def on_message(message):
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)
 async def handle_metadata_reply(message):
-    guild_id = message.guild.id
-    
-    
+    for guild in bot.guilds:
+        if guild.id == message.guild:
+            guild_id = guild.id
+            guild_name = guild.name
+            system_channel = guild.system_channel.id if guild.system_channel else None
     try:
         if not message.reference:
             logging.error("No message reference found")
@@ -249,10 +254,10 @@ async def handle_metadata_reply(message):
         
         # Create metadata dictionary with all required fields
         metadata = {
-            #'guild_id': submission['guild_id'],  # From pending submission
-            #'user_id': submission['user_id'],    # From pending submission
-            #'message_id': submission['original_msg_id'],  # From pending submission
-            #'image_url': submission['image_url'],  # From pending submission
+            'guild_id': submission[guild_id],  # From pending submission
+            'user_id': submission[user_id],    # From pending submission
+            'message_id': submission['original_msg_id'],  # From pending submission
+            'image_url': submission['image_url'],  # From pending submission
             'stl_name': None,    # To be filled from user input
             'bundle_name': None, # To be filled from user input
             'tags': None         # To be filled from user input (optional)
@@ -336,7 +341,7 @@ async def process_image_submission(message):
             )
             bot.pending_subs[submission_id]['prompt_msg_id'] = prompt_msg.id
             asyncio.create_task(clear_pending_submission(submission_id, timeout=900))
-            
+
         except mysql.connector.Error as e:
             logging.error(f"Database error processing {attachment.filename}: {e}")
             await message.channel.send("❌ Database error - please try again later", delete_after=10)
