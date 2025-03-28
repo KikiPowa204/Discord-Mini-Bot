@@ -34,7 +34,7 @@ class MySQLStorage:
     def init_db(cls, guild_id: Optional[str] = None):
         """Initialize database tables"""
         try:
-            with self.connection.cursor() as cursor:
+            with cls.connection.cursor() as cursor:
                 # Create guilds table if not exists
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS guilds (
@@ -66,7 +66,7 @@ class MySQLStorage:
                     )
                 ''')
                 
-            self.connection.commit()
+            cls.connection.commit()
             print("✅ Database tables initialized")
         except Error as e:
             print(f"❌ Table creation failed: {e}")
