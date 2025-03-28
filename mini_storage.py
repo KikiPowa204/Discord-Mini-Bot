@@ -92,7 +92,7 @@ class MySQLStorage:
             print(f"❌ Failed to store guild info: {e}")
             return False
 
-    async def store_submission(self, guild_id: str, **kwargs):
+    async def store_submission(self, **kwargs):
         """Store submission with all required fields"""
         try:
             cursor = self.connection.cursor()
