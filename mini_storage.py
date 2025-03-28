@@ -47,21 +47,22 @@ class MySQLStorage:
                 # Create miniatures table if not exists
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS miniatures (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        guild_id VARCHAR(255) NOT NULL,
-                        user_id VARCHAR(255) NOT NULL,
-                        message_id VARCHAR(255) NOT NULL,
-                        image_url TEXT NOT NULL,
-                        stl_name VARCHAR(255) NOT NULL,
-                        bundle_name VARCHAR(255) NOT NULL,
-                        tags TEXT,
-                        image_hash VARCHAR(255),
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        INDEX idx_guild (guild_id),
-                        INDEX idx_stl_name (stl_name),
-                        UNIQUE KEY unique_image (image_hash),
-                        FOREIGN KEY (guild_id) REFERENCES guilds(guild_id)
-                    )
+            id INT NOT NULL AUTO_INCREMENT,  # MySQL prefers this order
+            guild_id VARCHAR(255) NOT NULL,
+            user_id VARCHAR(255) NOT NULL,
+            message_id VARCHAR(255) NOT NULL,
+            image_url TEXT NOT NULL,
+            stl_name VARCHAR(255) NOT NULL,
+            bundle_name VARCHAR(255) NOT NULL,
+            tags TEXT,
+            image_hash VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),  # Explicit PRIMARY KEY declaration
+            INDEX idx_guild (guild_id),
+            INDEX idx_stl_name (stl_name),
+            UNIQUE KEY unique_image (image_hash),
+            CONSTRAINT fk_guild FOREIGN KEY (guild_id) REFERENCES guilds(guild_id)
+)           ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
                 ''')
                 
             self.connection.commit()
