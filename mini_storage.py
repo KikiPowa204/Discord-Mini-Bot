@@ -119,7 +119,7 @@ class MySQLStorage:
                     kwargs['bundle_name'],
                     kwargs.get('tags', '')
                 ))
-            self.connection.commit()
+            await self.connection.commit()
         except Exception as e:
             print(f"Async storage error: {e}")
         except Exception as e:
