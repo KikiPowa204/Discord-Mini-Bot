@@ -215,9 +215,6 @@ async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
 @bot.event
 async def on_message(message):
     # Let commands process first
-    if message.content.startswith(bot.command_prefix):
-        await bot.process_commands(message)
-        return
     if message.content.startswith('!'):
             await bot.process_commands(message)
             return
