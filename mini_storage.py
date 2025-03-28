@@ -8,10 +8,6 @@ import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
 
-connection = mysql.connector.connect(
-    ...,
-    autocommit=True  # Add this to your connection
-)
 
 class MySQLStorage:
     def __init__(self):
@@ -26,7 +22,8 @@ class MySQLStorage:
                 user="root",
                 password="VFPUYdKKzWeFagKmSOPyINxNqFUnwIRt",
                 port=19512,
-                database="railway"
+                database="railway",
+                autocommit=True
             )
             print("✅ MySQL connection successful!")
             return connection
