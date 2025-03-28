@@ -9,13 +9,28 @@ import asyncio
 from typing import Optional
 # Load environment variables first
 import mysql.connector
-from mysql.connector import Error
+from mysql.connector import Error, pooling
 # Remove: import sqlite3
 from mini_storage import mysql_storage
 
-connection = mysql.connector.connect(
+# Replace the global connection with a connection pool
+
+db_pool = pooling.MySQLConnectionPool(
+    pool_name="discord_pool",
+    pool_size=5,
     host="gondola.proxy.rlwy.net",
     user="root",
+    password="VFPUYdKKzWeFagKmSOPyINxNqFUnwIRt",
+    port=19512,
+    database="railway"
+)
+
+def get_db_connection():
+    return db_pool.get_connection()
+
+connection = mysql.connector.connect(
+    host="gondola.proxy.rlwy.net",
+    user="root",    
     password="VFPUYdKKzWeFagKmSOPyINxNqFUnwIRt",
     port=19512,
     database="railway"
@@ -467,8 +482,8 @@ async def delete_entry(ctx):
                 await ctx.send("❌ Please provide a message ID or reply to a message.", delete_after=10)
                 return
         with connection.connect() as conn:
-            c = conn.cursor()
-            c.execute("DELETE FROM miniatures WHERE message_id = ?", (message_id,))
+            # Replace SQLite ? placeholders with MySQL %s
+            cursor.execute("DELETE FROM miniatures WHERE message_id = %s", (message_id,))
             if c.rowcount == 0:
                 await ctx.send(f"❌ No entry found for the referenced message.", delete_after=10)
                 return
