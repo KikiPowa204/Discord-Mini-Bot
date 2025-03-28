@@ -32,9 +32,7 @@ class MySQLStorage:
             exit(1)
 
     def init_db(self):
-        if guild_id:
-            # Guild-specific initialization
-            self._ensure_guild_table(guild_id)
+        
 
         """Initialize database tables"""
         try:
