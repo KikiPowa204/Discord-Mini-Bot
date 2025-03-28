@@ -51,7 +51,7 @@ def fetch_miniatures(connection):
     cursor.close()  # Close cursor after fetching data
     return result
 
-
+#works. Don't touch.
 @bot.command(name='setup_DB')
 @commands.has_permissions(administrator=True)
 async def setup_DB(ctx):
@@ -133,14 +133,17 @@ async def on_ready():
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels with comprehensive error handling"""
     try:
-        print(f'Setup initiated in {ctx.guild.name} by {ctx.author}')
+        guild_id = get_guild_id(ctx)  # Check if in a guild
+        guild_name = get_guild_name(ctx)  # Check if in a guild
+        
+        print(f'Setup initiated in {guild_name} by {ctx.author}')
 
         # 1. Verify bot permissions
         if not ctx.guild.me.guild_permissions.manage_channels:
             raise commands.BotMissingPermissions(['manage_channels'])
 
-        # 2. Initialize database
-        if not mysql_storage.init_db(str(ctx.guild.id)):
+        # 2. Initialize database - Kian. Come here.
+        if not mysql_storage.init_db(str(guild_id)):
             raise Exception("Database initialization failed")
 
         # 3. Channel setup with interactive prompts
