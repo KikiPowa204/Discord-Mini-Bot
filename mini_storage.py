@@ -92,12 +92,10 @@ class MySQLStorage:
             print(f"❌ Failed to store guild info: {e}")
             return False
 
-    def store_submission(self, guild_id: str, **kwargs):
+    async def store_submission(self, guild_id: str, **kwargs):
         """Store submission with all required fields"""
-        required = ['guild_id', 'user_id', 'message_id', 'image_url', 'stl_name', 'bundle_name']
-        if any(kwargs.get(k) is None for k in required):
-            print(f"Missing required fields: {required}")
-            return False
+        loop=asyncio.get_event_loop()
+        
 
         try:
             with self.connection.cursor() as cursor:
@@ -124,12 +122,12 @@ class MySQLStorage:
                     kwargs.get('tags', '')
                 ))
                 
-            self.connection.commit()
-            return True
-        except Error as e:
-            print(f"Storage failed: {e}")
-            self.connection.rollback()
-            return False
+            return await loop.run_in_executor(
+            None, 
+            lambda: self.store_submission(guild_id, **kwargs)
+        )
+        except Exception as e:
+            print(f"Async storage error: {e}")
     
     def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
         """Retrieve submissions with search"""
