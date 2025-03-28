@@ -121,9 +121,7 @@ class MySQLStorage:
                     kwargs['bundle_name'],
                     kwargs.get('tags', '')
                 ))
-                
-            return await loop.run_in_executor(
-            None, 
+            ( 
             lambda: self.store_submission(guild_id, **kwargs)
         )
         except Exception as e:
