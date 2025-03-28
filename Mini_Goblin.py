@@ -123,6 +123,7 @@ async def on_ready():
     else:
         print("Warning: No submission/gallery channels found")
 bot.command(name='setup')
+@commands.has_permissions(administrator=True)
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
