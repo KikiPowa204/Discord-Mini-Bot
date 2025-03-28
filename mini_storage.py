@@ -13,7 +13,8 @@ class MySQLStorage:
         self.connection = self._create_connection()
         self.init_db()  # Initialize tables on startup
         print(f"Autocommit status: {self.connection.autocommit}")
-
+    """Initialize database for a specific guild"""
+        
     def _create_connection(self):
         """Create and return MySQL connection"""
         try:
@@ -31,6 +32,10 @@ class MySQLStorage:
             exit(1)
 
     def init_db(self):
+        if guild_id:
+            # Guild-specific initialization
+            self._ensure_guild_table(guild_id)
+
         """Initialize database tables"""
         try:
             with self.connection.cursor() as cursor:
@@ -70,7 +75,8 @@ class MySQLStorage:
         except Error as e:
             print(f"❌ Table creation failed: {e}")
             raise
-
+        self._create_tables()
+        return True
     def store_guild_info(self, guild_id: str, guild_name: str, system_channel: Optional[int] = None):
         """Store basic guild information"""
         try:

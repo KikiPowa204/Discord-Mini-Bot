@@ -46,7 +46,7 @@ intents=discord.Intents.all()
 intents.message_content = True
 intents.messages = True  # Needed for message history
 
-@bot.command()
+@bot.command(name='setup_DB')
 @commands.has_permissions(administrator=True)
 async def setup_DB(ctx):
     """Initialize database for this server (explicit admin command)"""
