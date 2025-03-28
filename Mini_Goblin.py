@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord import guild
 import os
 import hashlib
 from datetime import datetime, timezone
@@ -74,19 +75,19 @@ intents=discord.Intents.all()
 intents.message_content = True
 intents.messages = True  # Needed for message history
 
-@bot.command()
-@commands.has_permissions(administrator=True)
-async def setup_DB(ctx):
-    """Initialize database for this server (explicit admin command)"""
-    guild_id = ctx.guild.id
-    guild_name = ctx.guild.name
-    system_channel = ctx.guild.system_channel.id if ctx.guild.system_channel else None
+#@bot.command()
+#@commands.has_permissions(administrator=True)
+#async def setup_DB(ctx):
+#    """Initialize database for this server (explicit admin command)"""
+#    guild_id = ctx.guild.id
+#    guild_name = ctx.guild.name
+#    system_channel = ctx.guild.system_channel.id if ctx.guild.system_channel else None
 
     # Initialize the database for the server
-    mysql_storage.store_guild_info(guild_id, guild_name, system_channel)
+#    mysql_storage.store_guild_info(guild_id, guild_name, system_channel)
 
     # Send confirmation message
-    await ctx.send(f"✅ Server database initialized for **{guild_name}**!")
+#    await ctx.send(f"✅ Server database initialized for **{guild_name}**!")
 
 
 @bot.event
