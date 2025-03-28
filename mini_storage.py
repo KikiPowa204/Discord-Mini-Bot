@@ -109,37 +109,38 @@ class MySQLStorage:
             ''', (guild_id('guild_name', f"Guild-{guild_id}")))
             print(f"✓ Guild {guild_id} ensured")
 
-            # 2. Prepare miniature data
+            # 2. Prepare miniature data with validation
+        except Error as e:
+            print(f"❌ Failed to ensure guild: {e}")    
+            
+        try:
             miniature_data = (
-                guild_id,
-                str(kwargs['user_id']),
-                str(kwargs['message_id']),
-                kwargs['image_url'],
-                kwargs['stl_name'],
-                kwargs['bundle_name'],
-                kwargs.get('tags', ''),
-                kwargs.get('image_hash', None) ) #handle operational field
-            print("Miniature data prepared:", miniature_data)
+        str(guild_id),  # Ensure string type
+        str(kwargs['user_id']),
+        str(kwargs['message_id']),
+        kwargs['image_url'],  # Already validated URL
+        kwargs['stl_name'][:100],  # Enforce VARCHAR(100) limit
+        kwargs['bundle_name'][:100],  # Enforce VARCHAR(100) limit
+        kwargs.get('image_hash', '').lower()[:64] or None  # Normalize hash
+    )
+            print("Sanitized miniature data:", miniature_data)
+        except (KeyError, TypeError) as e:
+            raise ValueError(f"Missing required field: {e}") from None
 
             # 3. Insert miniature
-            cursor.execute('''
+        cursor.execute('''
                 INSERT INTO miniatures (
                     guild_id, user_id, message_id, image_url, stl_name, bundle_name, tags, image_hash
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             ''', miniature_data)
-            print(f"✓ Miniature inserted (ID: {cursor.lastrowid})")
+        print(f"✓ Miniature inserted (ID: {cursor.lastrowid})")
 
-            self.connection.commit()
+        if self.connection.commit():
             print("✓ Transaction committed")
             return True
-
-        except mysql.connector.Error as e:
-            print(f"✗ Database error: {e}")
-            self.connection.rollback()
-            return False
-        except Exception as e:
-            print(f"✗ Unexpected error: {e}")
-            return False    
+        else:
+            print("❌ Transaction failed")
+        
     def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
         """Retrieve submissions with search"""
         try:
