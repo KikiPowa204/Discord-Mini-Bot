@@ -11,7 +11,7 @@ from typing import Optional
 import mysql.connector
 from mysql.connector import Error
 # Remove: import sqlite3
-from mini_storage import mysql_storage
+from mini_storage import mysql_storage, MySQLStorage
 
 connection = mysql.connector.connect(
     host="gondola.proxy.rlwy.net",
@@ -140,7 +140,7 @@ async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
             raise commands.BotMissingPermissions(['manage_channels'])
 
         # 2. Initialize database
-        if not mysql_storage.init_db(str(ctx.guild.id)):
+        if not MySQLStorage.init_db(str(ctx.guild.id)):
             raise Exception("Database initialization failed")
 
         # 3. Channel setup with interactive prompts
