@@ -223,7 +223,7 @@ async def handle_metadata_reply(message: discord.Message):
         'user_id': str(submission['user_id']),
         'message_id': str(submission['original_msg_id']),
         'image_url': submission['image_url'],
-        **parse_metadata_lines(message.content)  # New helper function
+        **await parse_metadata_lines(message.content)  # New helper function
     }
 
     # Store to database
