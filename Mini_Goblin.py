@@ -187,7 +187,7 @@ async def on_message(message):
     if message.content.startswith('!'):
             await bot.process_commands(message)
             return
-    if message.has_attachment() and message.channel == bot.submit_chan:
+    if message.attachments() and message.channel == bot.submit_chan:
         # Process image submission
         await process_image_submission(message)
         return
