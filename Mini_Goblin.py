@@ -57,6 +57,7 @@ DEFAULTS = {
     'gallery_chan': 'miniature-gallery'
 }
 
+#return here. Something needs to be fixed.
 def get_guild_info(guild) -> Optional[dict]:
     """Safely extract guild information without GuildManager"""
     try:
@@ -111,7 +112,7 @@ async def on_guild_join(guild):
             "Thanks for adding me! Use `!setup_DB` to configure submission channels."
         )
 @bot.command()
-async def check_db(ctx):
+async def check_db(ctx, guild_id: int = None):
     """Verify database is working"""
     guild_id = ctx.guild_id
     db_path = mysql_storage.init_db()
@@ -138,7 +139,7 @@ async def on_ready():
 
 @bot.command(name='setup')
 @commands.has_permissions(administrator=True)
-async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
+async def setup_Channel(ctx, guild_id, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
     mysql_storage.init_db(ctx.guild_id)
