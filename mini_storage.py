@@ -94,7 +94,7 @@ class MySQLStorage:
 
     async def store_submission(self, guild_id: str, **kwargs):
         """Store submission with all required fields"""
-        loop=asyncio.get_event_loop()
+        
         
 
         try:
