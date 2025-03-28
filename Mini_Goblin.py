@@ -248,7 +248,7 @@ async def parse_metadata_lines(content: str) -> dict:
             result['tags'] = line[5:].strip()
     return result
 
-async def store_submission(guild_id, data: dict) -> bool:
+async def store_submission(data: dict) -> bool:
     """Database storage with connection handling"""
     query = """
         INSERT INTO miniatures 
