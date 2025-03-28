@@ -7,31 +7,41 @@ from typing import Optional
 import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
-
+import aiomysql
 class MySQLStorage:
     def __init__(self):
         self.connection = self._create_connection()
         self.init_db()  # Initialize tables on startup
+        self.pool = None
         print(f"Autocommit status: {self.connection.autocommit}")
     """Initialize database for a specific guild"""
         
-    def _create_connection(self):
+    async def _create_connection(self):
         """Create and return MySQL connection"""
         try:
-            connection = mysql.connector.connect(
-                host="gondola.proxy.rlwy.net",
-                user="root",
-                password="VFPUYdKKzWeFagKmSOPyINxNqFUnwIRt",
-                port=19512,
-                database="railway"
-            )
+            self.pool = await aiomysql.create_pool(
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASS'),
+            db=os.getenv('DB_NAME'),
+            minsize=1,
+            maxsize=10
+        )
             print("✅ MySQL connection successful!")
-            return connection
+            return self.connection
         except Error as e:
             print(f"❌ MySQL connection failed: {e}")
             exit(1)
 
-    def init_db(cls, guild_id: Optional[str] = None):
+    async def execute_query(self, query, args=None):
+        """Generic query executor"""
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(query, args or ())
+                await conn.commit()
+                return cursor
+
+    def init_db(cls):
         """Initialize database tables"""
         try:
             with cls.connection.cursor() as cursor:

@@ -111,6 +111,9 @@ class SubmissionButtons(discord.ui.View):
 
 @bot.event
 async def on_ready():
+    
+    await mysql_storage.init_db()
+    
     """Bot startup initialization"""
     print(f'{bot.user.name} online in {len(bot.guilds)} guilds!')
     bot.pending_subs = {}  # Reset pending submissions
@@ -249,28 +252,23 @@ async def parse_metadata_lines(content: str) -> dict:
     return result
 
 async def store_submission(data: dict) -> bool:
-    """Database storage with connection handling"""
+    """Proper async submission storage"""
     query = """
         INSERT INTO miniatures 
         (guild_id, user_id, message_id, image_url, stl_name, bundle_name, tags)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
-
     try:
-        async with mysql_storage.store_submission() as conn:
-            async with connection.cursor() as cursor:
-                await cursor.execute(query, (
-                    data['guild_id'],
-                    data['user_id'],
-                    data['message_id'],
-                    data['image_url'],
-                    data['stl_name'],
-                    data['bundle_name'],
-                    data['tags']
-                ))
-                await conn.commit()
-            logging.info(f"Stored submission: {data['stl_name']}")
-            return True
+        await mysql_storage.execute_query(query, (
+            str(data['guild_id']),
+            str(data['user_id']),
+            str(data['message_id']),
+            data['image_url'],
+            data['stl_name'],
+            data['bundle_name'],
+            data.get('tags', '')
+        ))
+        return True
     except Exception as e:
         logging.error(f"DB Error: {e}")
         return False
