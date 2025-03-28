@@ -151,7 +151,8 @@ async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     except asyncio.TimeoutError:
         await ctx.send("❌ Setup timed out. Please try again.")
         return
-
+    except Error as e:
+        await ctx.send(f"❌ Error: {e} Submitted name couldn't be used")
     # Handle submissions and gallery channels (existing logic remains unchanged)
     if submit_channel_name.lower() == 'default':
         bot.submit_chan = await ctx.guild.create_text_channel(
