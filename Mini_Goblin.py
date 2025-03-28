@@ -140,7 +140,7 @@ async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
             raise commands.BotMissingPermissions(['manage_channels'])
 
         # 2. Initialize database
-        if not MySQLStorage.init_db(str(ctx.guild.id)):
+        if not mysql_storage.init_db(str(ctx.guild.id)):
             raise Exception("Database initialization failed")
 
         # 3. Channel setup with interactive prompts

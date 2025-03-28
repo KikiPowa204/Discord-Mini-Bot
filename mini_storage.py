@@ -31,9 +31,7 @@ class MySQLStorage:
             print(f"❌ MySQL connection failed: {e}")
             exit(1)
 
-    def init_db(self):
-        
-
+    def init_db(cls, guild_id: Optional[str] = None):
         """Initialize database tables"""
         try:
             with self.connection.cursor() as cursor:
