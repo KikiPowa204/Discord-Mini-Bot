@@ -21,11 +21,7 @@ connection = mysql.connector.connect(
     database="railway"
 )
 
-# Use the connection to execute queries
-cursor = connection.cursor()
-cursor.execute("SELECT * FROM miniatures")
-result = cursor.fetchall()
-print(result)
+# Use the connection to execute querie
 
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
@@ -44,7 +40,15 @@ DEFAULTS = {
 # Runtime storage
 intents=discord.Intents.all()
 intents.message_content = True
-intents.messages = True  # Needed for message history
+intents.messages = True  # Needed
+
+def fetch_miniatures(connection):
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM miniatures")
+    result = cursor.fetchall()
+    cursor.close()  # Close cursor after fetching data
+    return result
+
 
 @bot.command(name='setup_DB')
 @commands.has_permissions(administrator=True)
