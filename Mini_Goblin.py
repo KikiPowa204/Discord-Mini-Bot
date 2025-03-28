@@ -306,16 +306,6 @@ async def process_image_submission(message):
 
             submission_id = f"{message.id}-{message.author.id}-{attachment.id}"
             
-            # Send metadata prompt
-            prompt_msg = await message.channel.send(
-                f"{message.author.mention} Please reply with:\n"
-                "`STL: ModelName`\n"
-                "`Bundle: BundleName`\n"
-                "`Tags: optional,tags`",
-                delete_after=900
-            )
-            bot.pending_subs[submission_id]['prompt_msg_id'] = prompt_msg.id
-            asyncio.create_task(clear_pending_submission(submission_id, timeout=900))
 
 # First ensure guild exists
             if not mysql_storage.store_guild_info(
@@ -335,6 +325,17 @@ async def process_image_submission(message):
                 'attachment_id': attachment.id
             }
 
+            
+            # Send metadata prompt
+            prompt_msg = await message.channel.send(
+                f"{message.author.mention} Please reply with:\n"
+                "`STL: ModelName`\n"
+                "`Bundle: BundleName`\n"
+                "`Tags: optional,tags`",
+                delete_after=900
+            )
+            bot.pending_subs[submission_id]['prompt_msg_id'] = prompt_msg.id
+            asyncio.create_task(clear_pending_submission(submission_id, timeout=900))
             
         except mysql.connector.Error as e:
             logging.error(f"Database error processing {attachment.filename}: {e}")

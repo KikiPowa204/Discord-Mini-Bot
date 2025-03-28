@@ -8,6 +8,11 @@ import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
 
+connection = mysql.connector.connect(
+    ...,
+    autocommit=True  # Add this to your connection
+)
+
 class MySQLStorage:
     def __init__(self):
         self.connection = self._create_connection()
