@@ -226,6 +226,7 @@ if __name__ == "__main__":
     )
 
     mysql_storage.store_submission(
+        guild_id="6789",
         user_id="12345",
         guild_name="Test Guild",
         system_channel=67890
