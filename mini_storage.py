@@ -215,8 +215,6 @@ if __name__ == "__main__":
     print("=== TEST COMPLETE ===\n")
 
 # Run the tests
-check_table_structure()
-test_miniature_storage()
 # Singleton instance
 
 if __name__ == "__main__":
