@@ -46,6 +46,10 @@ intents=discord.Intents.all()
 intents.message_content = True
 intents.messages = True  # Needed for message history
 
+async def fetch_guild_id(ctx, guild):
+    return guild.id 
+print (fetch_guild_id)
+
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def setup_DB(ctx):
@@ -82,9 +86,9 @@ async def on_guild_join(guild):
             "Thanks for adding me! Use `!setup_DB` to configure submission channels."
         )
 @bot.command()
-async def check_db(ctx):
+async def check_db(ctx, guild):
     """Verify database is working"""
-    guild_id = ctx.guild_id
+    guild_id = guild.id
     db_path = mysql_storage.init_db()
     await ctx.send(f"✅ Guild database active at: `{db_path}`")
 @bot.event
