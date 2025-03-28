@@ -111,7 +111,7 @@ class MySQLStorage:
                         image_url, stl_name, bundle_name, tags
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s)
                 ''', (
-                    guild_id,
+                    str(kwargs['guild_id']),
                     str(kwargs['user_id']),
                     str(kwargs['message_id']),
                     kwargs['image_url'],
