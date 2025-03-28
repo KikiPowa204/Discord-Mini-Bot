@@ -258,7 +258,7 @@ async def store_submission(data: dict) -> bool:
 
     try:
         async with mysql_storage.store_submission() as conn:
-            async with conn.cursor() as cursor:
+            async with connection.cursor() as cursor:
                 await cursor.execute(query, (
                     data['guild_id'],
                     data['user_id'],
@@ -368,7 +368,8 @@ class TaggingModal(discord.ui.Modal):
                 bundle_name=self.children[1].value,  # From Bundle input
                 tags=self.children[2].value  # From Tags input
         )
-        
+            await connection.commit()
+            logging.info(f"Stored submission: {submission['stl_name']}")
             if success:
                 await interaction.response.send_message("✅ Saved to database!", ephemeral=True)
             else:
