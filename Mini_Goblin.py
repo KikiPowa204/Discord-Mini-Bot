@@ -260,7 +260,7 @@ async def store_submission(guild_id, data: dict) -> bool:
         async with mysql_storage.store_submission() as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute(query, (
-                    data[guild_id],
+                    data['guild_id'],
                     data['user_id'],
                     data['message_id'],
                     data['image_url'],
@@ -287,7 +287,7 @@ async def process_image_submission(message):
                 continue
 
             submission_id = f"{message.id}-{message.author.id}-{attachment.id}"
-            
+            print(f"Processing submission {submission_id}")
             # Store pending submission
             bot.pending_subs[submission_id] = {
                 'user_id': message.author.id,
@@ -297,6 +297,7 @@ async def process_image_submission(message):
                 'original_msg_id': message.id,
                 'attachment_id': attachment.id
             }
+            print(f"Pending submission stored: {bot.pending_subs[submission_id]}")
 
             # First ensure guild exists
             if not mysql_storage.store_guild_info(
@@ -368,7 +369,6 @@ class TaggingModal(discord.ui.Modal):
         
             if success:
                 await interaction.response.send_message("✅ Saved to database!", ephemeral=True)
-                await interaction.message.add_reaction('✅')
             else:
                 await interaction.response.send_message("❌ Failed to save", ephemeral=True)
             
