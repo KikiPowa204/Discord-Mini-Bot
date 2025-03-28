@@ -94,10 +94,8 @@ class MySQLStorage:
 
     async def store_submission(self, guild_id: str, **kwargs):
         """Store submission with all required fields"""
-        
-        
-
         try:
+            cursor = self.connection.cursor()
             with self.connection.cursor() as cursor:
                 # Insert or update guild
                 cursor.execute('''
@@ -121,12 +119,13 @@ class MySQLStorage:
                     kwargs['bundle_name'],
                     kwargs.get('tags', '')
                 ))
-            ( 
-            lambda: self.store_submission(guild_id, **kwargs)
-        )
+            self.connection.commit()
         except Exception as e:
             print(f"Async storage error: {e}")
-    
+        except Exception as e:
+            print(f"Async storage error: {e}")
+        finally:
+            cursor.close()
     def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
         """Retrieve submissions with search"""
         try:
