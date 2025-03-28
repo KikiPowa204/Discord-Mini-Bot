@@ -73,7 +73,7 @@ class MySQLStorage:
         except Error as e:
             print(f"❌ Table creation failed: {e}")
             raise
-        self._create_tables()
+
         return True
     def store_guild_info(self, guild_id: str, guild_name: str, system_channel: Optional[int] = None):
         """Store basic guild information"""
