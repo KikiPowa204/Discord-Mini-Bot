@@ -187,6 +187,11 @@ async def on_message(message):
     if message.content.startswith('!'):
             await bot.process_commands(message)
             return
+    if message.has_attachment() and message.channel == bot.submit_chan:
+        # Process image submission
+        await process_image_submission(message)
+        return
+    
     # Handle metadata replies
     if (message.reference and 
         message.reference.message_id in 
