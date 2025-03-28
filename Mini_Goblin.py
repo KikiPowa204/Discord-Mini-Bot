@@ -133,8 +133,8 @@ async def on_ready():
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels with comprehensive error handling"""
     try:
-        guild_id = get_guild_id(ctx)  # Check if in a guild
-        guild_name = get_guild_name(ctx)  # Check if in a guild
+        guild_id = await get_guild_id(ctx)  # Check if in a guild
+        guild_name = await get_guild_name(ctx)  # Check if in a guild
         
         print(f'Setup initiated in {guild_name} by {ctx.author}')
 
