@@ -268,6 +268,8 @@ async def store_submission(data: dict) -> bool:
                     data['bundle_name'],
                     data['tags']
                 ))
+                await conn.commit()
+            logging.info(f"Stored submission: {data['stl_name']}")
             return True
     except Exception as e:
         logging.error(f"DB Error: {e}")
