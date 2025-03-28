@@ -6,26 +6,29 @@ import os
 from typing import Optional
 import mysql.connector
 from mysql.connector import Error
+from datetime import datetime
 
 class MySQLStorage:
     def __init__(self):
         self.connection = self._create_connection()
         self.init_db()  # Initialize tables on startup
-        print(f"Autocommit status: {self.connection.autocommit}")  # Should be False
+        print(f"Autocommit status: {self.connection.autocommit}")
 
     def _create_connection(self):
         """Create and return MySQL connection"""
         try:
-            return mysql.connector.connect(
+            connection = mysql.connector.connect(
                 host="gondola.proxy.rlwy.net",
                 user="root",
                 password="VFPUYdKKzWeFagKmSOPyINxNqFUnwIRt",
                 port=19512,
                 database="railway"
             )
+            print("✅ MySQL connection successful!")
+            return connection
         except Error as e:
             print(f"❌ MySQL connection failed: {e}")
-            raise
+            exit(1)
 
     def init_db(self):
         """Initialize database tables"""
@@ -88,33 +91,28 @@ class MySQLStorage:
             return False
 
     def store_submission(self, guild_id: str, **kwargs):
-        """Guaranteed storage with validation"""
-        required = ['user_id', 'message_id', 'image_url', 'stl_name', 'bundle_name']
-        
+        """Store submission with all required fields"""
+        required = ['guild_id', 'user_id', 'message_id', 'image_url', 'stl_name', 'bundle_name']
         if any(kwargs.get(k) is None for k in required):
             print(f"Missing required fields: {required}")
             return False
 
         try:
-            if not self.connection.is_connected():
-                self.connection.reconnect()
-            
             with self.connection.cursor() as cursor:
-                # Store guild reference
+                # Insert or update guild
                 cursor.execute('''
-                INSERT INTO guilds (guild_id, last_seen)
-                VALUES (%s, NOW())
-                ON DUPLICATE KEY UPDATE last_seen=NOW()
-                ''', (guild_id,))
+                    INSERT INTO guilds (guild_id, last_seen)
+                    VALUES (%s, NOW())
+                    ON DUPLICATE KEY UPDATE last_seen=NOW()
+                ''', (kwargs['guild_id'], f"Guild-{kwargs['guild_id']}"))
                 
-                # Store submission
+                # Then insert the submission
                 cursor.execute('''
                     INSERT INTO miniatures (
-                        guild_id, user_id, message_id, 
+                        guild_id, user_id, message_id,
                         image_url, stl_name, bundle_name, tags
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ''', )
-                (
+                ''', (
                     guild_id,
                     str(kwargs['user_id']),
                     str(kwargs['message_id']),
@@ -122,12 +120,13 @@ class MySQLStorage:
                     kwargs['stl_name'],
                     kwargs['bundle_name'],
                     kwargs.get('tags', '')
-                )
-                self.connection.commit()
-                print(f"Stored submission ID: {cursor.lastrowid}")
-                return True
+                ))
+                
+            self.connection.commit()
+            return True
         except Error as e:
-            print(f"❌ Failed to store submission: {e}")
+            print(f"Storage failed: {e}")
+            self.connection.rollback()
             return False
     
     def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
@@ -165,8 +164,9 @@ if __name__ == "__main__":
         system_channel=67890
     )
     
+    try:
     # Test submission storage
-    test_data = {
+        test_data = {
         'user_id': 123,
         'message_id': 999,
         'image_url': "http://test.com/img.jpg",
@@ -175,11 +175,13 @@ if __name__ == "__main__":
         'tags': "test,demo",
         'image_hash': "abc123",
         'guild_name': "Test Guild"
-    }
-    
+        }
+    except Error as e:
+        print(f"❌ Test data cannot be inputed: {e}")
+        raise
     if mysql_storage.store_submission("12345", **test_data):
         print("✅ Test storage successful")
     
     # Test retrieval
     results = mysql_storage.get_submissions("12345", "Test")
-    print(f"Test results: {results}")
+    print(f"Test results: {results}")   
