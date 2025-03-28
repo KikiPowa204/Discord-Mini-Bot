@@ -46,10 +46,6 @@ intents=discord.Intents.all()
 intents.message_content = True
 intents.messages = True  # Needed for message history
 
-async def fetch_guild_id(ctx, guild):
-    return guild.id 
-print (fetch_guild_id)
-
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def setup_DB(ctx):
@@ -63,265 +59,42 @@ async def setup_DB(ctx):
 
     # Send confirmation message
     await ctx.send(f"✅ Server database initialized for **{guild_name}**!")
+from discord.ext import commands
+from typing import Optional
 
+async def get_guild_id(ctx: commands.Context) -> Optional[int]:
+    """Safely retrieves the guild ID with proper typing and error handling."""
+    if not ctx.guild:  # Check if in DMs
+        await ctx.send("❌ This command only works in servers!")
+        return None
+    return ctx.guild.id
 
-@bot.event
-async def on_guild_join(guild):
-    """Auto-initialize for new guilds"""
-    try:
-        db_path = mysql_storage.store_guild_info(guild)
-        print(f"Initialized DB for {guild.id}")
-        
-        # Optional welcome message
-        if guild.system_channel:
-            await guild.system_channel.send(
-        "Little Goblin is ready to steal your pics! Start with a !setup_Chan command!"
-        )    
-    except Exception as e:
-        print(f"Failed to init DB for new guild: {str(e)}")
-    
-    # Optional: Send welcome message to system channel
-    if guild.system_channel:
-        await guild.system_channel.send(
-            "Thanks for adding me! Use `!setup_DB` to configure submission channels."
-        )
+async def get_guild_name(ctx: commands.Context) -> Optional[str]:
+    """Safely retrieves the guild name with proper typing and error handling."""
+    if not ctx.guild:
+        await ctx.send("❌ This command only works in servers!")
+        return None
+    return ctx.guild.name
 @bot.command()
-async def check_db(ctx, guild):
-    """Verify database is working"""
-    guild_id = guild.id
-    db_path = mysql_storage.init_db()
-    await ctx.send(f"✅ Guild database active at: `{db_path}`")
-@bot.event
-async def on_ready():
-    """Bot startup initialization"""
-    print(f'{bot.user.name} online in {len(bot.guilds)} guilds!')
-    bot.pending_subs = {}  # Reset pending submissions
+async def test_guild_info(ctx):
+    """Test both functions in one command"""
+    guild_id = await get_guild_id(ctx)
+    guild_name = await get_guild_name(ctx)
     
-    # Initialize databases for all current guilds
-    for guild in bot.guilds:
-        mysql_storage.init_db()
-        
-    # Find existing channels (first guild with both channels wins)
-    for guild in bot.guilds:
-        bot.submit_chan = discord.utils.get(guild.channels, name=DEFAULTS['submissions_chan'])
-        bot.gallery_chan = discord.utils.get(guild.channels, name=DEFAULTS['gallery_chan'])
-        if bot.submit_chan and bot.gallery_chan:
-            print(f"Found channels in {guild.name}")
-            break
-    else:
-        print("Warning: No submission/gallery channels found")
-
-@bot.command(name='setup')
-@commands.has_permissions(administrator=True)
-async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
-    """Initializes bot channels"""
-    print ('in setup')
-    mysql_storage.init_db(ctx.guild_id)
-    # Check if the bot has the necessary permissions
-    bot_member = ctx.guild.get_member(bot.user.id)
-    if not bot_member.guild_permissions.manage_channels:
-        await ctx.send("❌ I need the 'Manage Channels' permission to set up channels.")
-        return
-
-    def check(m):
-        return m.author == ctx.author and m.channel == ctx.channel
-
-    await ctx.send("Please enter the name of the submissions channel (or type 'default' to create a new one):")
-    try:
-        submit_response = await bot.wait_for('message', check=check, timeout=60)
-        submit_channel_name = submit_response.content.strip()
-    except asyncio.TimeoutError:
-        await ctx.send("❌ Setup timed out. Please try again.")
-        return
-
-    # Handle submissions and gallery channels (existing logic remains unchanged)
-    if submit_channel_name.lower() == 'default':
-        bot.submit_chan = await ctx.guild.create_text_channel(
-            DEFAULTS['submissions_chan'],
-            topic="Post your painted miniatures here"
-        )
-    else:
-        bot.submit_chan = discord.utils.get(ctx.guild.channels, name=submit_channel_name)
-        if not bot.submit_chan:
-            await ctx.send(f"❌ Channel '{submit_channel_name}' not found. Please try again.")
-            return
-
-    # Handle gallery channel
-    bot.gallery_chan = await ctx.guild.create_text_channel(
-        DEFAULTS['gallery_chan'],
-        topic="Bot-generated painting examples"
-        )
-
-    # Set permissions
-    await bot.submit_chan.set_permissions(ctx.guild.default_role, send_messages=True)
-    await bot.gallery_chan.set_permissions(ctx.guild.default_role, send_messages=False)
-
-    await ctx.send(
-        f"✅ Setup complete!\n"
-        f"- Submissions: {bot.submit_chan.mention}\n"
-        f"- Gallery: {bot.gallery_chan.mention}\n"
-        f"- Auto-cleanup: {cleanup_mins} minutes"
-    )
+    if None in (guild_id, guild_name):
+        return  # Errors already handled
+    
+    embed = discord.Embed(title="Guild Info Test")
+    embed.add_field(name="ID", value=f"`{guild_id}`", inline=False)
+    embed.add_field(name="Name", value=guild_name, inline=False)
+    embed.set_footer(text=f"Tested at {datetime.now().isoformat()}")
+    
+    await ctx.send(embed=embed)
 
 @bot.command()
-async def ping(ctx):
-    await ctx.send("Pong!")
-
-@bot.event
-async def on_message(message):
-    try:
-        if message.author == bot.user:
-            return
-
-        # Allow commands like !setup to bypass the channel restriction
-        if message.content.startswith('!'):
-            await bot.process_commands(message)
-            return
-
-        # Ensure the message is in the submissions channel
-        if bot.submit_chan and message.channel != bot.submit_chan:
-            return
-
-        # Handle image submissions
-        if message.attachments and any(
-            att.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))
-            for att in message.attachments
-        ):
-            await process_image_submission(message)
-
-        # Handle metadata replies
-        elif message.reference:
-            await handle_metadata_reply(message)
-
-    except Exception as e:
-        logging.error(f"Error: {str(e)}", exc_info=True)
-async def handle_metadata_reply(message):
-    guild_id = message.guild.id
-    
-    
-    try:
-        if not message.reference:
-            logging.error("No message reference found")
-            return
-            
-        # Find the original submission
-        submission_id = next(
-            (k for k,v in bot.pending_subs.items() 
-             if v.get('prompt_msg_id') == message.reference.message_id),
-            None
-        )
-        
-        if not submission_id:
-            return await message.channel.send("❌ No active submission found", delete_after=10)
-            
-        submission = bot.pending_subs[submission_id]
-        mysql_storage.store_guild_info(
-        guild_id=str(message.guild.id),
-        guild_name=message.guild.name,
-        system_channel=message.guild.system_channel.id if message.guild.system_channel else None
-)
-        
-        # Create metadata dictionary with all required fields
-        metadata = {
-            #'guild_id': submission['guild_id'],  # From pending submission
-            #'user_id': submission['user_id'],    # From pending submission
-            #'message_id': submission['original_msg_id'],  # From pending submission
-            #'image_url': submission['image_url'],  # From pending submission
-            'stl_name': None,    # To be filled from user input
-            'bundle_name': None, # To be filled from user input
-            'tags': None         # To be filled from user input (optional)
-        }
-
-
-        success = mysql_storage.store_submission(**metadata)
-        # Parse user input to fill the metadata
-        for line in message.content.split('\n'):
-            line = line.strip().lower()
-            if line.startswith('stl:'):
-                metadata['stl_name'] = line[4:].strip()
-            elif line.startswith('bundle:'):
-                metadata['bundle_name'] = line[7:].strip()
-            elif line.startswith('tags:'):
-                metadata['tags'] = line[5:].strip()
-        
-        # Validate required fields before storage
-        if not all([metadata['stl_name'], metadata['bundle_name']]):
-            await message.channel.send("❌ Both STL and Bundle names are required")
-            return
-        success = mysql_storage.store_submission(
-            #guild_id=str(submission['guild_id']),
-            user_id=str(submission['user_id']),
-            message_id=str(submission['original_msg_id']),
-            image_url=submission['image_url'],
-            stl_name=metadata['stl_name'],
-            bundle_name=metadata['bundle_name'],
-            tags=metadata.get('tags', '')
-        )
-        # Store with dictionary unpacking
-        if success:
-            await message.add_reaction('✅')
-            del bot.pending_subs[submission_id]  # Clean up
-        else:
-            await message.channel.send("❌ Failed to save submission", delete_after=10)
-            
-    except Exception as e:
-        logging.error(f"Metadata handling error: {e}")
-        await message.channel.send("❌ Processing failed", delete_after=10)
-
-async def process_image_submission(message):
-    if not message.attachments:
-        await message.channel.send("❌ No attachments found", delete_after=10)
-        return
-
-    for attachment in message.attachments:
-        try:
-            if not attachment.filename.lower().endswith(('.png','.jpg','.jpeg','.webp')):
-                continue
-
-            submission_id = f"{message.id}-{message.author.id}-{attachment.id}"
-            
-            # Store pending submission
-            bot.pending_subs[submission_id] = {
-                'user_id': message.author.id,
-                'guild_id': str(message.guild.id),
-                'channel_id': message.channel.id,
-                'image_url': attachment.url,
-                'original_msg_id': message.id,
-                'attachment_id': attachment.id
-            }
-
-            # First ensure guild exists
-            if not mysql_storage.store_guild_info(
-                guild_id=str(message.guild.id),
-                guild_name=message.guild.name,
-                system_channel=message.guild.system_channel.id if message.guild.system_channel else None
-            ):
-                raise Exception("Failed to store guild info")
-
-            # Send metadata prompt
-            prompt_msg = await message.channel.send(
-                f"{message.author.mention} Please reply with:\n"
-                "`STL: ModelName`\n"
-                "`Bundle: BundleName`\n"
-                "`Tags: optional,tags`",
-                delete_after=900
-            )
-            
-            bot.pending_subs[submission_id]['prompt_msg_id'] = prompt_msg.id
-            asyncio.create_task(clear_pending_submission(submission_id, timeout=900))
-
-        except mysql.connector.Error as e:
-            logging.error(f"Database error processing {attachment.filename}: {e}")
-            await message.channel.send("❌ Database error - please try again later", delete_after=10)
-        except Exception as e:
-            logging.error(f"Failed to process {attachment.filename}: {e}")
-            await message.channel.send(f"❌ Failed to process {attachment.filename}", delete_after=10)
-async def clear_pending_submission(submission_id, timeout):
-    await asyncio.sleep(timeout)
-    if submission_id in bot.pending_subs:
-        del bot.pending_subs[submission_id]
-        logging.info(f"Cleared timed out submission {submission_id}")
-  
+async def test_dm(ctx):
+    """Verify DM handling"""
+    await ctx.send(f"In DMs: ID={await get_guild_id(ctx)}, Name={await get_guild_name(ctx)}")
 class SubmissionButtons(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=3600)  # 1 hour timeout
@@ -416,76 +189,7 @@ async def handle_submission(message):
         await message.channel.send("❌ Something went wrong - please check your input")
         print(f"Unexpected error: {e}")  # Log for debugging
 
-@bot.command(name='del')
-@commands.has_permissions(administrator=True)
-async def delete_entry(ctx):
-    """Remove an entry from the database by replying to the post"""
-    if not ctx.message.reference:
-        await ctx.send("❌ Please reply to the message you want to delete.", delete_after=10)
-        return
 
-    # Get the referenced message
-    if ctx.message.reference:
-        # If the command is a reply to a message, fetch the referenced message
-        referenced_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-        message_id = referenced_message.id
-            
-    if referenced_message.author == bot.user and referenced_message.embeds:
-        embed = referenced_message.embeds[0]
-    if embed.image and embed.image.url:
-        image_url = embed.image.url
-        try:
-            with mysql.connector.connect(
-                host="your_host",
-                user="your_username",
-                password="your_password",
-                database="your_database"
-            ) as conn:
-                c = conn.cursor()
-                c.execute("SELECT message_id FROM miniatures WHERE image_url = %s", (image_url,))
-                result = c.fetchone()
-                if result:
-                    message_id = result[0]
-                else:
-                    await ctx.send("❌ No entry found for the referenced image.", delete_after=10)
-                    return
-        except mysql.connector.Error as e:
-            await ctx.send(f"❌ Error accessing the database: {e}", delete_after=10)
-            return            
-        else:
-            # If not a reply, assume the user provides the message ID directly
-            if not ctx.message.content.strip().split(" ")[1:]:
-                await ctx.send("❌ Please provide a message ID or reply to a message.", delete_after=10)
-                return
-        with connection.connect() as conn:
-            c = conn.cursor()
-            c.execute("DELETE FROM miniatures WHERE message_id = ?", (message_id,))
-            if c.rowcount == 0:
-                await ctx.send(f"❌ No entry found for the referenced message.", delete_after=10)
-                return
-            conn.commit()
-
-        await ctx.send(f"✅ Entry for the referenced message has been removed.", delete_after=10)
-        
-@bot.command(name='show')
-async def show_examples(ctx, *, search_query: str = ""):
-    """Display examples from MySQL"""
-    submissions = mysql_storage.get_submissions(
-        guild_id=str(ctx.guild.id),
-        search_query=search_query.strip()
-    )
-    
-    if not submissions:
-        return await ctx.send(f"No results for '{search_query}'")
-    
-    for sub in submissions:
-        embed = discord.Embed(
-            title=sub['stl_name'],
-            description=f"From {sub['bundle_name']}",
-            color=0x3498db
-        )
-        embed.set_image(url=sub['image_url'])
-        await ctx.send(embed=embed)
 # Set up logging
 logging.basicConfig(
     level=logging.INFO,
@@ -496,19 +200,7 @@ logging.basicConfig(
     ]
 )
 # to always keep the gallery channel empty
-def gallery_janitor():
-    async def cleanup_gallery():
-        if not bot.gallery_chan:  # Ensure the gallery channel exists
-            return
-        try:
-            async for message in bot.gallery_chan.history(limit=200):
-                if message.author == bot.user:
-                    await message.delete(delay=600)  # Deletes the bot's message after 10 minutes
-                else:
-                    await message.delete(delay=3600)  # Deletes other messages after 1 hour
-        except Exception as e:
-            logging.error(f"Gallery cleanup error: {e}")
-        return cleanup_gallery
+
 @bot.command()
 async def debug_pending(ctx):
     """Show current pending submissions"""
@@ -544,5 +236,6 @@ async def debug_db(ctx):
 
 if __name__ == "__main__":
     bot.run(os.getenv("DISCORD_TOKEN"))
+    
 # Last updated 03/25/2025 14:17:34
 
