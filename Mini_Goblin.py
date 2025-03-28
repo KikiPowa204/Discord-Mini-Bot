@@ -306,24 +306,6 @@ async def process_image_submission(message):
 
             submission_id = f"{message.id}-{message.author.id}-{attachment.id}"
             
-            # Store pending submission
-            bot.pending_subs[submission_id] = {
-                'user_id': message.author.id,
-                'guild_id': str(message.guild.id),
-                'channel_id': message.channel.id,
-                'image_url': attachment.url,
-                'original_msg_id': message.id,
-                'attachment_id': attachment.id
-            }
-
-            # First ensure guild exists
-            if not mysql_storage.store_guild_info(
-                guild_id=str(message.guild.id),
-                guild_name=message.guild.name,
-                system_channel=message.guild.system_channel.id if message.guild.system_channel else None
-            ):
-                raise Exception("Failed to store guild info")
-
             # Send metadata prompt
             prompt_msg = await message.channel.send(
                 f"{message.author.mention} Please reply with:\n"
@@ -332,10 +314,28 @@ async def process_image_submission(message):
                 "`Tags: optional,tags`",
                 delete_after=900
             )
-            
             bot.pending_subs[submission_id]['prompt_msg_id'] = prompt_msg.id
             asyncio.create_task(clear_pending_submission(submission_id, timeout=900))
 
+# First ensure guild exists
+            if not mysql_storage.store_guild_info(
+                guild_id=str(message.guild.id),
+                guild_name=message.guild.name,
+                system_channel=message.guild.system_channel.id if message.guild.system_channel else None
+            ):
+                raise Exception("Failed to store guild info")
+
+            # Store pending submission
+            bot.pending_subs[submission_id] = {
+                'guild_id': str(message.guild.id),
+                'user_id': message.author.id,
+                'channel_id': message.channel.id,
+                'image_url': attachment.url,
+                'original_msg_id': message.id,
+                'attachment_id': attachment.id
+            }
+
+            
         except mysql.connector.Error as e:
             logging.error(f"Database error processing {attachment.filename}: {e}")
             await message.channel.send("❌ Database error - please try again later", delete_after=10)

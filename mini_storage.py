@@ -47,7 +47,7 @@ class MySQLStorage:
                 # Create miniatures table if not exists
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS miniatures (
-            id INT NOT NULL AUTO_INCREMENT,  # MySQL prefers this order
+            id INT NOT NULL AUTO_INCREMENT, 
             guild_id VARCHAR(255) NOT NULL,
             user_id VARCHAR(255) NOT NULL,
             message_id VARCHAR(255) NOT NULL,
@@ -247,3 +247,4 @@ if __name__ == "__main__":
     # Test retrieval
     results = mysql_storage.get_submissions("12345", "Test")
     print(f"Test results: {results}")
+    print(f"Test results: {success}")
