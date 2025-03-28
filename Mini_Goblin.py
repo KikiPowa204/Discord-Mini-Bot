@@ -133,7 +133,7 @@ async def on_ready():
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
-    guild_id = await ctx.get_guild_id()
+    guild_id = await get_guild_id(ctx)
     mysql_storage.init_db(guild_id)
     # Check if the bot has the necessary permissions
     bot_member = ctx.guild.get_member(bot.user.id)
