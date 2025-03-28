@@ -122,58 +122,96 @@ async def on_ready():
             break
     else:
         print("Warning: No submission/gallery channels found")
-bot.command(name='setup')
+@bot.command(name='setup')
 @commands.has_permissions(administrator=True)
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
-    """Initializes bot channels"""
-    print ('in setup')
-    mysql_storage.init_db(ctx.guild_id)
-    # Check if the bot has the necessary permissions
-    bot_member = ctx.guild.get_member(bot.user.id)
-    if not bot_member.guild_permissions.manage_channels:
-        await ctx.send("❌ I need the 'Manage Channels' permission to set up channels.")
-        return
-
-    def check(m):
-        return m.author == ctx.author and m.channel == ctx.channel
-
-    await ctx.send("Please enter the name of the submissions channel (or type 'default' to create a new one):")
+    """Initializes bot channels with comprehensive error handling"""
     try:
-        submit_response = await bot.wait_for('message', check=check, timeout=60)
-        submit_channel_name = submit_response.content.strip()
+        print(f'Setup initiated in {ctx.guild.name} by {ctx.author}')
+
+        # 1. Verify bot permissions
+        if not ctx.guild.me.guild_permissions.manage_channels:
+            raise commands.BotMissingPermissions(['manage_channels'])
+
+        # 2. Initialize database
+        if not mysql_storage.init_db(str(ctx.guild.id)):
+            raise Exception("Database initialization failed")
+
+        # 3. Channel setup with interactive prompts
+        await ctx.send("🛠️ Starting setup process...")
+        
+        # Create channels with proper permissions
+        overwrites = {
+            ctx.guild.default_role: discord.PermissionOverwrite(
+                send_messages=True,  # Allow submissions
+                read_message_history=True
+            ),
+            ctx.guild.me: discord.PermissionOverwrite(
+                manage_messages=True,
+                embed_links=True
+            )
+        }
+
+        submissions_channel = await ctx.guild.create_text_channel(
+            name=DEFAULTS['submissions_chan'],
+            topic="Post your miniature submissions here",
+            overwrites=overwrites,
+            position=0  # Top position
+        )
+
+        gallery_overwrites = {
+            ctx.guild.default_role: discord.PermissionOverwrite(
+                send_messages=False,  # Read-only
+                read_messages=True
+            )
+        }
+
+        gallery_channel = await ctx.guild.create_text_channel(
+            name=DEFAULTS['gallery_chan'],
+            topic="Approved miniature gallery",
+            overwrites=gallery_overwrites,
+            position=1  # Below submissions
+        )
+
+        # 4. Store configuration
+        mysql_storage.store_guild_info(
+            guild_id=str(ctx.guild.id),
+            guild_name=ctx.guild.name,
+            system_channel=str(ctx.guild.system_channel.id) if ctx.guild.system_channel else None,
+            submissions_channel=str(submissions_channel.id),
+            gallery_channel=str(gallery_channel.id),
+            cleanup_mins=cleanup_mins
+        )
+
+        # 5. Final confirmation
+        embed = discord.Embed(
+            title="✅ Setup Complete",
+            color=0x00ff00
+        )
+        embed.add_field(
+            name="Submissions Channel",
+            value=submissions_channel.mention,
+            inline=False
+        )
+        embed.add_field(
+            name="Gallery Channel",
+            value=gallery_channel.mention,
+            inline=False
+        )
+        embed.set_footer(text=f"Auto-cleanup: {cleanup_mins} minutes")
+        
+        await ctx.send(embed=embed)
+
+    except commands.BotMissingPermissions as e:
+        await ctx.send(f"❌ Missing required permissions: {', '.join(e.missing_permissions)}")
     except asyncio.TimeoutError:
-        await ctx.send("❌ Setup timed out. Please try again.")
-        return
-
-    # Handle submissions and gallery channels (existing logic remains unchanged)
-    if submit_channel_name.lower() == 'default':
-        bot.submit_chan = await ctx.guild.create_text_channel(
-            DEFAULTS['submissions_chan'],
-            topic="Post your painted miniatures here"
-        )
-    else:
-        bot.submit_chan = discord.utils.get(ctx.guild.channels, name=submit_channel_name)
-        if not bot.submit_chan:
-            await ctx.send(f"❌ Channel '{submit_channel_name}' not found. Please try again.")
-            return
-
-    # Handle gallery channel
-    bot.gallery_chan = await ctx.guild.create_text_channel(
-        DEFAULTS['gallery_chan'],
-        topic="Bot-generated painting examples"
-        )
-
-    # Set permissions
-    await bot.submit_chan.set_permissions(ctx.guild.default_role, send_messages=True)
-    await bot.gallery_chan.set_permissions(ctx.guild.default_role, send_messages=False)
-
-    await ctx.send(
-        f"✅ Setup complete!\n"
-        f"- Submissions: {bot.submit_chan.mention}\n"
-        f"- Gallery: {bot.gallery_chan.mention}\n"
-        f"- Auto-cleanup: {cleanup_mins} minutes"
-    )
-
+        await ctx.send("⏰ Setup timed out. Please restart the process.")
+    except mysql.connector.Error as e:
+        await ctx.send("🔴 Database error during setup. Check logs.")
+        logging.error(f"Database error: {e}")
+    except Exception as e:
+        await ctx.send(f"⚠️ Unexpected error: {str(e)}")
+        logging.exception("Setup failed:")
 @bot.event
 async def on_message(message):
     # Let commands process first
