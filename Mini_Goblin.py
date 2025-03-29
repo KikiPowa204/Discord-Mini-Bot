@@ -189,27 +189,27 @@ async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
 @bot.event
 async def message_organiser(message: discord.Message):
     # Let commands process first
-    if message.content.startswith('!'):
-        await bot.process_commands(message)
-        return
-
-    # Ensure the message is in the submissions channel and not from a bot
-    elif not bot.submit_chan or message.channel != bot.submit_chan or message.author.bot:
-        print ('Issue is in bot check')
-        return
-
-    # Process the first valid attachment
-    try: 
-        if message.attachments and message.attachments[0].filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
-            print ('Got as far as the await function')
-            await process_submission(message)  # Use await for the async function
+    try:
+        if message.author == bot.user:
             return
-    except Error as e:
-        print ("Message.attachments failled to process")
 
-    # If no valid attachment is found
-    await message.channel.send("❌ Only image files (.png, .jpg, .jpeg, .gif) are allowed.", delete_after=30)
-        
+        # Allow commands like !setup to bypass the channel restriction
+        if message.content.startswith('!'):
+            await bot.process_commands(message)
+            return
+
+        # Ensure the message is in the submissions channel
+        if bot.submit_chan and message.channel != bot.submit_chan:
+            return
+
+        # Handle image submissions
+        if message.attachments and any(
+            att.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))
+            for att in message.attachments
+        ):
+            await process_submission(message)
+    except Exception as e:
+        logging.error(f"Error: {str(e)}", exc_info=True)    
 
 async def get_SBT(message: discord.Message):
     try:
