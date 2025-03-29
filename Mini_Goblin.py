@@ -192,18 +192,14 @@ async def message_organiser(message: discord.Message):
         return
 
     # Ensure the message is in the submissions channel and not from a bot
-    if not bot.submit_chan or message.channel != bot.submit_chan or message.author.bot:
+    elif not bot.submit_chan or message.channel != bot.submit_chan or message.author.bot:
         print ('Issue is in bot check')
-        return
-
-    # Check if the message contains attachments
-    if not message.attachments:
-        await message.channel.send("❌ Please attach an image to your submission.", delete_after=30)
         return
 
     # Process the first valid attachment
     try: 
         if message.attachments and message.attachments[0].filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+            print ('Got as far as the await function')
             await process_submission(message)  # Use await for the async function
             return
     except Error as e:
@@ -264,6 +260,7 @@ async def get_SBT(message: discord.Message):
         
 async def process_submission(self, submission: discord.Message):
     try:
+        print ('In process_submission')
         submission_data = await get_SBT(submission)
         
         submission_id = hashlib.md5(f"{submission.id}{submission.attachments[0].url}".encode()).hexdigest()
