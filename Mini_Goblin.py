@@ -27,6 +27,8 @@ cursor.execute("SELECT * FROM miniatures")
 result = cursor.fetchall()  # Close cursor after fetching data
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
+intents = discord.Intents.default()
+intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 # Custom database module
 #Update this bitch
