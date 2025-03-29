@@ -20,10 +20,10 @@ class MySQLStorage:
         """Create and return MySQL connection"""
         try:
             self.pool = await aiomysql.create_pool(
-            host=os.getenv('DB_HOST'),
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASS'),
-            db=os.getenv('DB_NAME'),
+            host=os.getenv('MYSQLHOST'),
+            user=os.getenv('MYSQLUSER'),
+            password=os.getenv('MYSQLPASSWORD'),
+            db=os.getenv('MYSQL_DATABASE'),
             minsize=1,
             maxsize=10
         )
