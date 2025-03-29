@@ -229,6 +229,7 @@ async def handle_metadata_reply(message: discord.Message):
             await message.channel.send("❌ Submission expired", delete_after=10)
             return
 
+        
         # Parse metadata
         metadata = await mysql_storage.store_submission(  # <-- Note the await
             guild_id=str(message.guild.id),
@@ -275,7 +276,7 @@ async def process_image_submission(message):
 
     for attachment in message.attachments:
         try:
-            if not attachment.filename.lower().endswith(('.png','.jpg','.jpeg','.webp')):
+            if attachment.filename.lower().endswith(('.png','.jpg','.jpeg','.webp')):
                 continue
 
             submission_id = f"{message.id}-{message.author.id}-{attachment.id}"
@@ -309,6 +310,7 @@ async def process_image_submission(message):
             )
             
             bot.pending_subs[submission_id]['prompt_msg_id'] = prompt_msg.id
+            parse_metadata_lines.bot.pending_subs[submission_id]['prompt_msg_id']
             # Schedule cleanup (async but don't await - we want it to run in background)
             asyncio.create_task(clear_pending_submission(submission_id, timeout=900))
 

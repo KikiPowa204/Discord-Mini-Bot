@@ -117,7 +117,7 @@ class MySQLStorage:
                     await cursor.execute('''
                     INSERT INTO guilds 
                     (guild_id, guild_name, system_channel, last_seen)
-                    VALUES (%s, %s, %s, NOW())
+                    VALUES (%s, %s, %s, NOW()) AS new
                     ON DUPLICATE KEY UPDATE
                         guild_name = VALUES(guild_name),
                         system_channel = VALUES(system_channel),
