@@ -194,6 +194,7 @@ async def message_organiser(message: discord.Message):
 
     # Ensure the message is in the submissions channel and not from a bot
     if not bot.submit_chan or message.channel != bot.submit_chan or message.author.bot:
+        print ('Issue is in bot check')
         return
 
     # Check if the message contains attachments
@@ -225,7 +226,7 @@ async def get_SBT(message: discord.Message):
             'tags': None
         }
         
-        prompt = await message.channel.reply(
+        prompt = await message.channel.send(
                 f"{message.author.mention} Please reply with:\n"
                 "`STL: ModelName`\n"
                 "`Bundle: BundleName`\n"
