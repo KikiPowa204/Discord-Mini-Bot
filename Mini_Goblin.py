@@ -252,18 +252,6 @@ async def handle_metadata_reply(message: discord.Message):
         await message.channel.send("⚠️ An error occurred while processing")
         
 # Helper functions
-async def parse_metadata_lines(content: str) -> dict:
-    """Extract STL, bundle, and tags from message content"""
-    result = {'stl_name': None, 'bundle_name': None, 'tags': ''}
-    for line in content.split('\n'):
-        line = line.strip().lower()
-        if line.startswith('stl:'): 
-            result['stl_name'] = line[4:].strip()
-        elif line.startswith('bundle:'):
-            result['bundle_name'] = line[7:].strip()
-        elif line.startswith('tags:'):
-            result['tags'] = line[5:].strip()
-    return result
 
 @bot.command()
 async def ping(ctx):
