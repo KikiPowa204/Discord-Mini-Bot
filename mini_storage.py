@@ -8,33 +8,60 @@ import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
 import aiomysql
+import re
+from urllib.parse import urlparse
 class MySQLStorage:
     def __init__(self):
         self.pool = None
     
+    def _parse_public_url(self):
+        """Extract connection details from MYSQL_PUBLIC_URL"""
+        url = os.getenv('MYSQL_PUBLIC_URL')
+        if not url:
+            raise ValueError("❌ MYSQL_PUBLIC_URL not found in environment")
+        
+        try:
+            # Parse the URL (e.g. "mysql://user:pass@host:port/db")
+            parsed = urlparse(url)
+            return {
+                'host': parsed.hostname,
+                'port': parsed.port or 3306,  # Default MySQL port
+                'user': parsed.username,
+                'password': parsed.password,
+                'db': parsed.path[1:]  # Remove leading '/'
+            }
+        except Exception as e:
+            raise ValueError(f"❌ Failed to parse MYSQL_PUBLIC_URL: {e}")
+
     async def initialize(self):
         """Initialize database for a specific guild"""
         """Call this once at setup"""
         await self._create_connection()
         print(f'Pool autocommit status: {self.pool.autocommit[0].autocommit}')
-
+    
     async def _create_connection(self):
         """Create and return MySQL connection"""
         try:
+            config = self._parse_public_url()
+            
             self.pool = await aiomysql.create_pool(
-            host=os.getenv('MYSQLHOST'),
-            port=int(os.getenv('MYSQLPORT', 3306)),
-            user=os.getenv('MYSQLUSER'),
-            password=os.getenv('MYSQLPASSWORD'),
-            db=os.getenv('MYSQL_DATABASE'),
-            minsize=1,
-            maxsize=10,
-            autocommit=False
-        )
-            print("✅ MySQL connection successful!")
-        except Error as e:
-            print(f"❌ MySQL connection failed: {e}")
-            exit(1)
+                host=config['host'],
+                port=config['port'],
+                user=config['user'],
+                password=config['password'],
+                db=config['db'],
+                minsize=1,
+                maxsize=10,
+                connect_timeout=10,
+                autocommit=False
+            )
+            print(f"✅ Connected to MySQL at {config['host']}:{config['port']}")
+        except Exception as e:
+            print(f"❌ Connection failed. Verify:")
+            print(f"- MYSQL_PUBLIC_URL is correct")
+            print(f"- MySQL service is running (not paused)")
+            print(f"- Error details: {e}")
+            raise
 
     async def execute_query(self, query, args=None):
         """Generic query executor"""
