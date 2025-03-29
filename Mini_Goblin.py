@@ -120,7 +120,7 @@ async def on_ready():
     
     # Initialize databases for all current guilds
     for guild in bot.guilds:
-        mysql_storage.init_db()
+        await mysql_storage.init_db()
         
     # Find existing channels (first guild with both channels wins)
     for guild in bot.guilds:
@@ -137,7 +137,7 @@ async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
     """Initializes bot channels"""
     print ('in setup')
     guild_id = await get_guild_id(ctx)
-    mysql_storage.init_db(guild_id)
+    await mysql_storage.init_db(guild_id)
     # Check if the bot has the necessary permissions
     bot_member = ctx.guild.get_member(bot.user.id)
     if not bot_member.guild_permissions.manage_channels:
