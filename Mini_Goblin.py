@@ -131,6 +131,7 @@ async def on_ready():
             break
     else:
         print("Warning: No submission/gallery channels found")
+
 @bot.command(name='setup')
 @commands.has_permissions(administrator=True)
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
@@ -185,74 +186,100 @@ async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
         f"- Auto-cleanup: {cleanup_mins} minutes"
     )
 @bot.event
-async def on_message(message):
+async def message_organiser(message: discord.Message):
     # Let commands process first
     if message.content.startswith('!'):
             await bot.process_commands(message)
             return
-    if message.attachments and message.channel == bot.submit_chan:
-        # Process image submission
-        await handle_submission(message)
+    if message.channel != bot.submit_chan or message.author.bot:
         return
-    
-    # Handle metadata replies
-    if (message.reference and 
-        message.reference.message_id in 
-        [v['prompt_msg_id'] for v in bot.pending_subs.values()]):
-        await handle_metadata_reply(message)
-
-async def handle_metadata_reply(message: discord.Message):
-    try:
-        # First ensure guild exists
-        if not await mysql_storage.store_guild_info(  # <-- Note the await
-            guild_id=str(message.guild.id),
-            guild_name=message.guild.name,
-            system_channel=message.channel.id if isinstance(message.channel, discord.TextChannel) else None
-        ):
-            await message.channel.send("❌ Failed to verify server registration")
-            return
-        """Process metadata replies with proper context handling"""
-        print(f"Handling metadata reply from {message.author}")
-        # Validate guild context
-        if not message.guild:
-            await message.channel.send("❌ This only works in servers", delete_after=10)
-            return
-
-        guild_id = message.guild.id
-        submission_id, submission = next(
-            ((k, v) for k, v in bot.pending_subs.items() 
-            if v.get('prompt_msg_id') == message.reference.message_id),
-            (None, None)
-        )
-
-        if not submission:
-            await message.channel.send("❌ Submission expired", delete_after=10)
-            return
-
-        handle_submission(submission)
-        # Parse metadata
-        metadata = await mysql_storage.store_submission(  # <-- Note the await
-            guild_id=str(message.guild.id),
-            user_id=str(message.author.id),
-            message_id=str(message.id),
-            image_url=submission['image_url'],
-            stl_name=metadata['stl_name'],
-            bundle_name=metadata.get('bundle_name'),
-            tags=metadata.get('tags', '')
-        )
-
-    # Store to database
-        if await mysql_storage.store_submission(metadata):
-            await message.add_reaction('✅')
-            del bot.pending_subs[submission_id]
-        else:
-            await message.channel.send("❌ Failed to save", delete_after=10)
-    except Exception as e:
-        logging.error(f"Metadata handling failed: {e}")
-        await message.channel.send("⚠️ An error occurred while processing")
+    if message.channel == bot.submit_chan and message.attachments:
+        # Check if the message has an attachment
+        if message.attachments.url.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+            process_submission(message)
         
-# Helper functions
 
+async def get_SBT(message: discord.Message):
+    try:
+        submission_data = {
+            'user_id': message.author.id,
+            'image_url': message.attachments[0].url if message.attachments else None,
+            'guild_id': message.guild.id,
+            'original_msg_id': message.id,
+            'prompt_id': None,
+            'channel_id': message.channel.id,
+            'stl_name': None,
+            'bundle_name': None,
+            'tags': None
+        }
+        
+        prompt = await message.channel.reply(
+                f"{message.author.mention} Please reply with:\n"
+                "`STL: ModelName`\n"
+                "`Bundle: BundleName`\n"
+                "`Tags: optional,tags`",
+                delete_after=900
+            )
+        submission_data['prompt_id'] = prompt.id
+        
+        # Parse user input to fill the metadata
+        def check(reply):
+            return reply.author == message.author and reply.channel == message.channel
+        
+        try:
+            user_reply = await bot.wait_for('message', timeout=300, check=check)  # Wait for 5 minutes
+        except asyncio.TimeoutError:
+            await message.channel.send("❌ You took too long to reply. Please try again.")
+            return
+        # Process the user's reply
+        for line in user_reply.content.split('\n'):
+            line = line.strip().lower()
+            if line.startswith('stl:'):
+                bot.pending_subs[prompt.id]['stl_name'] = line[4:].strip()
+            elif line.startswith('bundle:'):
+                bot.pending_subs[prompt.id]['bundle_name'] = line[7:].strip()
+            elif line.startswith('tags:'):
+                bot.pending_subs[prompt.id]['tags'] = line[5:].strip()
+        
+        # Confirm the submission
+        await message.channel.send("✅ Submission updated with your input!", delete_after= 30)
+
+        return submission_data
+    except Exception as e:
+        await message.channel.send(f"❌ An error occurred: {e}")
+        
+async def process_submission(self, submission: discord.Message):
+    try:
+        submission_id = hashlib.md5(f"{submission.id}{submission.attachments[0].url}".encode()).hexdigest()
+
+        submission_data = await get_SBT(submission)
+
+        if not submission_data:
+            logging.error("Submission data is empty or invalid")
+            return
+    
+        stl_name = submission_data.get('stl_name')
+        bundle_name = submission_data.get('bundle_name')
+        tags = submission_data.get('tags')
+    
+        #Store the submission in db
+        await mysql_storage.store_submission(
+        guild_id=submission_data['guild_id'],
+            user_id=submission_data['user_id'],
+            message_id=str(submission_data['original_msg_id']),
+            author=submission.author.name,
+            image_url=submission_data['image_url'],
+            stl_name=stl_name,
+            bundle_name=bundle_name,
+            tags=tags
+            )
+        await connection.commit()
+        
+       # Start a timer to clear the pending submission after 10 minutes
+        asyncio.create_task(clear_pending_submission(submission_id, 600))
+    
+    except Exception as e:
+        logging.error(f"Error processing submission: {e}")
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong!")
@@ -317,115 +344,7 @@ class TaggingModal(discord.ui.Modal):
         except Exception as e:
             logging.error(f"Cleanup error: {e}")
        
-async def handle_submission(message: discord.Message):
-    """Unified submission handler for both initial posts and metadata replies"""
-    try:
-        # Case 1: Metadata reply
-        if message.reference and message.reference.message_id:
-            await _handle_metadata_reply(message)
-            return
 
-        # Case 2: Initial image submission
-        if not message.attachments:
-            await message.channel.send("❌ No attachments found", delete_after=10)
-            return
-
-        await handle_submission(message)
-
-    except Exception as e:
-        logging.error(f"Submission handling failed: {e}")
-        await message.channel.send("❌ An error occurred - please try again", delete_after=15)
-
-async def _process_new_submission(message):
-    """Process initial image submission""" 
-    attachment = next(
-        (a for a in message.attachments 
-         if a.filename.lower().endswith(('.png','.jpg','.jpeg','.webp'))),
-        None
-    )
-    
-    if not attachment:
-        await message.channel.send("❌ No valid image attachments found", delete_after=10)
-        return
-
-    submission_id = f"{message.id}-{message.author.id}-{attachment.id}"
-    
-    # Store pending submission
-    bot.pending_subs[submission_id] = {
-        'guild_id': str(message.guild.id),
-        'user_id': str(message.author.id),
-        'channel_id': message.channel.id,
-        'image_url': attachment.url
-    }
-
-    # Register guild
-    if not await mysql_storage.store_guild_info(
-        guild_id=str(message.guild.id),
-        guild_name=message.guild.name,
-        system_channel=message.guild.system_channel.id if message.guild.system_channel else None
-    ):
-        raise Exception("Failed to register guild")
-
-    # Request metadata
-    prompt = await message.channel.send(
-        f"{message.author.mention} Please reply with:\n"
-        "`STL: ModelName`\n"
-        "`Bundle: BundleName`\n"
-        "`Tags: optional,tags`",
-        delete_after=900
-    )
-    
-    bot.pending_subs[submission_id]['prompt_msg_id'] = prompt.id
-    asyncio.create_task(clear_pending_submission(submission_id, timeout=900))
-
-async def _handle_metadata_reply(message):
-    """Process metadata replies"""
-    submission = next(
-        (v for k,v in bot.pending_subs.items() 
-         if v.get('prompt_msg_id') == message.reference.message_id),
-        None
-    )
-    
-    if not submission:
-        await message.channel.send("❌ Submission expired", delete_after=10)
-        return
-
-    # Parse metadata
-    metadata = {
-        'stl_name': None,
-        'bundle_name': None,
-        'tags': ''
-    }
-    
-    for line in message.content.split('\n'):
-        line = line.strip().lower()
-        if line.startswith('stl:'):
-            metadata['stl_name'] = line[4:].strip()
-        elif line.startswith('bundle:'):
-            metadata['bundle_name'] = line[7:].strip()
-        elif line.startswith('tags:'):
-            metadata['tags'] = line[5:].strip()
-
-    if not metadata['stl_name']:
-        await message.channel.send("❌ Missing STL name", delete_after=10)
-        return
-
-    # Store submission
-    success = await mysql_storage.store_submission(
-        guild_id=submission['guild_id'],
-        user_id=submission['user_id'],
-        message_id=str(message.id),
-        image_url=submission['image_url'],
-        stl_name=metadata['stl_name'],
-        bundle_name=metadata['bundle_name'],
-        tags=metadata['tags']
-    )
-
-    if success:
-        await message.add_reaction('✅')
-        del bot.pending_subs[submission['prompt_msg_id']]
-    else:
-        await message.channel.send("❌ Failed to save submission", delete_after=10)
 @bot.command(name='del')
 @commands.has_permissions(administrator=True)
 async def delete_entry(ctx):

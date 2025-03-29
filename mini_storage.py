@@ -204,25 +204,6 @@ if __name__ == "__main__":
         guild_name="Test Guild",
         system_channel=67890
     )
-    
-    try:
-    # Test submission storage
-        test_data = {
-        'user_id': 123,
-        'message_id': 999,
-        'image_url': "http://test.com/img.jpg",
-        'stl_name': "Test Model",
-        'bundle_name': "Test Bundle",
-        'tags': "test,demo",
-        'image_hash': "abc123",
-        'guild_name': "Test Guild"
-        }
-    except Error as e:
-        print(f"❌ Test data cannot be inputed: {e}")
-        raise
-    if mysql_storage.store_submission("12345", **test_data):
-        print("✅ Test storage successful")
-    
     # Test retrieval
     results = mysql_storage.get_submissions("12345", "Test")
     print(f"Test results: {results}")   
