@@ -203,10 +203,9 @@ async def message_organiser(message: discord.Message):
         return
 
     # Process the first valid attachment
-    for attachment in message.attachments:
-        if attachment.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
-            await process_submission(message)  # Use await for the async function
-            return
+    if message.attachments and message.attachments[0].filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+        await process_submission(message)  # Use await for the async function
+        return
 
     # If no valid attachment is found
     await message.channel.send("❌ Only image files (.png, .jpg, .jpeg, .gif) are allowed.", delete_after=30)
