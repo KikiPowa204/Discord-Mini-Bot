@@ -11,7 +11,7 @@ from typing import Optional
 import mysql.connector
 from mysql.connector import Error
 # Remove: import sqlite3
-from mini_storage import mysql_storage, MySQLStorage
+from mini_storage import mysql_storage
 
 connection = mysql.connector.connect(
     host="gondola.proxy.rlwy.net",
@@ -202,40 +202,53 @@ async def on_message(message):
         await handle_metadata_reply(message)
 
 async def handle_metadata_reply(message: discord.Message):
-    """Process metadata replies with proper context handling"""
-    print(f"Handling metadata reply from {message.author}")
-    # Validate guild context
-    if not message.guild:
-        await message.channel.send("❌ This only works in servers", delete_after=10)
-        return
+    try:
+        # First ensure guild exists
+        if not await mysql_storage.store_guild_info(  # <-- Note the await
+            guild_id=str(message.guild.id),
+            guild_name=message.guild.name,
+            system_channel=message.channel.id if isinstance(message.channel, discord.TextChannel) else None
+        ):
+            await message.channel.send("❌ Failed to verify server registration")
+            return
+        """Process metadata replies with proper context handling"""
+        print(f"Handling metadata reply from {message.author}")
+        # Validate guild context
+        if not message.guild:
+            await message.channel.send("❌ This only works in servers", delete_after=10)
+            return
 
-    guild_id = message.guild.id
-    submission_id, submission = next(
-        ((k, v) for k, v in bot.pending_subs.items() 
-         if v.get('prompt_msg_id') == message.reference.message_id),
-        (None, None)
-    )
+        guild_id = message.guild.id
+        submission_id, submission = next(
+            ((k, v) for k, v in bot.pending_subs.items() 
+            if v.get('prompt_msg_id') == message.reference.message_id),
+            (None, None)
+        )
 
-    if not submission:
-        await message.channel.send("❌ Submission expired", delete_after=10)
-        return
+        if not submission:
+            await message.channel.send("❌ Submission expired", delete_after=10)
+            return
 
-    # Parse metadata
-    metadata = {
-        'guild_id': str(guild_id),
-        'user_id': str(submission['user_id']),
-        'message_id': str(submission['original_msg_id']),
-        'image_url': submission['image_url'],
-        **await parse_metadata_lines(message.content)  # New helper function
-    }
+        # Parse metadata
+        metadata = await mysql_storage.store_submission(  # <-- Note the await
+            guild_id=str(message.guild.id),
+            user_id=str(message.author.id),
+            message_id=str(message.id),
+            image_url=submission['image_url'],
+            stl_name=metadata['stl_name'],
+            bundle_name=metadata.get('bundle_name'),
+            tags=metadata.get('tags', '')
+        )
 
     # Store to database
-    if await store_submission(metadata):
-        await message.add_reaction('✅')
-        del bot.pending_subs[submission_id]
-    else:
-        await message.channel.send("❌ Failed to save", delete_after=10)
-
+        if await mysql_storage.store_submission(metadata):
+            await message.add_reaction('✅')
+            del bot.pending_subs[submission_id]
+        else:
+            await message.channel.send("❌ Failed to save", delete_after=10)
+    except Exception as e:
+        logging.error(f"Metadata handling failed: {e}")
+        await message.channel.send("⚠️ An error occurred while processing")
         
 # Helper functions
 async def parse_metadata_lines(content: str) -> dict:
@@ -251,27 +264,6 @@ async def parse_metadata_lines(content: str) -> dict:
             result['tags'] = line[5:].strip()
     return result
 
-async def store_submission(data: dict) -> bool:
-    """Proper async submission storage"""
-    query = """
-        INSERT INTO miniatures 
-        (guild_id, user_id, message_id, image_url, stl_name, bundle_name, tags)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
-    """
-    try:
-        await mysql_storage.execute_query(query, (
-            str(data['guild_id']),
-            str(data['user_id']),
-            str(data['message_id']),
-            data['image_url'],
-            data['stl_name'],
-            data['bundle_name'],
-            data.get('tags', '')
-        ))
-        return True
-    except Exception as e:
-        logging.error(f"DB Error: {e}")
-        return False
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong!")
@@ -300,7 +292,7 @@ async def process_image_submission(message):
             print(f"Pending submission stored: {bot.pending_subs[submission_id]}")
 
             # First ensure guild exists
-            if not mysql_storage.store_guild_info(
+            if not await mysql_storage.store_guild_info(
                 guild_id=str(message.guild.id),
                 guild_name=message.guild.name,
                 system_channel=message.guild.system_channel.id if message.guild.system_channel else None
@@ -317,6 +309,7 @@ async def process_image_submission(message):
             )
             
             bot.pending_subs[submission_id]['prompt_msg_id'] = prompt_msg.id
+            # Schedule cleanup (async but don't await - we want it to run in background)
             asyncio.create_task(clear_pending_submission(submission_id, timeout=900))
 
         except mysql.connector.Error as e:

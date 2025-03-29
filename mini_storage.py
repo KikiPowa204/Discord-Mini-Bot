@@ -112,8 +112,8 @@ class MySQLStorage:
     async def store_guild_info(self, guild_id: str, guild_name: str, system_channel: Optional[int] = None):
         """Store basic guild information"""
         try:
-            with self.pool.acquire() as conn:
-                with conn.cursor() as cursor:
+            async with self.pool.acquire() as conn:
+                async with conn.cursor() as cursor:
                     await cursor.execute('''
                     INSERT INTO guilds 
                     (guild_id, guild_name, system_channel, last_seen)
@@ -124,7 +124,7 @@ class MySQLStorage:
                         last_seen = VALUES(last_seen)
                 ''', (guild_id, guild_name, system_channel))
                 await conn.commit()
-            return True
+                return True
         except Error as e:
             print(f"❌ Failed to store guild info: {e}")
             return False
