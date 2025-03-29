@@ -189,14 +189,26 @@ async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
 async def message_organiser(message: discord.Message):
     # Let commands process first
     if message.content.startswith('!'):
-            await bot.process_commands(message)
-            return
-    if message.channel != bot.submit_chan or message.author.bot:
+        await bot.process_commands(message)
         return
-    if message.channel == bot.submit_chan and message.attachments:
-        # Check if the message has an attachment
-        if message.attachments.url.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
-            process_submission(message)
+
+    # Ensure the message is in the submissions channel and not from a bot
+    if not bot.submit_chan or message.channel != bot.submit_chan or message.author.bot:
+        return
+
+    # Check if the message contains attachments
+    if not message.attachments:
+        await message.channel.send("❌ Please attach an image to your submission.", delete_after=30)
+        return
+
+    # Process the first valid attachment
+    for attachment in message.attachments:
+        if attachment.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+            await process_submission(message)  # Use await for the async function
+            return
+
+    # If no valid attachment is found
+    await message.channel.send("❌ Only image files (.png, .jpg, .jpeg, .gif) are allowed.", delete_after=30)
         
 
 async def get_SBT(message: discord.Message):
@@ -250,9 +262,9 @@ async def get_SBT(message: discord.Message):
         
 async def process_submission(self, submission: discord.Message):
     try:
-        submission_id = hashlib.md5(f"{submission.id}{submission.attachments[0].url}".encode()).hexdigest()
-
         submission_data = await get_SBT(submission)
+        
+        submission_id = hashlib.md5(f"{submission.id}{submission.attachments[0].url}".encode()).hexdigest()
 
         if not submission_data:
             logging.error("Submission data is empty or invalid")
