@@ -10,11 +10,14 @@ from datetime import datetime
 import aiomysql
 class MySQLStorage:
     def __init__(self):
-        self.connection = self._create_connection()
         self.pool = None
-        print(f"Autocommit status: {self.connection.autocommit}")
-    """Initialize database for a specific guild"""
-        
+    
+    async def initialize(self):
+        """Initialize database for a specific guild"""
+        """Call this once at setup"""
+        await self._create_connection()
+        print(f'Pool autocommit status: {self.pool.autocommit[0].autocommit}')
+
     async def _create_connection(self):
         """Create and return MySQL connection"""
         try:
@@ -29,7 +32,6 @@ class MySQLStorage:
             autocommit=False
         )
             print("✅ MySQL connection successful!")
-            return self.connection
         except Error as e:
             print(f"❌ MySQL connection failed: {e}")
             exit(1)
