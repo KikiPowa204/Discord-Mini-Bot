@@ -11,7 +11,6 @@ import aiomysql
 class MySQLStorage:
     def __init__(self):
         self.connection = self._create_connection()
-        self.init_db()  # Initialize tables on startup
         self.pool = None
         print(f"Autocommit status: {self.connection.autocommit}")
     """Initialize database for a specific guild"""
@@ -21,11 +20,13 @@ class MySQLStorage:
         try:
             self.pool = await aiomysql.create_pool(
             host=os.getenv('MYSQLHOST'),
+            port=int(os.getenv('MYSQLPORT', 3306)),
             user=os.getenv('MYSQLUSER'),
             password=os.getenv('MYSQLPASSWORD'),
             db=os.getenv('MYSQL_DATABASE'),
             minsize=1,
-            maxsize=10
+            maxsize=10,
+            autocommit=False
         )
             print("✅ MySQL connection successful!")
             return self.connection
@@ -41,12 +42,14 @@ class MySQLStorage:
                 await conn.commit()
                 return cursor
 
-    def init_db(cls):
+    async def init_db(self):
         """Initialize database tables"""
-        try:
-            with cls.connection.cursor() as cursor:
-                # Create guilds table if not exists
-                cursor.execute('''
+        if not self.pool:
+            await self._create_connection()
+
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute('''
                     CREATE TABLE IF NOT EXISTS guilds (
                         guild_id VARCHAR(255) PRIMARY KEY,
                         guild_name VARCHAR(255) NOT NULL,
@@ -55,9 +58,8 @@ class MySQLStorage:
                         INDEX idx_last_seen (last_seen)
                     )
                 ''')
-                
                 # Create miniatures table if not exists
-                cursor.execute('''
+                await cursor.execute('''
                     CREATE TABLE IF NOT EXISTS miniatures (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         guild_id VARCHAR(255) NOT NULL,
@@ -75,19 +77,15 @@ class MySQLStorage:
                         FOREIGN KEY (guild_id) REFERENCES guilds(guild_id)
                     )
                 ''')
-                
-            cls.connection.commit()
-            print("✅ Database tables initialized")
-        except Error as e:
-            print(f"❌ Table creation failed: {e}")
-            raise
-
+                await conn.commit()
         return True
-    def store_guild_info(self, guild_id: str, guild_name: str, system_channel: Optional[int] = None):
+    
+    async def store_guild_info(self, guild_id: str, guild_name: str, system_channel: Optional[int] = None):
         """Store basic guild information"""
         try:
-            with self.connection.cursor() as cursor:
-                cursor.execute('''
+            with self.pool.acquire() as conn:
+                with conn.cursor() as cursor:
+                    await cursor.execute('''
                     INSERT INTO guilds 
                     (guild_id, guild_name, system_channel, last_seen)
                     VALUES (%s, %s, %s, NOW())
@@ -96,7 +94,7 @@ class MySQLStorage:
                         system_channel = VALUES(system_channel),
                         last_seen = VALUES(last_seen)
                 ''', (guild_id, guild_name, system_channel))
-            self.connection.commit()
+                await conn.commit()
             return True
         except Error as e:
             print(f"❌ Failed to store guild info: {e}")
@@ -104,18 +102,23 @@ class MySQLStorage:
 
     async def store_submission(self, **kwargs):
         """Store submission with all required fields"""
+        required_fields = {'guild_id', 'user_id', 'message_id', 'image_url', 'stl_name'}
+        if not all(field in kwargs for field in required_fields):
+            print("❌ Missing required fields for submission")
+            return False
+        
         try:
-            cursor = self.connection.cursor()
-            with self.connection.cursor() as cursor:
-                # Insert or update guild
-                cursor.execute('''
+            async with self.pool.acquire() as conn:
+                async with conn.cursor() as cursor:
+                    await conn.begin()
+                    await cursor.execute('''
                     INSERT INTO guilds (guild_id, last_seen)
                     VALUES (%s, NOW())
                     ON DUPLICATE KEY UPDATE last_seen=NOW()
                 ''', (kwargs['guild_id'], f"Guild-{kwargs['guild_id']}"))
                 
                 # Then insert the submission
-                cursor.execute('''
+                await cursor.execute('''
                     INSERT INTO miniatures (
                         guild_id, user_id, message_id,
                         image_url, stl_name, bundle_name, tags
@@ -129,18 +132,20 @@ class MySQLStorage:
                     kwargs['bundle_name'],
                     kwargs.get('tags', '')
                 ))
-            await self.connection.commit()
+                await conn.commit()
+                return True
+        except Error as e:
+            print(f"❌Database error: {e}")
+            return False
         except Exception as e:
-            print(f"Async storage error: {e}")
-        except Exception as e:
-            print(f"Async storage error: {e}")
-        finally:
-            cursor.close()
-    def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
+            print(f"❌Unexpected Error: {e}")
+        
+    async def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
         """Retrieve submissions with search"""
         try:
-            with self.connection.cursor(dictionary=True) as cursor:
-                cursor.execute('''
+            async with self.pool.acquire() as conn:
+                async with conn.cursor() as cursor:
+                    await cursor.execute('''
                     SELECT m.*, g.guild_name 
                     FROM miniatures m
                     JOIN guilds g ON m.guild_id = g.guild_id
@@ -158,7 +163,7 @@ class MySQLStorage:
                 return cursor.fetchall()
         except Error as e:
             print(f"❌ Query failed: {e}")
-            return []
+            
 
 # Singleton instance
 mysql_storage = MySQLStorage()
