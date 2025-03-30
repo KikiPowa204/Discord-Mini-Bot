@@ -184,7 +184,7 @@ async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
         f"- Auto-cleanup: {cleanup_mins} minutes"
     )
 @bot.event
-async def message_organiser(message: discord.Message):
+async def on_message(message):
     # Let commands process first
     try:
         print ('testing to see if the author==bot')
