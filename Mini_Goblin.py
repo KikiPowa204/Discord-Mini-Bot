@@ -265,7 +265,7 @@ async def get_SBT(message: discord.Message):
         # Confirm the submission
         await message.channel.send("✅ Submission updated with your input!", delete_after= 30)
         print ("Got to the end of Get_SBT")
-        return bot.pending_subs[submission_id]
+        return submission_data
     except Exception as e:  # Broad exception for debugging
         logging.exception(f"Error in get_SBT: {e}")
         await message.channel.send("❌ Processing failed - please try again", delete_after=15)
