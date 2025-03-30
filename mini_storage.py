@@ -102,7 +102,6 @@ class MySQLStorage:
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         INDEX idx_guild (guild_id),
                         INDEX idx_stl_name (stl_name),
-                        UNIQUE KEY unique_image (image_hash),
                         FOREIGN KEY (guild_id) REFERENCES guilds(guild_id)
                     )
                 ''')
