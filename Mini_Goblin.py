@@ -251,11 +251,12 @@ async def get_SBT(message: discord.Message):
         for line in user_reply.content.split('\n'):
             line = line.strip().lower()
             if line.startswith('stl:'):
-                bot.pending_subs[prompt.id]['stl_name'] = line[4:].strip()
+                bot.pending_subs[submission_id]['stl_name'] = line[4:].strip()
             elif line.startswith('bundle:'):
-                bot.pending_subs[prompt.id]['bundle_name'] = line[7:].strip()
+                bot.pending_subs[submission_id]['bundle_name'] = line[7:].strip()
             elif line.startswith('tags:'):
-                bot.pending_subs[prompt.id]['tags'] = line[5:].strip()
+                bot.pending_subs[submission_id]['tags'] = line[5:].strip()
+
         
         if not bot.pending_subs[submission_id]['stl_name']:
             await message.channel.send("❌ STL name is required", delete_after=15)
