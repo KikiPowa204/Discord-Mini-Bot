@@ -263,7 +263,7 @@ async def get_SBT(message: discord.Message):
     except Exception as e:
         await message.channel.send(f"❌ An error occurred: {e}")
         
-async def process_submission(self, submission: discord.Message):
+async def process_submission(submission: discord.Message):
     try:
         print ('In process_submission')
         submission_data = await get_SBT(submission)
