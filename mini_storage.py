@@ -165,7 +165,7 @@ class MySQLStorage:
                             guild_id, user_id, message_id, author,
                             image_url, channel_id, stl_name,
                             bundle_name, tags,
-                            submitted_at, prompt_id
+                            submitted_at
                         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ''', (
                         str(submission_data['guild_id']),
