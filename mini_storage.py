@@ -164,7 +164,7 @@ class MySQLStorage:
                         INSERT INTO miniatures (
                             guild_id, user_id, message_id, author,
                             image_url, channel_id, stl_name,
-                            bundle_name, tags, approval_status,
+                            bundle_name, tags,
                             submitted_at, prompt_id
                         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ''', (
