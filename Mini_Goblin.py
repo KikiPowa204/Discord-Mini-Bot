@@ -236,7 +236,7 @@ async def get_SBT(message: discord.Message):
                 "`STL: ModelName`\n"
                 "`Bundle: BundleName`\n"
                 "`Tags: optional,tags`",
-                delete_after=900
+                delete_after=300
             )
          # Store prompt reference
         bot.pending_subs[submission_id]['prompt_id'] = prompt.id
@@ -270,7 +270,7 @@ async def get_SBT(message: discord.Message):
         # Confirm the submission
         await message.channel.send("✅ Submission updated with your input!", delete_after= 30)
         print ("Got to the end of Get_SBT")
-        bot.pending_subs[submission_id]
+        return bot.pending_subs[submission_id]
     except Exception as e:  # Broad exception for debugging
         logging.exception(f"Error in get_SBT: {e}")
         await message.channel.send("❌ Processing failed - please try again", delete_after=15)
@@ -304,7 +304,7 @@ async def process_submission(submission: discord.Message):
         await connection.commit()
         
        # Start a timer to clear the pending submission after 10 minutes
-        asyncio.create_task(clear_pending_submission(submission_id, 600))
+        asyncio.create_task(clear_pending_submission(submission_id, 30))
     
     except Exception as e:
         logging.error(f"Error processing submission: {e}")
