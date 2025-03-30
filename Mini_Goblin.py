@@ -321,13 +321,31 @@ async def clear_pending_submission(submission_id, timeout):
         del bot.pending_subs[submission_id]
         logging.info(f"Cleared timed out submission {submission_id}")
 
-class SubmissionButtons(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=3600)  # 1 hour timeout
+async def clear_pending_submission(
+    submission_id: str, 
+    timeout: float,
+    bot_instance: Optional[Bot] = None
+) -> None:
+    """Safely clear submission after timeout with cancellation support."""
+    try:
+        await asyncio.sleep(timeout)
+        
+        if not hasattr(bot_instance, 'pending_subs'):
+            logging.warning("No pending_subs dictionary found")
+            return
+
+        if submission_id in bot_instance.pending_subs:
+            del bot_instance.pending_subs[submission_id]
+            logging.info(f"Cleared submission {submission_id}")
+            
+    except asyncio.CancelledError:
+        logging.debug(f"Submission {submission_id} completed early")
+    except Exception as e:
+        logging.error(f"Failed to clear submission {submission_id}: {str(e)}")
     
-    @discord.ui.button(label="Add Tags", style=discord.ButtonStyle.blurple)
-    async def add_tags(self, interaction, button):
-        await interaction.response.send_modal(TaggingModal())
+@discord.ui.button(label="Add Tags", style=discord.ButtonStyle.blurple)
+async def add_tags(self, interaction, button):
+    await interaction.response.send_modal(TaggingModal())
 class TaggingModal(discord.ui.Modal):
     def __init__(self):
         super().__init__(title="Tag This Miniature")
