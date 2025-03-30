@@ -209,6 +209,12 @@ async def on_message(message):
 
 async def get_SBT(message: discord.Message):
     try:
+        # Validate input
+        if not message.attachments:
+            await message.channel.send("❌ No attachments found", delete_after=10)
+            return None
+
+        submission_id = f"{message.id}-{message.author.id}"
         submission_data = {
             'user_id': message.author.id,
             'image_url': message.attachments[0].url if message.attachments else None,
@@ -228,12 +234,8 @@ async def get_SBT(message: discord.Message):
                 "`Tags: optional,tags`",
                 delete_after=900
             )
-        submission_data['prompt_id'] = prompt.id
-        
-        submission_id = f"{message.id}-{message.author.id}"
-        bot.pending_subs[submission_id] = submission_data
+         # Store prompt reference
         bot.pending_subs[submission_id]['prompt_id'] = prompt.id
-
 
         # Parse user input to fill the metadata
         def check(reply):
@@ -263,7 +265,7 @@ async def get_SBT(message: discord.Message):
         # Confirm the submission
         await message.channel.send("✅ Submission updated with your input!", delete_after= 30)
         print ("Got to the end of Get_SBT")
-        return submission_data
+        return bot.pending_subs[submission_id]
     except Exception as e:  # Broad exception for debugging
         logging.exception(f"Error in get_SBT: {e}")
         await message.channel.send("❌ Processing failed - please try again", delete_after=15)
