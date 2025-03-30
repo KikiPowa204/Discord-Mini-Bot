@@ -286,9 +286,11 @@ async def process_submission(submission: discord.Message):
             logging.error("Submission data is empty or invalid")
             return
         
-        stl_name = bot.pending_sub.get('stl_name')
-        bundle_name = bot.pending_sub.get('bundle_name')
-        tags = bot.pending_sub.get('tags')
+        pending_data = bot.pending_subs.get(submission_id, {})
+
+        stl_name = pending_data.get('stl_name')
+        bundle_name = pending_data.get('bundle_name')
+        tags = pending_data.get('tags')
     
         #Store the submission in db
         await mysql_storage.store_submission(
