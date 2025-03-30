@@ -394,11 +394,73 @@ class TaggingModal(discord.ui.Modal):
                 msg = await channel.fetch_message(submission['original_msg_id'])
         except Exception as e:
             logging.error(f"Cleanup error: {e}")
+@bot.command(name='store')
+async def store_miniature(ctx):
+    """Store a miniature from a replied-to message"""
+    # Check if the message is a reply
+    if not ctx.message.reference:
+        await ctx.send("❌ Please reply to a message containing an image first")
+        return
+
+    try:
+        # Get the original message
+        original_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+        
+        # Verify the original message has an image
+        if not original_msg.attachments or not any(att.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')) for att in original_msg.attachments):
+            await ctx.send("❌ The replied message must contain an image")
+            return
+
+        # Parse the command content
+        content = ctx.message.content.split('\n')
+        stl_name = None
+        bundle_name = None
+        tags = None
+
+        for line in content:
+            line = line.strip().lower()
+            if line.startswith('stl:'):
+                stl_name = line[4:].strip()
+            elif line.startswith('bundle:'):
+                bundle_name = line[7:].strip()
+            elif line.startswith('tags:'):
+                tags = line[5:].strip()
+
+        # Validate required fields
+        if not stl_name:
+            await ctx.send("❌ STL name is required (format: `STL: ModelName`)")
+            return
+
+        # Prepare submission data
+        submission_data = {
+            'guild_id': str(ctx.guild.id),
+            'user_id': str(ctx.author.id),
+            'message_id': str(original_msg.id),
+            'author': str(original_msg.author),
+            'image_url': original_msg.attachments[0].url,
+            'channel_id': str(ctx.channel.id),
+            'stl_name': stl_name,
+            'bundle_name': bundle_name or None,
+            'tags': tags or None
+        }
+
+        # Store in database
+        success = await mysql_storage.store_submission(**submission_data)
+        if success:
+            await ctx.message.add_reaction('✅')
+            await ctx.send(f"✅ Successfully stored {stl_name}!", delete_after=10)
+        else:
+            await ctx.send("❌ Failed to store submission - please try again")
+
+    except Exception as e:
+        logging.error(f"Error in store command: {e}")
+        await ctx.send("❌ An error occurred while processing your request")
+
 @bot.command(name='show')
 async def show_miniature(ctx, stl_name: str):
     """Display a specific miniature from this server"""
     # Verify we're in the correct guild
-    if ctx.guild.id != bot.guild.id:  # Assuming bot.guild is set during initialization
+    if ctx.guild.id != bot.guilds.id:  # Assuming bot.guild is set during initialization
         await ctx.send("❌ This command only works in the server it was configured for")
         return
 
