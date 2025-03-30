@@ -187,23 +187,16 @@ async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
 async def on_message(message):
     # Let commands process first
     try:
-        print ('testing to see if the author==bot')
         if message.author == bot.user:
-            print ('recognised as bot. No actions taken')
             return
-        print ('checking to see if command')
         # Allow commands like !setup to bypass the channel restriction
         if message.content.startswith('!'):
-            print ("! command registered, processing command")
             await bot.process_commands(message)
             return
         # Ensure the message is in the submissions channel
 
-        print ("Checking to see if message is in submit_chan")
         if bot.submit_chan and message.channel != bot.submit_chan:
-            print ("Bot is being registered as not being in submit_chan")
             return
-        print ("Checking to see if bot recognises message.attachments in submit_chan")
         # Handle image submissions
         if message.attachments and any(
             att.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))
@@ -238,8 +231,8 @@ async def get_SBT(message: discord.Message):
         submission_data['prompt_id'] = prompt.id
         
         # Parse user input to fill the metadata
-        def check(reply):
-            return reply.author == message.author and reply.channel == message.channel
+#        def check(reply):
+ #           return reply.author == message.author and reply.channel == message.channel
         
         try:
             user_reply = await bot.wait_for('message', timeout=300, check=check)  # Wait for 5 minutes
@@ -260,7 +253,7 @@ async def get_SBT(message: discord.Message):
         await message.channel.send("✅ Submission updated with your input!", delete_after= 30)
 
         return submission_data
-    except Exception as e:
+    except Error as e:
         await message.channel.send(f"❌ An error occurred: {e}")
         
 async def process_submission(submission: discord.Message):
