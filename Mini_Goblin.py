@@ -220,7 +220,7 @@ async def get_SBT(message: discord.Message):
             'user_id': message.author.id,
             'original_msg_id': message.id,
             'author_name' : message.author,
-            'image_url': message.attachments[0].url if message.attachments else None,
+            'image_url': message.attachments[0].url,
             'channel_id': message.channel.id,
             'stl_name': "None",
             'bundle_name': "None",
