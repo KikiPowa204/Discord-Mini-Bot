@@ -208,7 +208,7 @@ async def on_message(message):
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)    
 
-async def get_SBT(message: discord.Message):
+async def get_SBT(message: discord.Message) -> Optional[dict]:
     try:
         # Validate input
         if not message.attachments:
@@ -272,20 +272,23 @@ async def get_SBT(message: discord.Message):
         await message.channel.send("✅ Submission updated with your input!", delete_after= 30)
         print ("Got to the end of Get_SBT")
         return bot.pending_subs[submission_id]
-    except Exception as e:  # Broad exception for debugging
-        logging.exception(f"Error in get_SBT: {e}")
-        await message.channel.send("❌ Processing failed - please try again", delete_after=15)
-        return False
+    except asyncio.TimeoutError:
+        raise ValueError("Response timeout")
+    except Exception as e:
+        logging.exception("Processing failed")
+        raise  # Re-raise the exception
 async def process_submission(submission: discord.Message):
     try:
         print ('In process_submission')
         submission_data = await get_SBT(submission)
-        
+        if submission_data is None:  # Covers both None and False
+            logging.error("Invalid submission data")
+            return False
         submission_id = hashlib.md5(f"{submission.id}{submission.attachments[0].url}".encode()).hexdigest()
 
         if not submission_data:
             logging.error("Submission data is empty or invalid")
-            return
+            return False
         
         pending_data = bot.pending_subs.get(submission_id, {})
 
@@ -312,6 +315,7 @@ async def process_submission(submission: discord.Message):
     
     except Exception as e:
         logging.error(f"Error processing submission: {e}")
+        return False
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong!")
