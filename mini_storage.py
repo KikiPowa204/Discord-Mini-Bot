@@ -139,8 +139,8 @@ class MySQLStorage:
         'bundle_name': '',
         'tags': '',
         'approval_status': 'pending',  # New field example
-        'submitted_at': datetime.utcnow(),
-        'prompt_id': None
+        'submitted_at': datetime.timezone.utc(),
+        'prompt_id': 'None'
     }
         submission_data = {**defaults, **kwargs}
 
