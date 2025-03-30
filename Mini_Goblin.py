@@ -74,14 +74,14 @@ async def get_guild_id(ctx: commands.Context) -> Optional[int]:
     """Safely retrieves the guild ID with proper typing and error handling."""
     if not ctx.guild:  # Check if in DMs
         await ctx.send("❌ This command only works in servers!")
-        return None
+        return False
     return ctx.guild.id
 
 async def get_guild_name(ctx: commands.Context) -> Optional[str]:
     """Safely retrieves the guild name with proper typing and error handling."""
     if not ctx.guild:
         await ctx.send("❌ This command only works in servers!")
-        return None
+        return False
     return ctx.guild.name
 @bot.command()
 async def test_guild_info(ctx):
@@ -265,7 +265,7 @@ async def get_SBT(message: discord.Message):
         if not bot.pending_subs[submission_id]['stl_name']:
             await message.channel.send("❌ STL name is required", delete_after=15)
             del bot.pending_subs[submission_id]
-            return None
+            return
 
         # Confirm the submission
         await message.channel.send("✅ Submission updated with your input!", delete_after= 30)
