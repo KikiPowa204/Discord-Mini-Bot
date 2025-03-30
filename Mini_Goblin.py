@@ -215,7 +215,7 @@ async def get_SBT(message: discord.Message):
             return None
 
         submission_id = f"{message.id}-{message.author.id}"
-        submission_data = {
+        bot.pending_subs[submission_id] = {
             'user_id': message.author.id,
             'image_url': message.attachments[0].url if message.attachments else None,
             'guild_id': message.guild.id,
@@ -265,7 +265,7 @@ async def get_SBT(message: discord.Message):
         # Confirm the submission
         await message.channel.send("✅ Submission updated with your input!", delete_after= 30)
         print ("Got to the end of Get_SBT")
-        return submission_data
+        bot.pending_subs[submission_id]
     except Exception as e:  # Broad exception for debugging
         logging.exception(f"Error in get_SBT: {e}")
         await message.channel.send("❌ Processing failed - please try again", delete_after=15)
