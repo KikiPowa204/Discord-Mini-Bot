@@ -232,7 +232,7 @@ async def get_SBT(message: discord.Message) -> Optional[dict]:
         # Store BEFORE sending prompt
         bot.pending_subs[submission_id] = submission_data
         print(f"Stored submission {submission_id}")  # Debug log
-        
+        #
         prompt = await message.channel.send(
                 f"{message.author.mention} Please reply with:\n"
                 "`STL: ModelName`\n"
