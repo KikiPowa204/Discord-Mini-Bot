@@ -228,7 +228,7 @@ async def get_SBT(message: discord.Message):
             'tags': None
         }
         
-        prompt = await message.channel.reply(
+        prompt = await message.channel.send(
                 f"{message.author.mention} Please reply with:\n"
                 "`STL: ModelName`\n"
                 "`Bundle: BundleName`\n"
