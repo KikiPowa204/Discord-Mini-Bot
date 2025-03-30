@@ -42,6 +42,15 @@ DEFAULTS = {
     'gallery_chan': 'miniature-gallery'
 }
 
+# In your database configuration (e.g., config.py or main bot file)
+DB_CONFIG = {
+    'host': 'your_mysql_host',  # Replace with actual host
+    'user': 'your_username',
+    'password': 'your_password',
+    'db': 'your_database_name',
+    'port': 3306  # Default MySQL port
+}
+
 # Runtime storage
 intents=discord.Intents.all()
 intents.message_content = True
@@ -111,6 +120,25 @@ class SubmissionButtons(discord.ui.View):
     @discord.ui.button(label="Add Tags", style=discord.ButtonStyle.blurple)
     async def add_tags(self, interaction, button):
         await interaction.response.send_modal(TaggingModal())
+
+async def get_db_connection():
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            conn = await aiomysql.connect(
+                host=DB_CONFIG['host'],
+                port=DB_CONFIG['port'],
+                user=DB_CONFIG['user'],
+                password=DB_CONFIG['password'],
+                db=DB_CONFIG['db'],
+                cursorclass=aiomysql.DictCursor
+            )
+            return conn
+        except Exception as e:
+            logging.error(f"Connection attempt {attempt + 1} failed: {e}")
+            if attempt == max_retries - 1:
+                raise
+            await asyncio.sleep(1)
 
 @bot.event
 async def on_ready():
@@ -281,10 +309,7 @@ async def process_submission(submission: discord.Message):
             await submission.channel.send("❌ Please include an image attachment", delete_after=10)
             return False
 
-        # Generate submission ID
         submission_id = f"{submission.id}-{submission.author.id}"
-        
-        # Store initial data
         submission_data = {
             'guild_id': str(submission.guild.id),
             'user_id': str(submission.author.id),
@@ -292,26 +317,22 @@ async def process_submission(submission: discord.Message):
             'author': str(submission.author),
             'image_url': submission.attachments[0].url,
             'channel_id': str(submission.channel.id),
-            'stl_name': None,  # Will be filled from user reply
+            'stl_name': None,
             'bundle_name': None,
             'tags': None
         }
         bot.pending_subs[submission_id] = submission_data
 
-        # Send prompt for metadata
+        # Send prompt for metadata (don't auto-delete this one)
         prompt_msg = await submission.channel.send(
             f"{submission.author.mention} Please reply with:\n"
             "`STL: ModelName` (required)\n"
             "`Bundle: BundleName`\n"
             "`Tags: tag1,tag2`\n"
-            "You have 5 minutes to reply.",
-            delete_after=300
         )
 
-        # Store prompt reference
         bot.pending_subs[submission_id]['prompt_id'] = prompt_msg.id
 
-        # Wait for user reply
         def check(m):
             return (m.author == submission.author and 
                     m.channel == submission.channel and
@@ -333,38 +354,59 @@ async def process_submission(submission: discord.Message):
 
             # Validate required STL name
             if not bot.pending_subs[submission_id]['stl_name']:
+                await prompt_msg.delete()
+                await reply.delete()
                 await submission.channel.send("❌ STL name is required", delete_after=15)
                 del bot.pending_subs[submission_id]
                 return False
 
             # Store in database
-            success = await mysql_storage.store_submission(
-                guild_id=bot.pending_subs[submission_id]['guild_id'],
-                user_id=bot.pending_subs[submission_id]['user_id'],
-                message_id=bot.pending_subs[submission_id]['message_id'],
-                author=bot.pending_subs[submission_id]['author'],
-                image_url=bot.pending_subs[submission_id]['image_url'],
-                channel_id=bot.pending_subs[submission_id]['channel_id'],
-                stl_name=bot.pending_subs[submission_id]['stl_name'],
-                bundle_name=bot.pending_subs[submission_id]['bundle_name'],
-                tags=bot.pending_subs[submission_id]['tags']
-            )
+            success = await mysql_storage.store_submission(**{
+                k: bot.pending_subs[submission_id][k] 
+                for k in [
+                    'guild_id', 'user_id', 'message_id', 'author',
+                    'image_url', 'channel_id', 'stl_name',
+                    'bundle_name', 'tags'
+                ]
+            })
 
             if success:
+                # Cleanup messages
+                try:
+                    await prompt_msg.delete()
+                    await reply.delete()
+                except discord.NotFound:
+                    pass  # Messages already deleted
+                
                 await submission.add_reaction('✅')
-                await submission.channel.send(
-                    f"✅ Saved {bot.pending_subs[submission_id]['stl_name']}!",
-                    delete_after=15
-                )
                 return True
             else:
                 await submission.channel.send("❌ Failed to store submission", delete_after=15)
                 return False
 
         except asyncio.TimeoutError:
+            try:
+                await prompt_msg.delete()
+            except discord.NotFound:
+                pass
             await submission.channel.send("❌ Timed out waiting for details", delete_after=15)
             del bot.pending_subs[submission_id]
             return False
+
+    except Exception as e:
+        logging.error(f"Submission processing error: {e}")
+        if submission_id in bot.pending_subs:
+            try:
+                if 'prompt_id' in bot.pending_subs[submission_id]:
+                    prompt_msg = await submission.channel.fetch_message(
+                        bot.pending_subs[submission_id]['prompt_id']
+                    )
+                    await prompt_msg.delete()
+            except:
+                pass
+            del bot.pending_subs[submission_id]
+        await submission.channel.send("❌ Error processing submission", delete_after=15)
+        return False
 
     except Exception as e:
         logging.error(f"Submission processing error: {e}")
@@ -564,55 +606,41 @@ async def show_miniature(ctx, stl_name: str):
         await ctx.send("❌ An error occurred while fetching this miniature")
 
 @bot.command(name='del')
-@commands.has_permissions(administrator=True)
-async def delete_entry(ctx):
-    """Remove an entry from the database by replying to the post"""
-    if not ctx.message.reference:
-        await ctx.send("❌ Please reply to the message you want to delete.", delete_after=10)
-        return
+async def delete_submission(ctx, submission_id: str):
+    """Delete a submission by ID"""
+    try:
+        # Verify permissions
+        if not ctx.author.guild_permissions.manage_messages:
+            await ctx.send("❌ You need manage messages permission to delete submissions")
+            return
 
-    # Get the referenced message
-    if ctx.message.reference:
-        # If the command is a reply to a message, fetch the referenced message
-        referenced_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-        message_id = referenced_message.id
-            
-    if referenced_message.author == bot.user and referenced_message.embeds:
-        embed = referenced_message.embeds[0]
-    if embed.image and embed.image.url:
-        image_url = embed.image.url
-        try:
-            with mysql.connector.connect(
-                host="your_host",
-                user="your_username",
-                password="your_password",
-                database="your_database"
-            ) as conn:
-                c = conn.cursor()
-                c.execute("SELECT message_id FROM miniatures WHERE image_url = %s", (image_url,))
-                result = c.fetchone()
-                if result:
-                    message_id = result[0]
-                else:
-                    await ctx.send("❌ No entry found for the referenced image.", delete_after=10)
+        async with await get_db_connection() as conn:
+            async with conn.cursor() as cursor:
+                # Delete from database
+                await cursor.execute(
+                    "DELETE FROM miniatures WHERE message_id = %s",
+                    (submission_id,)
+                )
+                
+                if cursor.rowcount == 0:
+                    await ctx.send(f"❌ No submission found with ID {submission_id}")
                     return
-        except mysql.connector.Error as e:
-            await ctx.send(f"❌ Error accessing the database: {e}", delete_after=10)
-            return            
-        else:
-            # If not a reply, assume the user provides the message ID directly
-            if not ctx.message.content.strip().split(" ")[1:]:
-                await ctx.send("❌ Please provide a message ID or reply to a message.", delete_after=10)
-                return
-        with connection.connect() as conn:
-            c = conn.cursor()
-            c.execute("DELETE FROM miniatures WHERE message_id = ?", (message_id,))
-            if c.rowcount == 0:
-                await ctx.send(f"❌ No entry found for the referenced message.", delete_after=10)
-                return
-            conn.commit()
+                
+                await conn.commit()
+                await ctx.message.add_reaction('✅')
+                
+                # Optional: Delete the original message if still exists
+                try:
+                    msg = await ctx.channel.fetch_message(submission_id)
+                    await msg.delete()
+                except discord.NotFound:
+                    pass  # Message already deleted
+                except discord.Forbidden:
+                    logging.warning(f"No permission to delete message {submission_id}")
 
-        await ctx.send(f"✅ Entry for the referenced message has been removed.", delete_after=10)
+    except Exception as e:
+        logging.error(f"Delete error: {e}")
+        await ctx.send("❌ Failed to delete submission - check logs")
         
 
 # Set up logging
