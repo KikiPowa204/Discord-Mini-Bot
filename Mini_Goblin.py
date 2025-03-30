@@ -274,24 +274,15 @@ async def get_SBT(message: discord.Message) -> Optional[dict]:
         logging.exception("Error in get_SBT")
         raise  # Re-raise the exception
 async def process_submission(submission: discord.Message):
-    try:
-        
-        try:
-            submission_data = await get_SBT(submission)
-        except ValueError as e:
-            await submission.channel.send(f"❌ {str(e)}", delete_after=15)
-            return False
-        except Exception as e:
-            logging.error(f"Unexpected error: {e}")
-            return False
+    try:    
         print ('In process_submission')
-        
+        submission_data = await get_SBT(submission)
+        if not submission_data:
+            logging.error("Submission data is empty or invalid.")
+            await submission.channel.send("❌ Submission failed. Please try again.", delete_after=30)
+            return False
         submission_id = hashlib.md5(f"{submission.id}{submission.attachments[0].url}".encode()).hexdigest()
 
-        if not submission_data:
-            logging.error("Submission data is empty or invalid")
-            return False
-        
         pending_data = bot.pending_subs.get(submission_id, {})
 
         stl_name = pending_data.get('stl_name')
@@ -317,6 +308,7 @@ async def process_submission(submission: discord.Message):
     
     except Exception as e:
         logging.error(f"Error processing submission: {e}")
+        await submission.channel.send("❌ An unexpected error occurred. Please try again later.", delete_after=30)
         return False
 @bot.command()
 async def ping(ctx):
