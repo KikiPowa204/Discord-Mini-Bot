@@ -94,6 +94,7 @@ class MySQLStorage:
                         guild_id VARCHAR(255) NOT NULL,
                         user_id VARCHAR(255) NOT NULL,
                         message_id VARCHAR(255) NOT NULL,
+                        author VARCHAR(255) NOT NULL,
                         image_url TEXT NOT NULL,
                         stl_name VARCHAR(255) NOT NULL,
                         bundle_name VARCHAR(255) NOT NULL,
