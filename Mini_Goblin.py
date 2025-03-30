@@ -274,44 +274,103 @@ async def get_SBT(message: discord.Message) -> Optional[dict]:
         logging.exception("Error in get_SBT")
         raise  # Re-raise the exception
 async def process_submission(submission: discord.Message):
-    try:    
-        print ('In process_submission')
-        submission_data = await get_SBT(submission)
-        if not submission_data:
-            logging.error("Submission data is empty or invalid.")
-            await submission.channel.send("❌ Submission failed. Please try again.", delete_after=30)
+    """Process a submission from the submissions channel"""
+    try:
+        # Validate message has attachments
+        if not submission.attachments:
+            await submission.channel.send("❌ Please include an image attachment", delete_after=10)
             return False
-        submission_id = hashlib.md5(f"{submission.id}{submission.attachments[0].url}".encode()).hexdigest()
 
-        pending_data = bot.pending_subs.get(submission_id, {})
-
-        stl_name = pending_data.get('stl_name')
-        bundle_name = pending_data.get('bundle_name')
-        tags = pending_data.get('tags')
-    
-        #Store the submission in db
-        # Remove the global connection.commit() - let the storage method handle it
-        success = await mysql_storage.store_submission(
-    guild_id=submission_data['guild_id'],
-    user_id=submission_data['user_id'],
-    message_id=str(submission_data['original_msg_id']),
-    author=submission_data['author'],  # Changed from 'author'
-    image_url=submission_data['image_url'],
-    channel_id=submission_data['channel_id'],
-    stl_name=stl_name,
-    bundle_name=bundle_name,
-    tags=tags
-)
-
-        if not success:
-            raise Exception("Failed to store submission")
+        # Generate submission ID
+        submission_id = f"{submission.id}-{submission.author.id}"
         
-       # Start a timer to clear the pending submission after 10 minutes
-        asyncio.create_task(clear_pending_submission(submission_id, 30))
-    
+        # Store initial data
+        submission_data = {
+            'guild_id': str(submission.guild.id),
+            'user_id': str(submission.author.id),
+            'message_id': str(submission.id),
+            'author': str(submission.author),
+            'image_url': submission.attachments[0].url,
+            'channel_id': str(submission.channel.id),
+            'stl_name': None,  # Will be filled from user reply
+            'bundle_name': None,
+            'tags': None
+        }
+        bot.pending_subs[submission_id] = submission_data
+
+        # Send prompt for metadata
+        prompt_msg = await submission.channel.send(
+            f"{submission.author.mention} Please reply with:\n"
+            "`STL: ModelName` (required)\n"
+            "`Bundle: BundleName`\n"
+            "`Tags: tag1,tag2`\n"
+            "You have 5 minutes to reply.",
+            delete_after=300
+        )
+
+        # Store prompt reference
+        bot.pending_subs[submission_id]['prompt_id'] = prompt_msg.id
+
+        # Wait for user reply
+        def check(m):
+            return (m.author == submission.author and 
+                    m.channel == submission.channel and
+                    m.reference and 
+                    m.reference.message_id == prompt_msg.id)
+
+        try:
+            reply = await bot.wait_for('message', check=check, timeout=300)
+            
+            # Parse reply
+            for line in reply.content.split('\n'):
+                line = line.strip().lower()
+                if line.startswith('stl:'):
+                    bot.pending_subs[submission_id]['stl_name'] = line[4:].strip()
+                elif line.startswith('bundle:'):
+                    bot.pending_subs[submission_id]['bundle_name'] = line[7:].strip()
+                elif line.startswith('tags:'):
+                    bot.pending_subs[submission_id]['tags'] = line[5:].strip()
+
+            # Validate required STL name
+            if not bot.pending_subs[submission_id]['stl_name']:
+                await submission.channel.send("❌ STL name is required", delete_after=15)
+                del bot.pending_subs[submission_id]
+                return False
+
+            # Store in database
+            success = await mysql_storage.store_submission(
+                guild_id=bot.pending_subs[submission_id]['guild_id'],
+                user_id=bot.pending_subs[submission_id]['user_id'],
+                message_id=bot.pending_subs[submission_id]['message_id'],
+                author=bot.pending_subs[submission_id]['author'],
+                image_url=bot.pending_subs[submission_id]['image_url'],
+                channel_id=bot.pending_subs[submission_id]['channel_id'],
+                stl_name=bot.pending_subs[submission_id]['stl_name'],
+                bundle_name=bot.pending_subs[submission_id]['bundle_name'],
+                tags=bot.pending_subs[submission_id]['tags']
+            )
+
+            if success:
+                await submission.add_reaction('✅')
+                await submission.channel.send(
+                    f"✅ Saved {bot.pending_subs[submission_id]['stl_name']}!",
+                    delete_after=15
+                )
+                return True
+            else:
+                await submission.channel.send("❌ Failed to store submission", delete_after=15)
+                return False
+
+        except asyncio.TimeoutError:
+            await submission.channel.send("❌ Timed out waiting for details", delete_after=15)
+            del bot.pending_subs[submission_id]
+            return False
+
     except Exception as e:
-        logging.error(f"Error processing submission: {e}")
-        await submission.channel.send("❌ An unexpected error occurred. Please try again later.", delete_after=30)
+        logging.error(f"Submission processing error: {e}")
+        if submission_id in bot.pending_subs:
+            del bot.pending_subs[submission_id]
+        await submission.channel.send("❌ Error processing submission", delete_after=15)
         return False
 @bot.command()
 async def ping(ctx):
@@ -396,38 +455,43 @@ class TaggingModal(discord.ui.Modal):
             logging.error(f"Cleanup error: {e}")
 @bot.command(name='store')
 async def store_miniature(ctx):
-    """Store a miniature from a replied-to message"""
-    # Check if the message is a reply
+    """Store a miniature from a replied-to message with metadata"""
+    # Check if message is a reply
     if not ctx.message.reference:
-        await ctx.send("❌ Please reply to a message containing an image first")
+        await ctx.send("❌ Please reply to an image message first")
         return
 
     try:
-        # Get the original message
+        # Get original message
         original_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
         
-        # Verify the original message has an image
-        if not original_msg.attachments or not any(att.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')) for att in original_msg.attachments):
-            await ctx.send("❌ The replied message must contain an image")
+        # Verify image exists
+        if not original_msg.attachments:
+            await ctx.send("❌ Replied message has no image attachment")
             return
 
-        # Parse the command content
-        content = ctx.message.content.split('\n')
-        stl_name = None
-        bundle_name = None
-        tags = None
+        # Parse command content
+        lines = [line.strip() for line in ctx.message.content.split('\n') if line.strip()]
+        metadata = {
+            'stl_name': None,
+            'bundle_name': None,
+            'tags': None
+        }
 
-        for line in content:
-            line = line.strip().lower()
-            if line.startswith('stl:'):
-                stl_name = line[4:].strip()
-            elif line.startswith('bundle:'):
-                bundle_name = line[7:].strip()
-            elif line.startswith('tags:'):
-                tags = line[5:].strip()
+        for line in lines[1:]:  # Skip first line (!store)
+            if ':' in line:
+                key, value = line.split(':', 1)
+                key = key.strip().lower()
+                value = value.strip()
+                if key == 'stl':
+                    metadata['stl_name'] = value
+                elif key == 'bundle':
+                    metadata['bundle_name'] = value
+                elif key == 'tags':
+                    metadata['tags'] = value
 
         # Validate required fields
-        if not stl_name:
+        if not metadata['stl_name']:
             await ctx.send("❌ STL name is required (format: `STL: ModelName`)")
             return
 
@@ -439,22 +503,25 @@ async def store_miniature(ctx):
             'author': str(original_msg.author),
             'image_url': original_msg.attachments[0].url,
             'channel_id': str(ctx.channel.id),
-            'stl_name': stl_name,
-            'bundle_name': bundle_name or None,
-            'tags': tags or None
+            'stl_name': metadata['stl_name'],
+            'bundle_name': metadata['bundle_name'],
+            'tags': metadata['tags']
         }
+
+        # Debug output
+        print(f"Storing submission: {submission_data}")
 
         # Store in database
         success = await mysql_storage.store_submission(**submission_data)
         if success:
             await ctx.message.add_reaction('✅')
-            await ctx.send(f"✅ Successfully stored {stl_name}!", delete_after=10)
+            await ctx.send(f"✅ Saved {metadata['stl_name']}!", delete_after=10)
         else:
-            await ctx.send("❌ Failed to store submission - please try again")
+            await ctx.send("❌ Failed to store - please try again")
 
     except Exception as e:
-        logging.error(f"Error in store command: {e}")
-        await ctx.send("❌ An error occurred while processing your request")
+        logging.error(f"Store error: {e}")
+        await ctx.send("❌ An error occurred - check your format and try again")
 
 @bot.command(name='show')
 async def show_miniature(ctx, stl_name: str):
