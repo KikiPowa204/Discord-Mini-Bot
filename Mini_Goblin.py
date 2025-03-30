@@ -44,7 +44,7 @@ DEFAULTS = {
 # Runtime storage
 intents=discord.Intents.all()
 intents.message_content = True
-intents.messages = True  # Needed
+intents.messages = True  # Needed to read messages
 
 def fetch_miniatures(connection):
     cursor = connection.cursor()
@@ -187,23 +187,29 @@ async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
 async def message_organiser(message: discord.Message):
     # Let commands process first
     try:
+        print ('testing to see if the author==bot')
         if message.author == bot.user:
+            print ('recognised as bot. No actions taken')
             return
-
+        print ('checking to see if command')
         # Allow commands like !setup to bypass the channel restriction
         if message.content.startswith('!'):
+            print ("! command registered, processing command")
             await bot.process_commands(message)
             return
-
         # Ensure the message is in the submissions channel
-        if bot.submit_chan and message.channel != bot.submit_chan:
-            return
 
+        print ("Checking to see if message is in submit_chan")
+        if bot.submit_chan and message.channel != bot.submit_chan:
+            print ("Bot is being registered as not being in submit_chan")
+            return
+        print ("Checking to see if bot recognises message.attachments in submit_chan")
         # Handle image submissions
         if message.attachments and any(
             att.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))
             for att in message.attachments
         ):
+            print ("Bot recognises message in submit_chan")
             await process_submission(message)
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)    
