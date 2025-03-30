@@ -275,11 +275,17 @@ async def get_SBT(message: discord.Message) -> Optional[dict]:
         raise  # Re-raise the exception
 async def process_submission(submission: discord.Message):
     try:
-        print ('In process_submission')
-        submission_data = await get_SBT(submission)
-        if submission_data is None:  # Covers both None and False
-            logging.error("Invalid submission data")
+        
+        try:
+            submission_data = await get_SBT(submission)
+        except ValueError as e:
+            await submission.channel.send(f"❌ {str(e)}", delete_after=15)
             return False
+        except Exception as e:
+            logging.error(f"Unexpected error: {e}")
+            return False
+        print ('In process_submission')
+        
         submission_id = hashlib.md5(f"{submission.id}{submission.attachments[0].url}".encode()).hexdigest()
 
         if not submission_data:
