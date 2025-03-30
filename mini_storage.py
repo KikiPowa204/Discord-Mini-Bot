@@ -140,9 +140,7 @@ class MySQLStorage:
         defaults = {
             'bundle_name': None,
             'tags': None,
-            'approval_status': 'pending',
             'submitted_at': datetime.now(timezone.utc),
-            'prompt_id': None,
             'author': 'Unknown',
             'channel_id': None
         }
