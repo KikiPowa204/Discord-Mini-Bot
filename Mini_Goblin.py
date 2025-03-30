@@ -222,9 +222,9 @@ async def get_SBT(message: discord.Message):
             'author_name' : message.author,
             'image_url': message.attachments[0].url if message.attachments else None,
             'channel_id': message.channel.id,
-            'stl_name': None,
-            'bundle_name': None,
-            'tags': None
+            'stl_name': "None",
+            'bundle_name': "None",
+            'tags': "None"
         }
 
         # Store BEFORE sending prompt
