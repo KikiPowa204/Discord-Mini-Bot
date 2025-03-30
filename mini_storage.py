@@ -142,7 +142,7 @@ class MySQLStorage:
             'approval_status': 'pending',
             'submitted_at': datetime.now(timezone.utc),
             'prompt_id': None,
-            'author_name': 'Unknown',
+            'author': 'Unknown',
             'channel_id': None
         }
         submission_data = {**defaults, **kwargs}
@@ -163,7 +163,7 @@ class MySQLStorage:
                     # Insert submission
                     await cursor.execute('''
                         INSERT INTO miniatures (
-                            guild_id, user_id, message_id, author_name,
+                            guild_id, user_id, message_id, author,
                             image_url, channel_id, stl_name,
                             bundle_name, tags, approval_status,
                             submitted_at, prompt_id
@@ -172,7 +172,7 @@ class MySQLStorage:
                         str(submission_data['guild_id']),
                         str(submission_data['user_id']),
                         str(submission_data['message_id']),
-                        str(submission_data['author_name']),
+                        str(submission_data['author']),
                         submission_data['image_url'],
                         str(submission_data['channel_id']) if submission_data['channel_id'] else None,
                         submission_data['stl_name'],
