@@ -250,7 +250,7 @@ async def get_SBT(message: discord.Message):
         except asyncio.TimeoutError:
             await message.channel.send("❌ You took too long to reply. Please try again.", delete_after=15)
             del bot.pending_subs[submission_id]
-            return None
+            return
         # Process the user's reply
         for line in user_reply.content.split('\n'):
             line = line.strip().lower()
