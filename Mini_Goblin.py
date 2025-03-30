@@ -462,29 +462,31 @@ async def show_miniature(ctx, stl_name: str):
     try:
         async with ctx.typing():
             # Search database for this guild only
-            submissions = await mysql_storage.get_submissions(
-                guild_id=str(ctx.guild.id),
-                search_query=stl_name,
-                limit=1
-            )
+            async with mysql_storage.pool.acquire() as conn:
+                async with conn.cursor(aiomysql.DictCursor) as cursor:
+                    await cursor.execute('''
+                        SELECT * FROM miniatures
+                        WHERE guild_id = %s
+                        AND stl_name LIKE %s
+                        LIMIT 1
+                    ''', (str(ctx.guild.id), f'%{stl_name}%'))
+                    
+                    submission = await cursor.fetchone()
 
-            if not submissions:
+            if not submission:
                 await ctx.send(f"❌ No miniature found matching '{stl_name}' in this server")
                 return
 
-            # Get first match
-            submission = submissions[0]
+            # Create embed with the submission data
             embed = discord.Embed(
                 title=f"STL: {submission['stl_name']}",
                 description=f"From bundle: {submission['bundle_name'] or 'No bundle specified'}",
                 color=discord.Color.blue()
             )
             
-            # Add author and image
             embed.set_author(name=f"Painted by {submission['author']}")
             embed.set_image(url=submission['image_url'])
             
-            # Add additional fields if available
             if submission['tags']:
                 embed.add_field(name="Tags", value=submission['tags'], inline=False)
             
