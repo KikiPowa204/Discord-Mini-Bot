@@ -113,19 +113,16 @@ class SubmissionButtons(discord.ui.View):
 
 @bot.event
 async def on_ready():
-    
-    await mysql_storage.init_db()
+    bot.pending_subs = {}
+    print(f'{bot.user.name} online!')
     
     """Bot startup initialization"""
     print(f'{bot.user.name} online in {len(bot.guilds)} guilds!')
     bot.pending_subs = {}  # Reset pending submissions
     
-    # Initialize databases for all current guilds
-    for guild in bot.guilds:
-        await mysql_storage.init_db()
-        
     # Find existing channels (first guild with both channels wins)
     for guild in bot.guilds:
+        await mysql_storage.init_db()
         bot.submit_chan = discord.utils.get(guild.channels, name=DEFAULTS['submissions_chan'])
         bot.gallery_chan = discord.utils.get(guild.channels, name=DEFAULTS['gallery_chan'])
         if bot.submit_chan and bot.gallery_chan:
