@@ -140,7 +140,7 @@ class MySQLStorage:
         defaults = {
             'bundle_name': None,
             'tags': None,
-            'submitted_at': datetime.now(timezone.utc),
+            'created_at': datetime.now(timezone.utc),
             'author': 'Unknown',
             'channel_id': None
         }
@@ -165,7 +165,7 @@ class MySQLStorage:
                             guild_id, user_id, message_id, author,
                             image_url, channel_id, stl_name,
                             bundle_name, tags,
-                            submitted_at
+                            created_at, prompt_id
                         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ''', (
                         str(submission_data['guild_id']),
