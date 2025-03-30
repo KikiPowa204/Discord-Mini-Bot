@@ -133,7 +133,6 @@ class MySQLStorage:
         required_fields = {'guild_id', 'user_id', 'message_id', 'image_url', 'stl_name'}
         if missing := required_fields - kwargs.keys():
             print(f"❌ Missing required fields: {missing}")
-            return False
         
         defaults = {
         'bundle_name': '',
