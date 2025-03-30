@@ -182,7 +182,7 @@ class MySQLStorage:
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
-        #
+        ##
     async def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
         """Retrieve submissions with search"""
         try:

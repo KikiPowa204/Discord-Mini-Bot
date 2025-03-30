@@ -228,7 +228,7 @@ async def get_SBT(message: discord.Message) -> Optional[dict]:
             'bundle_name': "None",
             'tags': "None"
         }
-
+        #
         # Store BEFORE sending prompt
         bot.pending_subs[submission_id] = submission_data
         print(f"Stored submission {submission_id}")  # Debug log
