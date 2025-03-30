@@ -215,7 +215,7 @@ async def get_SBT(message: discord.Message):
             return None
 
         submission_id = f"{message.id}-{message.author.id}"
-        bot.pending_subs[submission_id] = {
+        submission_data = {
             'user_id': message.author.id,
             'image_url': message.attachments[0].url if message.attachments else None,
             'guild_id': message.guild.id,
@@ -226,6 +226,10 @@ async def get_SBT(message: discord.Message):
             'bundle_name': None,
             'tags': None
         }
+
+        # Store BEFORE sending prompt
+        bot.pending_subs[submission_id] = submission_data
+        print(f"Stored submission {submission_id}")  # Debug log
         
         prompt = await message.channel.send(
                 f"{message.author.mention} Please reply with:\n"
