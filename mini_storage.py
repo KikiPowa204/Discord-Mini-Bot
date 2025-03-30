@@ -1,5 +1,5 @@
 from pathlib import Path
-from datetime import datetime
+import datetime
 import os
 from mysql.connector import connect, Error  # Import MySQL connector
 import os
@@ -139,7 +139,7 @@ class MySQLStorage:
         'bundle_name': '',
         'tags': '',
         'approval_status': 'pending',  # New field example
-        'submitted_at': datetime.fromtimestamp(),
+        'submitted_at': datetime.datetime.fromtimestamp(datetime.UTC),
         'prompt_id': 'None'
     }
         submission_data = {**defaults, **kwargs}
