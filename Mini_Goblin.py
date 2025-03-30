@@ -606,6 +606,7 @@ async def show_miniature(ctx, stl_name: str):
         await ctx.send("❌ An error occurred while fetching this miniature")
 
 @bot.command(name='del')
+@commands.has_permissions(administrator=True)
 async def delete_submission(ctx):
     """Delete a submission by replying to a !show result"""
     # Check if message is a reply
