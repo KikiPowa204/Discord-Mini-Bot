@@ -230,6 +230,11 @@ async def get_SBT(message: discord.Message):
             )
         submission_data['prompt_id'] = prompt.id
         
+        submission_id = f"{message.id}-{message.author.id}"
+        bot.pending_subs[submission_id] = submission_data
+        bot.pending_subs[submission_id]['prompt_id'] = prompt.id
+
+
         # Parse user input to fill the metadata
         def check(reply):
             return reply.author == message.author and reply.channel == message.channel
@@ -237,8 +242,9 @@ async def get_SBT(message: discord.Message):
         try:
             user_reply = await bot.wait_for('message', timeout=300, check=check)  # Wait for 5 minutes
         except asyncio.TimeoutError:
-            await message.channel.send("❌ You took too long to reply. Please try again.")
-            return
+            await message.channel.send("❌ You took too long to reply. Please try again.", delete_after=15)
+            del bot.pending_subs[submission_id]
+            return None
         # Process the user's reply
         for line in user_reply.content.split('\n'):
             line = line.strip().lower()
@@ -249,13 +255,19 @@ async def get_SBT(message: discord.Message):
             elif line.startswith('tags:'):
                 bot.pending_subs[prompt.id]['tags'] = line[5:].strip()
         
+        if not bot.pending_subs[submission_id]['stl_name']:
+            await message.channel.send("❌ STL name is required", delete_after=15)
+            del bot.pending_subs[submission_id]
+            return None
+
         # Confirm the submission
         await message.channel.send("✅ Submission updated with your input!", delete_after= 30)
-
+        print ("Got to the end of Get_SBT")
         return submission_data
-    except Error as e:
-        await message.channel.send(f"❌ An error occurred: {e}")
-        
+    except Exception as e:  # Broad exception for debugging
+        logging.exception(f"Error in get_SBT: {e}")
+        await message.channel.send("❌ Processing failed - please try again", delete_after=15)
+        return None    
 async def process_submission(submission: discord.Message):
     try:
         print ('In process_submission')
