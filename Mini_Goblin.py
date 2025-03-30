@@ -264,18 +264,14 @@ async def get_SBT(message: discord.Message) -> Optional[dict]:
 
         
         if not bot.pending_subs[submission_id]['stl_name']:
-            await message.channel.send("❌ STL name is required", delete_after=15)
-            del bot.pending_subs[submission_id]
-            return
+            raise ValueError("STL name is required")
 
-        # Confirm the submission
-        await message.channel.send("✅ Submission updated with your input!", delete_after= 30)
-        print ("Got to the end of Get_SBT")
         return bot.pending_subs[submission_id]
+
     except asyncio.TimeoutError:
-        raise ValueError("Response timeout")
+        raise ValueError("You took too long to reply")
     except Exception as e:
-        logging.exception("Processing failed")
+        logging.exception("Error in get_SBT")
         raise  # Re-raise the exception
 async def process_submission(submission: discord.Message):
     try:
