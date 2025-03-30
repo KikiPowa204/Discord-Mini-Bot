@@ -212,7 +212,7 @@ async def get_SBT(message: discord.Message):
         # Validate input
         if not message.attachments:
             await message.channel.send("❌ No attachments found", delete_after=10)
-            return None
+            return False
 
         submission_id = f"{message.id}-{message.author.id}"
         submission_data = {
@@ -274,7 +274,7 @@ async def get_SBT(message: discord.Message):
     except Exception as e:  # Broad exception for debugging
         logging.exception(f"Error in get_SBT: {e}")
         await message.channel.send("❌ Processing failed - please try again", delete_after=15)
-        return None    
+        return False
 async def process_submission(submission: discord.Message):
     try:
         print ('In process_submission')
