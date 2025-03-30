@@ -140,7 +140,7 @@ class MySQLStorage:
         'tags': '',
         'approval_status': 'pending',  # New field example
         'submitted_at': datetime.now(timezone.utc),
-        'prompt_id': 'None'
+        'prompt_id': ''
     }
         submission_data = {**defaults, **kwargs}
 
