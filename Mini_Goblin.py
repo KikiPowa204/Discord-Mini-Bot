@@ -296,7 +296,7 @@ async def process_submission(submission: discord.Message):
     guild_id=submission_data['guild_id'],
     user_id=submission_data['user_id'],
     message_id=str(submission_data['original_msg_id']),
-    author_name=submission_data['author_name'],  # Changed from 'author'
+    author=submission_data['author_name'],  # Changed from 'author'
     image_url=submission_data['image_url'],
     channel_id=submission_data['channel_id'],
     stl_name=stl_name,
