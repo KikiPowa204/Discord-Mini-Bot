@@ -2,8 +2,7 @@ import discord
 from discord.ext import commands
 import os
 import hashlib
-from datetime import datetime, timezone
-from pathlib import Path
+from datetime import datetime
 import logging
 import asyncio
 from typing import Optional
