@@ -236,71 +236,6 @@ async def on_message(message):
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)    
 
-async def get_SBT(message: discord.Message) -> Optional[dict]:
-    try:
-        # Validate input
-        if not message.attachments:
-            await message.channel.send("❌ No attachments found", delete_after=10)
-            return False
-
-        submission_id = f"{message.id}-{message.author.id}"
-        submission_data = {
-            'guild_id': message.guild.id,
-            'user_id': message.author.id,
-            'original_msg_id': message.id,
-            'author' : message.author,
-            'image_url': message.attachments[0].url,
-            'channel_id': message.channel.id,
-            'stl_name': "None",
-            'bundle_name': "None",
-            'tags': "None"
-        }
-        #
-        # Store BEFORE sending prompt
-        bot.pending_subs[submission_id] = submission_data
-        print(f"Stored submission {submission_id}")  # Debug log
-        #
-        prompt = await message.channel.send(
-                f"{message.author.mention} Please reply with:\n"
-                "`STL: ModelName`\n"
-                "`Bundle: BundleName`\n"
-                "`Tags: optional,tags`",
-                delete_after=300
-            )
-         # Store prompt reference
-        bot.pending_subs[submission_id]['prompt_id'] = prompt.id
-
-        # Parse user input to fill the metadata
-        def check(reply):
-            return reply.author == message.author and reply.channel == message.channel
-        
-        try:
-            user_reply = await bot.wait_for('message', timeout=300, check=check)  # Wait for 5 minutes
-        except asyncio.TimeoutError:
-            await message.channel.send("❌ You took too long to reply. Please try again.", delete_after=15)
-            del bot.pending_subs[submission_id]
-            return
-        # Process the user's reply
-        for line in user_reply.content.split('\n'):
-            line = line.strip().lower()
-            if line.startswith('stl:'):
-                bot.pending_subs[submission_id]['stl_name'] = line[4:].strip()
-            elif line.startswith('bundle:'):
-                bot.pending_subs[submission_id]['bundle_name'] = line[7:].strip()
-            elif line.startswith('tags:'):
-                bot.pending_subs[submission_id]['tags'] = line[5:].strip()
-
-        
-        if not bot.pending_subs[submission_id]['stl_name']:
-            raise ValueError("STL name is required")
-
-        return bot.pending_subs[submission_id]
-
-    except asyncio.TimeoutError:
-        raise ValueError("You took too long to reply")
-    except Exception as e:
-        logging.exception("Error in get_SBT")
-        raise  # Re-raise the exception
 async def process_submission(submission: discord.Message):
     """Process a submission from the submissions channel"""
     try:
@@ -567,10 +502,10 @@ async def store_miniature(ctx):
 
 @bot.command(name='show')
 async def show_miniature(ctx, stl_name: str):
-    """Display a specific miniature from this server"""
+    """Display a specific miniature with deletion metadata"""
     try:
         async with ctx.typing():
-            # Search database for this guild only
+            # Search database
             async with mysql_storage.pool.acquire() as conn:
                 async with conn.cursor(aiomysql.DictCursor) as cursor:
                     await cursor.execute('''
@@ -579,22 +514,26 @@ async def show_miniature(ctx, stl_name: str):
                         AND stl_name LIKE %s
                         LIMIT 1
                     ''', (str(ctx.guild.id), f'%{stl_name}%'))
-                    
                     submission = await cursor.fetchone()
 
             if not submission:
-                await ctx.send(f"❌ No miniature found matching '{stl_name}' in this server")
+                await ctx.send(f"❌ No miniature found matching '{stl_name}'")
                 return
 
-            # Create embed with the submission data
+            # Create embed with deletion metadata
             embed = discord.Embed(
                 title=f"STL: {submission['stl_name']}",
                 description=f"From bundle: {submission['bundle_name'] or 'No bundle specified'}",
                 color=discord.Color.blue()
             )
             
+            # Add visible fields
             embed.set_author(name=f"Painted by {submission['author']}")
             embed.set_image(url=submission['image_url'])
+            
+            # Add hidden metadata for deletion
+            embed.add_field(name="Submission ID", value=submission['message_id'], inline=False)
+            embed.add_field(name="Guild ID", value=submission['guild_id'], inline=False)
             
             if submission['tags']:
                 embed.add_field(name="Tags", value=submission['tags'], inline=False)
@@ -606,75 +545,84 @@ async def show_miniature(ctx, stl_name: str):
         await ctx.send("❌ An error occurred while fetching this miniature")
 
 @bot.command(name='del')
-@commands.has_permissions(administrator=True)
 async def delete_submission(ctx):
     """Delete a submission by replying to a !show result"""
     # Check if message is a reply
     if not ctx.message.reference:
-        await ctx.send("❌ Please reply to a !show result message to delete")
+        await ctx.send("❌ Please reply to a !show result to delete")
         return
 
     try:
         # Verify permissions
         if not ctx.author.guild_permissions.manage_messages:
-            await ctx.send("❌ You need 'Manage Messages' permission to delete submissions")
+            await ctx.send("❌ You need 'Manage Messages' permission")
             return
 
         # Get the original !show message
         show_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
 
-        # Verify it's a bot's !show result
+        # Verify it's our bot's embed
         if show_message.author != bot.user or not show_message.embeds:
             await ctx.send("❌ Please reply to a valid !show result")
             return
 
-        # Extract submission ID from embed
         embed = show_message.embeds[0]
-        if not embed.fields:
-            await ctx.send("❌ Invalid !show result format")
+        
+        # Extract metadata from embed fields
+        submission_id = None
+        guild_id = None
+        
+        for field in embed.fields:
+            if field.name == "Submission ID":
+                submission_id = field.value
+            elif field.name == "Guild ID":
+                guild_id = field.value
+
+        if not submission_id or not guild_id:
+            await ctx.send("❌ Couldn't find submission data in this message")
             return
 
-        # Find the message_id field (we'll add this to the embed)
-        message_id = None
-        for field in embed.fields:
-            if field.name.lower() == "message id":
-                message_id = field.value
-                break
-
-        if not message_id:
-            await ctx.send("❌ Could not find submission ID in the message")
+        # Verify the submission belongs to this guild
+        if guild_id != str(ctx.guild.id):
+            await ctx.send("❌ You can only delete submissions from this server")
             return
 
         # Delete from database
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                await cursor.execute(
-                    "DELETE FROM miniatures WHERE message_id = %s",
-                    (message_id,)
-                )
+                deleted = await cursor.execute('''
+                    DELETE FROM miniatures 
+                    WHERE message_id = %s 
+                    AND guild_id = %s
+                ''', (submission_id, guild_id))
+                
                 await conn.commit()
 
-                if cursor.rowcount == 0:
-                    await ctx.send("❌ Submission not found in database")
+                if not deleted:
+                    await ctx.send("❌ Submission not found or already deleted")
                     return
 
-        # Delete the original submission message if possible
+        # Try to delete associated messages
         try:
-            original_submission = await ctx.channel.fetch_message(message_id)
+            # Delete original submission message
+            original_submission = await ctx.channel.fetch_message(submission_id)
             await original_submission.delete()
         except (discord.NotFound, discord.Forbidden):
-            pass  # Message already deleted or no permissions
+            pass  # Message already gone or no permissions
 
-        # Clean up the !show result and our !del command
-        await show_message.delete()
+        # Clean up the command and !show result
         await ctx.message.delete()
+        await show_message.delete()
 
-        # Send confirmation (will auto-delete)
-        confirmation = await ctx.send(f"✅ Successfully deleted submission {message_id}", delete_after=10)
-        
+        # Send ephemeral confirmation
+        confirmation = await ctx.send(
+            f"✅ Deleted submission {submission_id[:6]}...", 
+            delete_after=5
+        )
+
     except Exception as e:
         logging.error(f"Delete error: {e}")
-        await ctx.send("❌ Failed to delete submission - check logs", delete_after=10)
+        await ctx.send("❌ Failed to delete - check logs", delete_after=10)
         
 
 # Set up logging
