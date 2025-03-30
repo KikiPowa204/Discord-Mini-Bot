@@ -394,7 +394,50 @@ class TaggingModal(discord.ui.Modal):
                 msg = await channel.fetch_message(submission['original_msg_id'])
         except Exception as e:
             logging.error(f"Cleanup error: {e}")
-       
+@bot.command(name='show')
+async def show_miniature(ctx, stl_name: str):
+    """Display a specific miniature from this server"""
+    # Verify we're in the correct guild
+    if ctx.guild.id != bot.guild.id:  # Assuming bot.guild is set during initialization
+        await ctx.send("❌ This command only works in the server it was configured for")
+        return
+
+    try:
+        async with ctx.typing():
+            # Search database
+            submissions = await mysql_storage.get_submissions(
+                guild_id=str(ctx.guild.id),
+                search_query=stl_name,
+                limit=1
+            )
+
+            if not submissions:
+                await ctx.send(f"❌ No miniature found matching '{stl_name}'")
+                return
+
+            # Get first match
+            submission = submissions[0]
+            embed = discord.Embed(
+                title=f"STL: {submission['stl_name']}",
+                description=f"From bundle: {submission['bundle_name']}",
+                color=discord.Color.blue()
+            )
+            
+            # Add author and image
+            embed.set_author(name=f"Painted by {submission['author']}")
+            embed.set_image(url=submission['image_url'])
+            
+            # Add additional fields if available
+            if submission['tags']:
+                embed.add_field(name="Tags", value=submission['tags'], inline=False)
+            
+            embed.set_footer(text=f"Submitted on {submission.get('submitted_at', 'unknown date')}")
+            
+            await ctx.send(embed=embed)
+
+    except Exception as e:
+        logging.error(f"Error showing miniature: {e}")
+        await ctx.send("❌ An error occurred while fetching this miniature")       
 
 @bot.command(name='del')
 @commands.has_permissions(administrator=True)
