@@ -7,6 +7,7 @@ from pathlib import Path
 import logging
 import asyncio
 from typing import Optional
+from discord.ext.commands import Bot
 # Load environment variables first
 import mysql.connector
 from mysql.connector import Error
