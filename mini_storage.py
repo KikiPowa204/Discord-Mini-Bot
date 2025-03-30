@@ -173,7 +173,7 @@ class MySQLStorage:
                     submission_data['tags']
                 ))
                 await conn.commit()
-                return True
+                
         except Error as e:
             print(f"❌Database error: {e}")
             return False
