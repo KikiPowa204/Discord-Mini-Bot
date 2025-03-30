@@ -606,41 +606,74 @@ async def show_miniature(ctx, stl_name: str):
         await ctx.send("❌ An error occurred while fetching this miniature")
 
 @bot.command(name='del')
-async def delete_submission(ctx, submission_id: str):
-    """Delete a submission by ID"""
+async def delete_submission(ctx):
+    """Delete a submission by replying to a !show result"""
+    # Check if message is a reply
+    if not ctx.message.reference:
+        await ctx.send("❌ Please reply to a !show result message to delete")
+        return
+
     try:
         # Verify permissions
         if not ctx.author.guild_permissions.manage_messages:
-            await ctx.send("❌ You need manage messages permission to delete submissions")
+            await ctx.send("❌ You need 'Manage Messages' permission to delete submissions")
             return
 
-        async with await get_db_connection() as conn:
+        # Get the original !show message
+        show_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+
+        # Verify it's a bot's !show result
+        if show_message.author != bot.user or not show_message.embeds:
+            await ctx.send("❌ Please reply to a valid !show result")
+            return
+
+        # Extract submission ID from embed
+        embed = show_message.embeds[0]
+        if not embed.fields:
+            await ctx.send("❌ Invalid !show result format")
+            return
+
+        # Find the message_id field (we'll add this to the embed)
+        message_id = None
+        for field in embed.fields:
+            if field.name.lower() == "message id":
+                message_id = field.value
+                break
+
+        if not message_id:
+            await ctx.send("❌ Could not find submission ID in the message")
+            return
+
+        # Delete from database
+        async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                # Delete from database
                 await cursor.execute(
                     "DELETE FROM miniatures WHERE message_id = %s",
-                    (submission_id,)
+                    (message_id,)
                 )
-                
-                if cursor.rowcount == 0:
-                    await ctx.send(f"❌ No submission found with ID {submission_id}")
-                    return
-                
                 await conn.commit()
-                await ctx.message.add_reaction('✅')
-                
-                # Optional: Delete the original message if still exists
-                try:
-                    msg = await ctx.channel.fetch_message(submission_id)
-                    await msg.delete()
-                except discord.NotFound:
-                    pass  # Message already deleted
-                except discord.Forbidden:
-                    logging.warning(f"No permission to delete message {submission_id}")
 
+                if cursor.rowcount == 0:
+                    await ctx.send("❌ Submission not found in database")
+                    return
+
+        # Delete the original submission message if possible
+        try:
+            original_submission = await ctx.channel.fetch_message(message_id)
+            await original_submission.delete()
+        except (discord.NotFound, discord.Forbidden):
+            pass  # Message already deleted or no permissions
+
+        # Clean up the !show result and our !del command
+        await show_message.delete()
+        await ctx.message.delete()
+
+        # Send confirmation (will auto-delete)
+        confirmation = await ctx.send(f"✅ Successfully deleted submission {message_id}", delete_after=10)
+        
     except Exception as e:
         logging.error(f"Delete error: {e}")
-        await ctx.send("❌ Failed to delete submission - check logs")
+        await ctx.send("❌ Failed to delete submission - check logs", delete_after=10)
         
 
 # Set up logging
