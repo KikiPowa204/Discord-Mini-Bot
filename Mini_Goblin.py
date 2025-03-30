@@ -231,8 +231,8 @@ async def get_SBT(message: discord.Message):
         submission_data['prompt_id'] = prompt.id
         
         # Parse user input to fill the metadata
-#        def check(reply):
- #           return reply.author == message.author and reply.channel == message.channel
+        def check(reply):
+            return reply.author == message.author and reply.channel == message.channel
         
         try:
             user_reply = await bot.wait_for('message', timeout=300, check=check)  # Wait for 5 minutes
