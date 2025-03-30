@@ -130,29 +130,27 @@ class MySQLStorage:
             return False
 
 async def store_submission(self, **kwargs):
-    """Store submission with all required fields"""
-    # 1. Validate required fields
+    """Store submission using connection pool"""
     required_fields = {'guild_id', 'user_id', 'message_id', 'image_url', 'stl_name'}
     if missing := required_fields - kwargs.keys():
         logging.error(f"Missing required fields: {missing}")
         return False
 
-    # 2. Set defaults
     defaults = {
         'bundle_name': None,
         'tags': None,
         'approval_status': 'pending',
         'submitted_at': datetime.now(timezone.utc),
         'prompt_id': None,
-        'author_name': 'Unknown',  # Added default author
-        'channel_id': None         # Added default channel
+        'author_name': 'Unknown',
+        'channel_id': None
     }
     submission_data = {**defaults, **kwargs}
 
     try:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                # 3. Upsert guild record
+                # Upsert guild
                 await cursor.execute('''
                     INSERT INTO guilds (guild_id, guild_name, last_seen)
                     VALUES (%s, %s, NOW())
@@ -162,36 +160,33 @@ async def store_submission(self, **kwargs):
                     f"Guild-{submission_data['guild_id']}"
                 ))
 
-                # 4. Insert submission
+                # Insert submission
                 await cursor.execute('''
                     INSERT INTO miniatures (
-                        guild_id, user_id, message_id,
-                        image_url, stl_name, bundle_name,
-                        tags, approval_status, submitted_at,
-                        prompt_id, author_name, channel_id
+                        guild_id, user_id, message_id, author_name,
+                        image_url, channel_id, stl_name,
+                        bundle_name, tags, approval_status,
+                        submitted_at, prompt_id
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ''', (
                     str(submission_data['guild_id']),
                     str(submission_data['user_id']),
                     str(submission_data['message_id']),
+                    str(submission_data['author_name']),
                     submission_data['image_url'],
+                    str(submission_data['channel_id']) if submission_data['channel_id'] else None,
                     submission_data['stl_name'],
                     submission_data['bundle_name'],
                     submission_data['tags'],
                     submission_data['approval_status'],
                     submission_data['submitted_at'],
-                    submission_data['prompt_id'],
-                    str(submission_data['author_name']),
-                    str(submission_data['channel_id']) if submission_data['channel_id'] else None
+                    submission_data['prompt_id']
                 ))
                 
                 await conn.commit()
                 return True
-                
     except Exception as e:
         logging.error(f"Database error: {e}")
-        if 'conn' in locals():
-            await conn.rollback()
         return False
         
     async def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
