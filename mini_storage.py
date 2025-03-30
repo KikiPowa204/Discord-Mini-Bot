@@ -97,6 +97,7 @@ class MySQLStorage:
                         message_id VARCHAR(255) NOT NULL,
                         author VARCHAR(255) NOT NULL,
                         image_url TEXT NOT NULL,
+                        channel_id VARCHAR(255)
                         stl_name VARCHAR(255),
                         bundle_name VARCHAR(255),
                         tags TEXT,
