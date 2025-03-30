@@ -101,7 +101,6 @@ class MySQLStorage:
                         stl_name VARCHAR(255),
                         bundle_name VARCHAR(255),
                         tags TEXT,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         INDEX idx_guild (guild_id),
                         INDEX idx_stl_name (stl_name),
                         FOREIGN KEY (guild_id) REFERENCES guilds(guild_id)
@@ -140,7 +139,6 @@ class MySQLStorage:
         defaults = {
             'bundle_name': None,
             'tags': None,
-            'created_at': datetime.now(timezone.utc),
             'author': 'Unknown',
             'channel_id': None
         }
@@ -165,7 +163,7 @@ class MySQLStorage:
                             guild_id, user_id, message_id, author,
                             image_url, channel_id, stl_name,
                             bundle_name, tags,
-                            created_at
+                            
                         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ''', (
                         str(submission_data['guild_id']),
@@ -176,7 +174,7 @@ class MySQLStorage:
                         str(submission_data['channel_id']) if submission_data['channel_id'] else None,
                         submission_data['stl_name'],
                         submission_data['bundle_name'],
-                        submission_data['tags'],
+                        submission_data['tags']
                     ))
                     
                     await conn.commit()
@@ -196,7 +194,6 @@ class MySQLStorage:
                     JOIN guilds g ON m.guild_id = g.guild_id
                     WHERE m.guild_id = %s
                     AND (m.stl_name LIKE %s OR m.bundle_name LIKE %s OR m.tags LIKE %s)
-                    ORDER BY m.created_at DESC
                     LIMIT %s
                 ''', (
                     str(guild_id),
