@@ -291,18 +291,21 @@ async def process_submission(submission: discord.Message):
         tags = pending_data.get('tags')
     
         #Store the submission in db
-        await mysql_storage.store_submission(
-            guild_id=submission_data['guild_id'],
-            user_id=submission_data['user_id'],
-            message_id=str(submission_data['original_msg_id']),
-            author=submission_data['author_name'],
-            image_url=submission_data['image_url'],
-            channel_id= submission_data['channel_id'],
-            stl_name=stl_name,
-            bundle_name=bundle_name,
-            tags=tags
-            )
-        await connection.commit()
+        # Remove the global connection.commit() - let the storage method handle it
+        success = await mysql_storage.store_submission(
+    guild_id=submission_data['guild_id'],
+    user_id=submission_data['user_id'],
+    message_id=str(submission_data['original_msg_id']),
+    author_name=submission_data['author_name'],  # Changed from 'author'
+    image_url=submission_data['image_url'],
+    channel_id=submission_data['channel_id'],
+    stl_name=stl_name,
+    bundle_name=bundle_name,
+    tags=tags
+)
+
+        if not success:
+            raise Exception("Failed to store submission")
         
        # Start a timer to clear the pending submission after 10 minutes
         asyncio.create_task(clear_pending_submission(submission_id, 30))
