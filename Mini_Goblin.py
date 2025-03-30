@@ -221,7 +221,6 @@ async def get_SBT(message: discord.Message):
             'original_msg_id': message.id,
             'author_name' : message.author,
             'image_url': message.attachments[0].url if message.attachments else None,
-            'prompt_id': None,
             'channel_id': message.channel.id,
             'stl_name': None,
             'bundle_name': None,
@@ -298,8 +297,9 @@ async def process_submission(submission: discord.Message):
             guild_id=submission_data['guild_id'],
             user_id=submission_data['user_id'],
             message_id=str(submission_data['original_msg_id']),
-            image_url=submission_data['image_url'],
             author=submission_data['author_name'],
+            image_url=submission_data['image_url'],
+            channel_id= submission_data['channel_id'],
             stl_name=stl_name,
             bundle_name=bundle_name,
             tags=tags

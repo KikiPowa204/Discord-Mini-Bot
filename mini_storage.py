@@ -98,7 +98,6 @@ class MySQLStorage:
                         stl_name VARCHAR(255) NOT NULL,
                         bundle_name VARCHAR(255) NOT NULL,
                         tags TEXT,
-                        image_hash VARCHAR(255),
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         INDEX idx_guild (guild_id),
                         INDEX idx_stl_name (stl_name),
@@ -132,34 +131,47 @@ class MySQLStorage:
     async def store_submission(self, **kwargs):
         """Store submission with all required fields"""
         required_fields = {'guild_id', 'user_id', 'message_id', 'image_url', 'stl_name'}
-        if not all(field in kwargs for field in required_fields):
-            print("❌ Missing required fields for submission")
+        if missing := required_fields - kwargs.keys():
+            print(f"❌ Missing required fields: {missing}")
             return False
         
+        defaults = {
+        'bundle_name': '',
+        'tags': '',
+        'approval_status': 'pending',  # New field example
+        'submitted_at': datetime.utcnow(),
+        'prompt_id': None
+    }
+        submission_data = {**defaults, **kwargs}
+
         try:
             async with self.pool.acquire() as conn:
                 async with conn.cursor() as cursor:
                     await conn.begin()
                     await cursor.execute('''
-                    INSERT INTO guilds (guild_id, last_seen)
+                    INSERT INTO guilds (guild_id, guild_name, last_seen)
                     VALUES (%s, NOW())
                     ON DUPLICATE KEY UPDATE last_seen=NOW()
-                ''', (kwargs['guild_id'], f"Guild-{kwargs['guild_id']}"))
-                
+                ''', (submission_data['guild_id'], 
+                     f"Guild-{submission_data['guild_id']}"))
                 # Then insert the submission
                 await cursor.execute('''
                     INSERT INTO miniatures (
                         guild_id, user_id, message_id,
-                        image_url, stl_name, bundle_name, tags
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        image_url, stl_name, bundle_name,
+                        tags, approval_status, submitted_at,
+                        prompt_id
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ''', (
-                    str(kwargs['guild_id']),
-                    str(kwargs['user_id']),
-                    str(kwargs['message_id']),
-                    kwargs['image_url'],
-                    kwargs['stl_name'],
-                    kwargs['bundle_name'],
-                    kwargs.get('tags', '')
+                    str(submission_data['guild_id']),
+                    str(submission_data['user_id']),
+                    str(submission_data['message_id']),
+                    str(submission_data['author_name']),
+                    submission_data['image_url'],
+                    submission_data['channel_id'],
+                    submission_data['stl_name'],
+                    submission_data['bundle_name'],
+                    submission_data['tags']
                 ))
                 await conn.commit()
                 return True
