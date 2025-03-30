@@ -167,7 +167,7 @@ class MySQLStorage:
                             image_url, channel_id, stl_name,
                             bundle_name, tags, approval_status,
                             submitted_at, prompt_id
-                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ''', (
                         str(submission_data['guild_id']),
                         str(submission_data['user_id']),
@@ -178,9 +178,6 @@ class MySQLStorage:
                         submission_data['stl_name'],
                         submission_data['bundle_name'],
                         submission_data['tags'],
-                        submission_data['approval_status'],
-                        submission_data['submitted_at'],
-                        submission_data['prompt_id']
                     ))
                     
                     await conn.commit()
