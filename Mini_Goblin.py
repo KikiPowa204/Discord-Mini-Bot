@@ -12,7 +12,7 @@ import mysql.connector
 from mysql.connector import Error
 # Remove: import sqlite3
 from mini_storage import mysql_storage
-
+import aiomysql
 
 connection = mysql.connector.connect(
     host="gondola.proxy.rlwy.net",
