@@ -147,7 +147,7 @@ class MySQLStorage:
         try:
             async with self.pool.acquire() as conn:
                 async with conn.cursor() as cursor:
-                    # Upsert guild
+                    # Upsert guild (simplified version)
                     await cursor.execute('''
                         INSERT INTO guilds (guild_id, guild_name, last_seen)
                         VALUES (%s, %s, NOW())
@@ -157,13 +157,12 @@ class MySQLStorage:
                         f"Guild-{submission_data['guild_id']}"
                     ))
 
-                    # Insert submission
+                    # Fixed INSERT statement - removed trailing comma
                     await cursor.execute('''
                         INSERT INTO miniatures (
                             guild_id, user_id, message_id, author,
                             image_url, channel_id, stl_name,
-                            bundle_name, tags,
-                            
+                            bundle_name, tags
                         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ''', (
                         str(submission_data['guild_id']),
@@ -182,7 +181,6 @@ class MySQLStorage:
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
-        ##
     async def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
         """Retrieve submissions with search"""
         try:
