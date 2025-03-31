@@ -269,6 +269,54 @@ async def on_message(message):
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)    
 
+@bot.command(name='help')
+async def get_help(ctx):
+    """Display help information about bot commands"""
+    embed = discord.Embed(
+        title="Miniature Gallery Bot Help",
+        description="Here are all the available commands:",
+        color=discord.Color.blue()
+    )
+    
+    embed.add_field(
+        name="!setup",
+        value="Admin only. Configures the submission and gallery channels for this server.",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="!store",
+        value=(
+            "Reply to a submission with this command, then include:\n"
+            "```STL: ModelName (required)\n"
+            "Bundle: BundleName (optional)\n"
+            "Tags: tag1,tag2 (optional)```\n"
+            "Each field should be on a new line."
+        ),
+        inline=False
+    )
+    
+    embed.add_field(
+        name="!show [search]",
+        value=(
+            "Search for miniatures in the gallery channel. Examples:\n"
+            "• `!show Dragon` - Finds dragon miniatures\n"
+            "• `!show collection:BundleName` - Shows bundle contents\n"
+            "• `!show tags:fantasy` - Finds fantasy-tagged miniatures"
+        ),
+        inline=False
+    )
+    
+    embed.add_field(
+        name="!del",
+        value="Reply to a gallery post with this command to delete your submission (authors and admins only).",
+        inline=False
+    )
+    
+    embed.set_footer(text="Bot created by [Your Name]")
+    
+    await ctx.send(embed=embed)
+
 async def process_submission(submission: discord.Message):
     """Process a submission from the submissions channel"""
     try:
