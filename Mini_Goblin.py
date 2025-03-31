@@ -501,7 +501,7 @@ async def store_miniature(ctx):
 
         # Validate required fields
         if not metadata['stl_name']:
-            await ctx.send("❌ STL name is required (format: `STL: ModelName`)")
+            await ctx.send("❌ STL name is required (format: `STL: ModelName`)", delete_after = 15)
             return
 
         # Prepare submission data
