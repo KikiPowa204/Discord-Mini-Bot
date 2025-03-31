@@ -620,62 +620,7 @@ async def show_miniature(ctx, *, search_query: str = None):
     except Exception as e:
         logging.error(f"Show error: {e}", exc_info=True)
         await ctx.send("❌ Error searching miniatures")
-@bot.command(name='show tag')
-async def show_by_tag(ctx, *, tag_query: str = None):
-    """Show random miniatures matching tags
-    
-    Examples:
-    !show tag fantasy
-    !show tag fantasy,creature
-    !show tag       (shows completely random)
-    """
-    try:
-        async with ctx.typing():
-            async with mysql_storage.pool.acquire() as conn:
-                async with conn.cursor(aiomysql.DictCursor) as cursor:
-                    if tag_query:
-                        # Search by specific tags
-                        tags = [tag.strip() for tag in tag_query.split(",")]
-                        await cursor.execute('''
-                            SELECT * FROM miniatures
-                            WHERE guild_id = %s
-                            AND tags REGEXP %s
-                            ORDER BY RAND()
-                            LIMIT 5
-                        ''', (str(ctx.guild.id), "|".join(tags)))
-                    else:
-                        # Show completely random if no tag specified
-                        await cursor.execute('''
-                            SELECT * FROM miniatures
-                            WHERE guild_id = %s
-                            ORDER BY RAND()
-                            LIMIT 5
-                        ''', (str(ctx.guild.id),))
 
-                    submissions = await cursor.fetchall()
-
-            if not submissions:
-                await ctx.send(f"❌ No miniatures found{f' with tags: {tag_query}' if tag_query else ''}")
-                return
-
-            # Display each result as its own embed
-            for sub in submissions:
-                embed = discord.Embed(
-                    title=f"{sub['stl_name']}",
-                    description=f"From bundle: {sub['bundle_name'] or 'No bundle'}",
-                    color=discord.Color.blue()
-                )
-                embed.set_image(url=sub['image_url'])
-                
-                if sub['tags']:
-                    embed.add_field(name="Tags", value=sub['tags'], inline=False)
-                
-                embed.set_footer(text=f"ID: {sub['message_id']} | Found via tag search")
-                await ctx.send(embed=embed)
-
-    except Exception as e:
-        logging.error(f"Tag search error: {e}")
-        await ctx.send("❌ Error searching by tags")
 @bot.command(name='del')
 async def delete_submission(ctx, deletion_id: str = None):
     """Delete a submission by replying to its gallery post"""
