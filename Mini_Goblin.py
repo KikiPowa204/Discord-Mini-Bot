@@ -454,14 +454,20 @@ async def amend_submission(ctx, deletion_id: str,*,new_data: str):
                     metadata['bundle_name'] = value
                 elif key == 'tags':
                     metadata['tags'] = value
+        # Validate at least one field is being updated
+        if not any(metadata.values()):
+            await ctx.send("❌ Provide at least one field to update (STL:/Bundle:/Tags:)")
+            return
+
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
+                # Update only provided fields
                 await cursor.execute('''
                     UPDATE miniatures
-                    SET 
-                        stl_name = %s,
-                        bundle_name = %s,
-                        tags = %s
+                    SET
+                        stl_name = COALESCE(%s, stl_name),
+                        bundle_name = COALESCE(%s, bundle_name),
+                        tags = COALESCE(%s, tags)
                     WHERE message_id = %s AND guild_id = %s
                 ''', (
                     metadata['stl_name'],
@@ -470,12 +476,38 @@ async def amend_submission(ctx, deletion_id: str,*,new_data: str):
                     deletion_id,
                     str(ctx.guild.id)
                 ))
+                
+                if cursor.rowcount == 0:
+                    await ctx.send("❌ No submission found with that ID")
+                    return
+                    
                 await conn.commit()
         
-        await ctx.message.add_reaction('✏️')  # Pencil emoji
+        # Update gallery embed if exists
+    
+            gallery_channel = bot.channels[ctx.guild.id]['gallery']
+            async for message in gallery_channel.history(limit=100):
+                if message.embeds and f"DELETION_ID:{deletion_id}" in message.embeds[0].footer.text:
+                    embed = message.embeds[0]
+                    new_embed = discord.Embed(
+                        title=f"STL: {metadata['stl_name'] or embed.title.split(':')[1].strip()}",
+                        description=f"Bundle: {metadata['bundle_name'] or embed.description.split(':')[1].strip()}",
+                        color=embed.color
+                    )
+                    new_embed.set_image(url=embed.image.url)
+                    new_embed.set_footer(text=embed.footer.text)
+                    await message.edit(embed=new_embed)
+                    break
     except Exception as e:
+        logging.error(f"Edit error: {e}")
         await ctx.message.add_reaction('❌')
-
+    
+    except:
+        pass  # Skip if gallery update fails
+            
+        await ctx.message.add_reaction('✏️')  # Pencil emoji
+        
+    
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong!")
