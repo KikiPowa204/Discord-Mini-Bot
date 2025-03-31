@@ -591,32 +591,32 @@ async def show_miniature(ctx, *, search_query: str = None):
                         
                         
                         submissions = await cursor.fetchall()
-                    if not submissions:
-                        await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}")
-                        return
-        
-            # New connection for gallery message updates
-            async with mysql_storage.pool.acquire() as conn:
-                async with conn.cursor(aiomysql.DictCursor) as cursor:
-                    for sub in submissions:
-                        embed = discord.Embed(
-                            title=f"STL: {sub['stl_name']}",
-                            description=f"Bundle: {sub['bundle_name'] or 'None'}",
-                            color=discord.Color.blue()
-                        )
-                        embed.set_image(url=sub['image_url'])
-                        embed.set_footer(text=f"DELETION_ID:{sub['message_id']}:{sub['guild_id']}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
-                        
-                        msg = await gallery_channel.send(embed=embed)
-                        
-                        await cursor.execute('''
-                            UPDATE miniatures
-                            SET gallery_message_id = %s
-                            WHERE message_id = %s AND guild_id = %s
-                        ''', (str(msg.id), sub['message_id'], str(ctx.guild.id)))
-                        await conn.commit()
+                        if not submissions:
+                            await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}")
+                            return
 
-        await ctx.send(f"✅ Displayed {len(submissions)} results in {gallery_channel.mention}")
+                        # New connection for gallery message updates
+                        async with mysql_storage.pool.acquire() as conn:
+                            async with conn.cursor(aiomysql.DictCursor) as cursor:
+                                for sub in submissions:
+                                    embed = discord.Embed(
+                                        title=f"STL: {sub['stl_name']}",
+                                        description=f"Bundle: {sub['bundle_name'] or 'None'}",
+                                        color=discord.Color.blue()
+                                    )
+                                    embed.set_image(url=sub['image_url'])
+                                    embed.set_footer(text=f"DELETION_ID:{sub['message_id']}:{sub['guild_id']}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
+                                    
+                                    msg = await gallery_channel.send(embed=embed)
+                                    
+                                    await cursor.execute('''
+                                        UPDATE miniatures
+                                        SET gallery_message_id = %s
+                                        WHERE message_id = %s AND guild_id = %s
+                                    ''', (str(msg.id), sub['message_id'], str(ctx.guild.id)))
+                                    await conn.commit()
+
+                        await ctx.send(f"✅ Displayed {len(submissions)} results in {gallery_channel.mention}")
 
     except Exception as e:
         logging.error(f"Show error: {e}", exc_info=True)
