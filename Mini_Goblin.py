@@ -229,7 +229,7 @@ async def on_message(message):
 
         # Handle image submissions
         if message.guild.id in bot.channels:  # Check if guild has configured channels
-        submit_channel = bot.channels[message.guild.id].get('submit')
+            submit_channel = bot.channels[message.guild.id].get('submit')
         
         if submit_channel and message.channel == submit_channel:
             if message.attachments and any(
