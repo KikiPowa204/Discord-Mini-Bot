@@ -531,7 +531,7 @@ async def store_miniature(ctx):
     except Exception as e:
         logging.error(f"Store error: {e}")
         await ctx.send("❌ An error occurred - check your format and try again")
-
+@bot.command(name='show')
 async def show_miniature(ctx, *, search_query: str = None):
     """Display 5 random miniatures in gallery channel"""
     try:
