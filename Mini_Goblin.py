@@ -520,21 +520,19 @@ async def show_miniature(ctx, stl_name: str):
                 await ctx.send(f"❌ No miniature found matching '{stl_name}'")
                 return
 
-            # Create embed with deletion metadata
             embed = discord.Embed(
-                title=f"STL: {submission['stl_name']}",
-                description=f"From bundle: {submission['bundle_name'] or 'No bundle specified'}",
-                color=discord.Color.blue()
-            )
+    title=f"STL: {submission['stl_name']}",
+    description=f"From bundle: {submission['bundle_name'] or 'No bundle specified'}",
+    color=discord.Color.blue()
+)
             
             # Add visible fields
             embed.set_author(name=f"Painted by {submission['author']}")
             embed.set_image(url=submission['image_url'])
             
             # Add hidden metadata for deletion
-            embed.add_field(name="Submission ID", value=submission['message_id'], inline=False)
-            embed.add_field(name="Guild ID", value=submission['guild_id'], inline=False)
-            
+            embed.set_footer(text=f"DELETION_ID:{submission['message_id']}:{submission['guild_id']}")
+
             if submission['tags']:
                 embed.add_field(name="Tags", value=submission['tags'], inline=False)
             
@@ -546,83 +544,55 @@ async def show_miniature(ctx, stl_name: str):
 
 @bot.command(name='del')
 async def delete_submission(ctx):
-    """Delete a submission by replying to a !show result"""
-    # Check if message is a reply
     if not ctx.message.reference:
-        await ctx.send("❌ Please reply to a !show result to delete")
+        await ctx.send("❌ Please reply to a !show result")
         return
 
     try:
-        # Verify permissions
         if not ctx.author.guild_permissions.manage_messages:
-            await ctx.send("❌ You need 'Manage Messages' permission")
+            await ctx.send("❌ Permission denied")
             return
 
-        # Get the original !show message
         show_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-
-        # Verify it's our bot's embed
+        
         if show_message.author != bot.user or not show_message.embeds:
-            await ctx.send("❌ Please reply to a valid !show result")
+            await ctx.send("❌ Invalid target message")
             return
 
-        embed = show_message.embeds[0]
-        
-        # Extract metadata from embed fields
-        submission_id = None
-        guild_id = None
-        
-        for field in embed.fields:
-            if field.name == "Submission ID":
-                submission_id = field.value
-            elif field.name == "Guild ID":
-                guild_id = field.value
-
-        if not submission_id or not guild_id:
-            await ctx.send("❌ Couldn't find submission data in this message")
+        # Extract hidden metadata from footer
+        footer_text = show_message.embeds[0].footer.text
+        if not footer_text.startswith("DELETION_ID:"):
+            await ctx.send("❌ Not a deletable submission")
             return
 
-        # Verify the submission belongs to this guild
+        _, message_id, guild_id = footer_text.split(":")
+        
         if guild_id != str(ctx.guild.id):
-            await ctx.send("❌ You can only delete submissions from this server")
+            await ctx.send("❌ Cross-server deletion not allowed")
             return
 
-        # Delete from database
+        # Database deletion
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                deleted = await cursor.execute('''
+                await cursor.execute('''
                     DELETE FROM miniatures 
-                    WHERE message_id = %s 
-                    AND guild_id = %s
-                ''', (submission_id, guild_id))
-                
+                    WHERE message_id = %s AND guild_id = %s
+                ''', (message_id, guild_id))
                 await conn.commit()
 
-                if not deleted:
-                    await ctx.send("❌ Submission not found or already deleted")
-                    return
-
-        # Try to delete associated messages
+        # Cleanup messages
         try:
-            # Delete original submission message
-            original_submission = await ctx.channel.fetch_message(submission_id)
-            await original_submission.delete()
-        except (discord.NotFound, discord.Forbidden):
-            pass  # Message already gone or no permissions
-
-        # Clean up the command and !show result
+            await ctx.channel.fetch_message(message_id).delete()
+        except:
+            pass
+            
         await ctx.message.delete()
         await show_message.delete()
-
-        # Send ephemeral confirmation
-        confirmation = await ctx.send(
-            f"✅ Deleted submission {submission_id[:6]}...", 
-            delete_after=5
-        )
+        await ctx.send("✅ Deleted", delete_after=2)
 
     except Exception as e:
         logging.error(f"Delete error: {e}")
-        await ctx.send("❌ Failed to delete - check logs", delete_after=10)
+        await ctx.send("❌ Deletion failed", delete_after=5)
         
 
 # Set up logging
