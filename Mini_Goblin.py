@@ -227,18 +227,17 @@ async def on_message(message):
             return
         # Ensure the message is in the submissions channel
 
-        if bot.submit_chan and message.channel != bot.submit_chan:
-            return
         # Handle image submissions
-        if message.guild.id in bot.channels:
-            if message.channel == bot.channels[message.guild.id]['submit']:    
-            
-                if message.attachments and any(
+        if message.guild.id in bot.channels:  # Check if guild has configured channels
+        submit_channel = bot.channels[message.guild.id].get('submit')
+        
+        if submit_channel and message.channel == submit_channel:
+            if message.attachments and any(
                 att.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))
                 for att in message.attachments
-        ):
-                    print ("Bot recognises message in submit_chan")
-                    await process_submission(message)
+            ):
+                print("Bot recognises message in submit_chan")
+                await process_submission(message)
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)    
 
