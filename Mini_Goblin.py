@@ -620,7 +620,7 @@ async def show_miniature(ctx, *, search_query: str = None):
 
                     submissions = await cursor.fetchall()
                     if not submissions:
-                        await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}")
+                        await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}", delete_after = 10)
                         return
 
                     # Send results to gallery channel
@@ -643,7 +643,7 @@ async def show_miniature(ctx, *, search_query: str = None):
                         ''', (str(msg.id), sub['message_id'], str(ctx.guild.id)))
                     
                     await conn.commit()
-                    await ctx.send(f"✅ Displayed {len(submissions)} results in {gallery_channel.mention}")
+                    await ctx.send(f"✅ Displayed {len(submissions)} results in {gallery_channel.mention}",delete_after = 10)
 
     except Exception as e:
         logging.error(f"Show error: {e}", exc_info=True)
