@@ -468,7 +468,7 @@ async def show_miniature(ctx, stl_name: str):
                         SELECT * FROM miniatures
                         WHERE guild_id = %s
                         AND stl_name LIKE %s
-                        LIMIT 1
+                        LIMIT 5
                     ''', (str(ctx.guild.id), f'%{stl_name}%'))
                     submission = await cursor.fetchone()
 
