@@ -461,7 +461,6 @@ async def clear_pending_submission(
         logging.debug(f"Submission {submission_id} completed early")
     except Exception as e:
         logging.error(f"Failed to clear submission {submission_id}: {str(e)}")
-
 @bot.command(name='store')
 async def store_miniature(ctx):
     """Store a miniature from a replied-to message with metadata"""
@@ -522,11 +521,32 @@ async def store_miniature(ctx):
 
         # Store in database
         success = await mysql_storage.store_submission(**submission_data)
-        if success:
-            await ctx.message.add_reaction('✅')
-            await ctx.send(f"✅ Saved {metadata['stl_name']}!", delete_after=10)
-        else:
-            await ctx.send("❌ Failed to store - please try again")
+        
+        try:
+            if success:
+                # Add checkmark reaction to the command message
+                await ctx.message.add_reaction('✅')
+                
+                # Send confirmation (will auto-delete)
+                confirmation = await ctx.send(f"✅ Saved {metadata['stl_name']}!", delete_after=10)
+                
+                # Delete the original command message after 3 seconds
+                await asyncio.sleep(3)
+                await ctx.message.delete()
+                
+                # Optional: Delete the confirmation after it auto-deletes
+                await confirmation.delete(delay=7)  # Matches the 10s total
+            else:
+                await ctx.message.add_reaction('❌')
+                error_msg = await ctx.send("❌ Failed to store - please try again")
+                await asyncio.sleep(5)
+                await error_msg.delete()
+                await ctx.message.delete()
+
+        except discord.Forbidden:
+            logging.warning(f"Missing permissions in {ctx.guild.id}")
+        except discord.HTTPException as e:
+            logging.error(f"Message cleanup failed: {e}")
 
     except Exception as e:
         logging.error(f"Store error: {e}")
