@@ -485,23 +485,26 @@ async def amend_submission(ctx, deletion_id: str,*,new_data: str):
         
         # Update gallery embed if exists
     
-            gallery_channel = bot.channels[ctx.guild.id]['gallery']
-            async for message in gallery_channel.history(limit=100):
-                if message.embeds and f"DELETION_ID:{deletion_id}" in message.embeds[0].footer.text:
-                    embed = message.embeds[0]
-                    new_embed = discord.Embed(
-                        title=f"STL: {metadata['stl_name'] or embed.title.split(':')[1].strip()}",
-                        description=f"Bundle: {metadata['bundle_name'] or embed.description.split(':')[1].strip()}",
-                        color=embed.color
-                    )
-                    new_embed.set_image(url=embed.image.url)
-                    new_embed.set_footer(text=embed.footer.text)
-                    await message.edit(embed=new_embed)
-                    break
+            # Update gallery embed
+        gallery_channel = bot.channels[ctx.guild.id]['gallery']
+        async for message in gallery_channel.history(limit=200):
+            if message.embeds and f"DELETION_ID:{ctx.message.id}" in message.embeds[0].footer.text:
+                embed = message.embeds[0]
+                new_embed = discord.Embed(
+                    title=f"STL: {metadata['stl_name'] or embed.title.split(':')[1].strip()}",
+                    description=f"Bundle: {metadata['bundle_name'] or embed.description.split(':')[1].strip()}",
+                    color=embed.color
+                )
+                new_embed.set_image(url=embed.image.url)
+                new_embed.set_footer(text=embed.footer.text)
+                await message.edit(embed=new_embed)
+                break
+                
+        await ctx.message.add_reaction('✏️')
+        
     except Exception as e:
-        logging.error(f"Edit error: {e}")
+        logging.error(f"Amend error: {e}", exc_info=True)
         await ctx.message.add_reaction('❌')
-    
     except:
         pass  # Skip if gallery update fails
             
@@ -726,73 +729,82 @@ async def show_miniature(ctx, *, search_query: str = None):
         logging.error(f"Show error: {e}", exc_info=True)
         await ctx.send("❌ Error searching miniatures")
 
-@bot.command(name='del')
-async def delete_submission(ctx, deletion_id: str = None):
-    """Delete a submission by replying to its gallery post"""
+@bot.command(name='amend')
+async def amend_submission(ctx, *, args: str):
+    """Edit a submission's metadata. Usage: Reply to a gallery post with: !amend STL:NewName Bundle:NewBundle Tags:new,tags"""
     try:
-        # Check if replying to a message
+        # Verify reply exists
         if not ctx.message.reference:
-            await ctx.send("❌ Please reply to the gallery post you want to delete")
+            await ctx.send("❌ Please reply to the gallery post you want to amend")
             return
             
         replied_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
         
-        # Verify we're in gallery channel
-        if ctx.guild.id not in bot.channels or ctx.channel != bot.channels[ctx.guild.id]['gallery']:
-            await ctx.send("❌ Deletions must be done in gallery channel")
-            return
-
-        # Extract deletion ID from embed footer
+        # Extract deletion_id from embed footer
         if not replied_msg.embeds:
-            await ctx.send("❌ No embed found in replied message")
+            await ctx.send("❌ Replied message is not a valid gallery post")
             return
             
         embed = replied_msg.embeds[0]
         if not embed.footer.text or "DELETION_ID:" not in embed.footer.text:
-            await ctx.send("❌ Invalid gallery post format")
+            await ctx.send("❌ Could not find submission ID in this post")
             return
             
         deletion_id = embed.footer.text.split("DELETION_ID:")[1].split(":")[0]
+        
+        # Rest of your parsing/update logic...
+        metadata = {
+            'stl_name': None,
+            'bundle_name': None,
+            'tags': None
+        }
+        
+        for line in args.split('\n'):
+            if ':' in line:
+                key, value = line.split(':', 1)
+                key = key.strip().lower()
+                value = value.strip()
+                if key == 'stl':
+                    metadata['stl_name'] = value
+                elif key == 'bundle':
+                    metadata['bundle_name'] = value
+                elif key == 'tags':
+                    metadata['tags'] = value
 
+        # Database update...
         async with mysql_storage.pool.acquire() as conn:
-            async with conn.cursor(aiomysql.DictCursor) as cursor:
-                # Find the submission
+            async with conn.cursor() as cursor:
                 await cursor.execute('''
-                    SELECT * FROM miniatures
-                    WHERE guild_id = %s
-                    AND message_id = %s
-                    LIMIT 1
-                ''', (str(ctx.guild.id), deletion_id))
-                submission = await cursor.fetchone()
-
-                if not submission:
-                    await ctx.send("❌ No submission found with that ID")
-                    return
-
-                # Verify author or admin
-                if (str(ctx.author.id) != submission['author'] and not ctx.author.guild_permissions.administrator):
-                    await ctx.send("❌ You can only delete your own submissions!")
-                    return
-
-                # Delete from database
-                await cursor.execute('''
-                    DELETE FROM miniatures
-                    WHERE guild_id = %s
-                    AND message_id = %s
-                ''', (str(ctx.guild.id), deletion_id))
+                    UPDATE miniatures
+                    SET
+                        stl_name = COALESCE(%s, stl_name),
+                        bundle_name = COALESCE(%s, bundle_name),
+                        tags = COALESCE(%s, tags)
+                    WHERE message_id = %s AND guild_id = %s
+                ''', (
+                    metadata['stl_name'],
+                    metadata['bundle_name'],
+                    metadata['tags'],
+                    deletion_id,
+                    str(ctx.guild.id)
+                ))
                 await conn.commit()
-
-        # Try to delete both original and gallery messages
         
-        await replied_msg.delete()
-        await ctx.message.delete()
+        # Update the replied embed
+        new_embed = discord.Embed(
+            title=f"STL: {metadata['stl_name'] or embed.title.split(':')[1].strip()}",
+            description=f"Bundle: {metadata['bundle_name'] or embed.description.split(':')[1].strip()}",
+            color=embed.color
+        )
+        new_embed.set_image(url=embed.image.url)
+        new_embed.set_footer(text=embed.footer.text)
+        await replied_msg.edit(embed=new_embed)
         
-        await ctx.send("🗑️ Submission deleted successfully", delete_after=15)
-
+        await ctx.message.add_reaction('✏️')
+        
     except Exception as e:
-        logging.error(f"Delete error: {e}")
-        await ctx.send("❌ Error deleting submission")
-
+        logging.error(f"Amend error: {e}", exc_info=True)
+        await ctx.message.add_reaction('❌')
 @bot.command()
 async def debug_pending(ctx):
     """Show current pending submissions"""
