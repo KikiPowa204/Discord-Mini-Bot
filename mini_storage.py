@@ -51,7 +51,7 @@ class MySQLStorage:
                 user=config['user'],
                 password=config['password'],
                 db=config['db'],
-                minsize=1,
+                minsize=5,
                 maxsize=10,
                 connect_timeout=10,
                 autocommit=False
