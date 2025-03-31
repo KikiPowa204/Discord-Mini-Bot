@@ -565,21 +565,20 @@ async def show_miniature(ctx, *, search_query: str = None):
                             tag_input = search_query.split(":", 1)[1].strip()
                             tags = [t.strip().lower() for t in tag_input.split(",") if t.strip()]
                             
-                            async with conn.cursor() as cursor:
-                                # For MySQL/MariaDB
-                                await cursor.execute('''
-                                    SELECT * FROM miniatures
-                                    WHERE guild_id = %s
-                                    AND (
-                                        -- Exact tag match (comma-separated)
-                                        FIND_IN_SET(%s, tags)
-                                        OR
-                                        -- Broad search (tags LIKE %%)
-                                        tags LIKE %s
-                                    )
-                                    ORDER BY RAND()
-                                    LIMIT 5
-                                ''', (str(ctx.guild.id), tags[0], f'%{tags[0]}%'))
+                            # For MySQL/MariaDB
+                            await cursor.execute('''
+                                SELECT * FROM miniatures
+                                WHERE guild_id = %s
+                                AND (
+                                    -- Exact tag match (comma-separated)
+                                    FIND_IN_SET(%s, tags)
+                                    OR
+                                    -- Broad search (tags LIKE %%)
+                                    tags LIKE %s
+                                )
+                                ORDER BY RAND()
+                                LIMIT 5
+                            ''', (str(ctx.guild.id), tags[0], f'%{tags[0]}%'))
                         else:
                             await cursor.execute('''
                                 SELECT * FROM miniatures
