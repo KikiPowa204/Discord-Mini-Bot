@@ -532,7 +532,6 @@ async def store_miniature(ctx):
         logging.error(f"Store error: {e}")
         await ctx.send("❌ An error occurred - check your format and try again")
 
-@bot.command(name='show')
 async def show_miniature(ctx, *, search_query: str = None):
     """Display 5 random miniatures in gallery channel"""
     try:
@@ -548,7 +547,6 @@ async def show_miniature(ctx, *, search_query: str = None):
         is_tag_search = search_query and search_query.startswith("tags:")
         
         async with ctx.typing():
-            # Establish new connection and cursor for the main query
             async with mysql_storage.pool.acquire() as conn:
                 async with conn.cursor(aiomysql.DictCursor) as cursor:
                     if is_collection_search:
@@ -561,24 +559,6 @@ async def show_miniature(ctx, *, search_query: str = None):
                                 ORDER BY RAND()
                                 LIMIT 5
                             ''', (str(ctx.guild.id), f'%{bundle_name}%'))
-                        elif is_tag_search:
-                            tag_input = search_query.split(":", 1)[1].strip()
-                            tags = [t.strip().lower() for t in tag_input.split(",") if t.strip()]
-                            
-                            # For MySQL/MariaDB
-                            await cursor.execute('''
-                                SELECT * FROM miniatures
-                                WHERE guild_id = %s
-                                AND (
-                                    -- Exact tag match (comma-separated)
-                                    FIND_IN_SET(%s, tags)
-                                    OR
-                                    -- Broad search (tags LIKE %%)
-                                    tags LIKE %s
-                                )
-                                ORDER BY RAND()
-                                LIMIT 5
-                            ''', (str(ctx.guild.id), tags[0], f'%{tags[0]}%'))
                         else:
                             await cursor.execute('''
                                 SELECT * FROM miniatures
@@ -587,35 +567,62 @@ async def show_miniature(ctx, *, search_query: str = None):
                                 ORDER BY RAND()
                                 LIMIT 5
                             ''', (str(ctx.guild.id),))
+                            
+                    elif is_tag_search:
+                        tag_input = search_query.split(":", 1)[1].strip()
+                        tags = [t.strip().lower() for t in tag_input.split(",") if t.strip()]
                         
+                        # Build dynamic OR conditions for tags
+                        conditions = []
+                        params = [str(ctx.guild.id)]
+                        for tag in tags:
+                            conditions.append("(FIND_IN_SET(%s, tags) OR tags LIKE %s")
+                            params.extend([tag, f'%{tag}%'])
                         
-                        submissions = await cursor.fetchall()
-                        if not submissions:
-                            await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}")
-                            return
+                        await cursor.execute(f'''
+                            SELECT * FROM miniatures
+                            WHERE guild_id = %s
+                            AND ({' OR '.join(conditions)})
+                            ORDER BY RAND()
+                            LIMIT 5
+                        ''', params)
+                        
+                    else:  # Default STL name search
+                        search_term = search_query or ""
+                        await cursor.execute('''
+                            SELECT * FROM miniatures
+                            WHERE guild_id = %s
+                            AND (stl_name LIKE %s OR tags LIKE %s)
+                            ORDER BY RAND()
+                            LIMIT 5
+                        ''', (str(ctx.guild.id), f'%{search_term}%', f'%{search_term}%'))
 
-                        # New connection for gallery message updates
-                        async with mysql_storage.pool.acquire() as conn:
-                            async with conn.cursor(aiomysql.DictCursor) as cursor:
-                                for sub in submissions:
-                                    embed = discord.Embed(
-                                        title=f"STL: {sub['stl_name']}",
-                                        description=f"Bundle: {sub['bundle_name'] or 'None'}",
-                                        color=discord.Color.blue()
-                                    )
-                                    embed.set_image(url=sub['image_url'])
-                                    embed.set_footer(text=f"DELETION_ID:{sub['message_id']}:{sub['guild_id']}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
-                                    
-                                    msg = await gallery_channel.send(embed=embed)
-                                    
-                                    await cursor.execute('''
-                                        UPDATE miniatures
-                                        SET gallery_message_id = %s
-                                        WHERE message_id = %s AND guild_id = %s
-                                    ''', (str(msg.id), sub['message_id'], str(ctx.guild.id)))
-                                    await conn.commit()
+                    submissions = await cursor.fetchall()
+                    if not submissions:
+                        await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}")
+                        return
 
-                        await ctx.send(f"✅ Displayed {len(submissions)} results in {gallery_channel.mention}")
+                    # Send results to gallery channel
+                    for sub in submissions:
+                        embed = discord.Embed(
+                            title=f"STL: {sub['stl_name']}",
+                            description=f"Bundle: {sub['bundle_name'] or 'None'}",
+                            color=discord.Color.blue()
+                        )
+                        embed.set_image(url=sub['image_url'])
+                        embed.set_footer(text=f"DELETION_ID:{sub['message_id']}:{sub['guild_id']}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
+                        
+                        msg = await gallery_channel.send(embed=embed)
+                        
+                        # Update gallery_message_id in database
+                        await cursor.execute('''
+                            UPDATE miniatures
+                            SET gallery_message_id = %s
+                            WHERE message_id = %s AND guild_id = %s
+                        ''', (str(msg.id), sub['message_id'], str(ctx.guild.id)))
+                    
+                    await conn.commit()
+                    await ctx.send(f"✅ Displayed {len(submissions)} results in {gallery_channel.mention}")
 
     except Exception as e:
         logging.error(f"Show error: {e}", exc_info=True)
