@@ -730,14 +730,24 @@ async def show_miniature(ctx, *, search_query: str = None):
         await ctx.send("❌ Error searching miniatures")
 
 @bot.command(name='edit')
-async def amend_submission(ctx, *, args: str):
-    """Edit a submission's metadata. Usage: Reply to a gallery post with: !amend STL:NewName Bundle:NewBundle Tags:new,tags"""
+async def edit_submission(ctx):
+    """Edit a submission's metadata. Usage: Reply to a gallery post and include:
+    !edit STL:NewName
+    !edit Bundle:NewBundle
+    !edit Tags:new,tags
+    Or combine them with line breaks"""
     try:
+        # Check if message has content after !edit
+        if not ctx.message.content.strip()[5:]:  # 5 = len("!edit")
+            await ctx.send("❌ Please include edit parameters (STL:/Bundle:/Tags:)")
+            return
+
         # Verify reply exists
         if not ctx.message.reference:
-            await ctx.send("❌ Please reply to the gallery post you want to amend")
+            await ctx.send("❌ Please reply to the gallery post you want to edit")
             return
             
+        # Get replied message
         replied_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
         
         # Extract deletion_id from embed footer
@@ -752,7 +762,8 @@ async def amend_submission(ctx, *, args: str):
             
         deletion_id = embed.footer.text.split("DELETION_ID:")[1].split(":")[0]
         
-        # Rest of your parsing/update logic...
+        # Parse metadata from command content (skip "!edit")
+        args = ctx.message.content.strip()[5:].strip()
         metadata = {
             'stl_name': None,
             'bundle_name': None,
@@ -760,6 +771,7 @@ async def amend_submission(ctx, *, args: str):
         }
         
         for line in args.split('\n'):
+            line = line.strip()
             if ':' in line:
                 key, value = line.split(':', 1)
                 key = key.strip().lower()
@@ -771,7 +783,12 @@ async def amend_submission(ctx, *, args: str):
                 elif key == 'tags':
                     metadata['tags'] = value
 
-        # Database update...
+        # Validate at least one field is being updated
+        if not any(metadata.values()):
+            await ctx.send("❌ Provide at least one field to update (STL:/Bundle:/Tags:)")
+            return
+
+        # Update database
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute('''
@@ -788,9 +805,14 @@ async def amend_submission(ctx, *, args: str):
                     deletion_id,
                     str(ctx.guild.id)
                 ))
+                
+                if cursor.rowcount == 0:
+                    await ctx.send("❌ Submission not found in database")
+                    return
+                    
                 await conn.commit()
         
-        # Update the replied embed
+        # Update gallery embed
         new_embed = discord.Embed(
             title=f"STL: {metadata['stl_name'] or embed.title.split(':')[1].strip()}",
             description=f"Bundle: {metadata['bundle_name'] or embed.description.split(':')[1].strip()}",
@@ -800,11 +822,12 @@ async def amend_submission(ctx, *, args: str):
         new_embed.set_footer(text=embed.footer.text)
         await replied_msg.edit(embed=new_embed)
         
-        await ctx.message.add_reaction('✏️')
+        await ctx.message.add_reaction('✏️')  # Pencil emoji
         
     except Exception as e:
-        logging.error(f"Amend error: {e}", exc_info=True)
+        logging.error(f"Edit error: {e}", exc_info=True)
         await ctx.message.add_reaction('❌')
+
 @bot.command()
 async def debug_pending(ctx):
     """Show current pending submissions"""
