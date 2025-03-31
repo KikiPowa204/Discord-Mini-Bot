@@ -561,6 +561,25 @@ async def show_miniature(ctx, *, search_query: str = None):
                                 ORDER BY RAND()
                                 LIMIT 5
                             ''', (str(ctx.guild.id), f'%{bundle_name}%'))
+                        elif is_tag_search:
+                            tag_input = search_query.split(":", 1)[1].strip()
+                            tags = [t.strip().lower() for t in tag_input.split(",") if t.strip()]
+                            
+                            async with conn.cursor() as cursor:
+                                # For MySQL/MariaDB
+                                await cursor.execute('''
+                                    SELECT * FROM miniatures
+                                    WHERE guild_id = %s
+                                    AND (
+                                        -- Exact tag match (comma-separated)
+                                        FIND_IN_SET(%s, tags)
+                                        OR
+                                        -- Broad search (tags LIKE %%)
+                                        tags LIKE %s
+                                    )
+                                    ORDER BY RAND()
+                                    LIMIT 5
+                                ''', (str(ctx.guild.id), tags[0], f'%{tags[0]}%'))
                         else:
                             await cursor.execute('''
                                 SELECT * FROM miniatures
@@ -569,27 +588,9 @@ async def show_miniature(ctx, *, search_query: str = None):
                                 ORDER BY RAND()
                                 LIMIT 5
                             ''', (str(ctx.guild.id),))
-                    elif is_tag_search:
-                        tag_input = search_query.split(":", 1)[1].strip()
-                        tags = [t.strip().lower() for t in tag_input.split(",") if t.strip()]
                         
-                        async with conn.cursor() as cursor:
-                            # For MySQL/MariaDB
-                            await cursor.execute('''
-                                SELECT * FROM miniatures
-                                WHERE guild_id = %s
-                                AND (
-                                    -- Exact tag match (comma-separated)
-                                    FIND_IN_SET(%s, tags)
-                                    OR
-                                    -- Broad search (tags LIKE %%)
-                                    tags LIKE %s
-                                )
-                                ORDER BY RAND()
-                                LIMIT 5
-                            ''', (str(ctx.guild.id), tags[0], f'%{tags[0]}%'))
-                    submissions = await cursor.fetchall()
-                            
+                        
+                        submissions = await cursor.fetchall()
                     if not submissions:
                         await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}")
                         return
