@@ -756,7 +756,6 @@ async def edit_submission(ctx):
         if not ctx.message.reference:
             await ctx.send("❌ Please reply to the gallery post you want to edit", delete_after = 15)
             return
-            
         # Get replied message
         replied_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
         
