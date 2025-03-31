@@ -313,7 +313,7 @@ async def get_help(ctx):
         inline=False
     )
     
-    embed.set_footer(text="Bot created by [Your Name]")
+    embed.set_footer(text="Bot created by kiann.ardalan")
     
     await ctx.send(embed=embed)
 
