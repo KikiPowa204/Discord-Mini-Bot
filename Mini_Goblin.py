@@ -306,7 +306,17 @@ async def get_help(ctx):
         ),
         inline=False
     )
-    
+    embed.add_field(
+        name="!edit [STL:/Bundle:/Tags:]",
+        value=(
+            "Reply to a message and use command with above format.\n"
+            "• `!edit STL: (new name)\n"
+            "• `!edit Bundle: (new bundle name)`\n"
+            "• `!edit tags: (new tags)`"
+        ),
+        inline=False
+    )
+
     embed.add_field(
         name="!del",
         value="Reply to a gallery post with this command to delete your submission (authors and admins only).",
@@ -762,6 +772,26 @@ async def edit_submission(ctx):
             
         deletion_id = embed.footer.text.split("DELETION_ID:")[1].split(":")[0]
         
+        async with mysql_storage.pool.acquire() as conn:
+            async with conn.cursor(aiomysql.DictCursor) as cursor:
+                await cursor.execute('''
+                    SELECT author_id FROM miniatures 
+                    WHERE message_id = %s AND guild_id = %s
+                ''', (deletion_id, str(ctx.guild.id)))
+                submission = await cursor.fetchone()
+                
+                if not submission:
+                    await ctx.send("❌ Submission not found in database")
+                    return
+                    
+                # Check if user is author OR admin
+                is_author = str(ctx.author.id) == submission['author_id']
+                is_admin = ctx.author.guild_permissions.administrator
+                
+                if not (is_author or is_admin):
+                    await ctx.send("❌ You can only edit your own submissions!")
+                    return
+
         # Parse metadata from command content (skip "!edit")
         args = ctx.message.content.strip()[5:].strip()
         metadata = {
