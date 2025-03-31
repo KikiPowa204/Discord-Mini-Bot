@@ -570,7 +570,7 @@ async def show_miniature(ctx, *, search_query: str = None):
             async with mysql_storage.pool.acquire() as conn:
                 async with conn.cursor(aiomysql.DictCursor) as cursor:
                     if is_collection_search:
-                        bundle_name = search_query.split(":", 1)[1] if ":" in search_query else None
+                        bundle_name = search_query.split(":", 1)[1].strip() if ":" in search_query else None
                         if bundle_name:
                             await cursor.execute('''
                                 SELECT * FROM miniatures
