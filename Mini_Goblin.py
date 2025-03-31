@@ -269,7 +269,7 @@ async def on_message(message):
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)    
 
-@bot.command(name='help')
+@bot.command(name='guide')
 async def get_help(ctx):
     """Display help information about bot commands"""
     embed = discord.Embed(
