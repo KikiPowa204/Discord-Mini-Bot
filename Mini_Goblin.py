@@ -146,23 +146,51 @@ async def on_ready():
         # Initialize database (if needed per server)
         await mysql_storage.init_db()
         
-        # Find required channels
-        submit_chan = discord.utils.get(guild.channels, name=DEFAULTS['submissions_chan'])
-        gallery_chan = discord.utils.get(guild.channels, name=DEFAULTS['gallery_chan'])
+        # Find required channels with more flexible search
+        submit_chan = discord.utils.find(lambda c: (
+            c.name.lower() == DEFAULTS['submissions_chan'].lower() and 
+            isinstance(c, discord.TextChannel)
+        ), guild.channels)
+        
+        gallery_chan = discord.utils.find(lambda c: (
+            c.name.lower() == DEFAULTS['gallery_chan'].lower() and 
+            isinstance(c, discord.TextChannel)
+        ), guild.channels)
         
         if submit_chan and gallery_chan:
             bot.channels[guild.id] = {
                 'submit': submit_chan,
-                'gallery': gallery_chan
+                'gallery': gallery_chan,
+                'configured': True
             }
             print(f"✅ Found channels in {guild.name} (ID: {guild.id})")
+            
+            # Verify database schema
+            async with mysql_storage.pool.acquire() as conn:
+                async with conn.cursor() as cursor:
+                    await cursor.execute("""
+                        SELECT COLUMN_NAME 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_NAME = 'miniatures' 
+                        AND COLUMN_NAME = 'gallery_message_id'
+                    """)
+                    if not await cursor.fetchone():
+                        print(f"⚠️ Adding gallery_message_id column for {guild.name}")
+                        await cursor.execute("""
+                            ALTER TABLE miniatures
+                            ADD COLUMN gallery_message_id VARCHAR(20)
+                        """)
+                        await conn.commit()
         else:
-            print(f"⚠️ Missing channels in {guild.name} - need both:")
-            print(f"    - {DEFAULTS['submissions_chan']}")
-            print(f"    - {DEFAULTS['gallery_chan']}")
+            bot.channels[guild.id] = {'configured': False}
+            missing = []
+            if not submit_chan: missing.append(DEFAULTS['submissions_chan'])
+            if not gallery_chan: missing.append(DEFAULTS['gallery_chan'])
+            
+            print(f"⚠️ Missing channels in {guild.name}: {', '.join(missing)}")
 
-    print(f"\nBot fully initialized in {len(bot.channels)}/{len(bot.guilds)} servers")
-    print("Servers with proper setup:", ', '.join([str(gid) for gid in bot.channels.keys()]))
+    print(f"\nBot fully initialized in {len([g for g in bot.channels.values() if g.get('configured')])}/{len(bot.guilds)} servers")
+    print("Servers with proper setup:", ', '.join([str(gid) for gid, ch in bot.channels.items() if ch.get('configured')]))
 @bot.command(name='setup')
 @commands.has_permissions(administrator=True)
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
@@ -457,28 +485,25 @@ async def store_miniature(ctx):
         await ctx.send("❌ An error occurred - check your format and try again")
 
 @bot.command(name='show')
-async def show_miniature(ctx, stl_name: str = None):
-    """Display 5 random miniatures matching search (in guild's gallery channel)"""
+async def show_miniature(ctx, *, search_query: str = None):
+    """Display 5 random miniatures in gallery channel"""
     try:
-        # Check if command is in the correct gallery channel
+        # Verify gallery channel exists
         if ctx.guild.id not in bot.channels or 'gallery' not in bot.channels[ctx.guild.id]:
-            await ctx.send(f"❌ Gallery channel not configured! Please ask an admin to set one up.")
+            await ctx.send("❌ Gallery channel not configured! Ask an admin to set one up.")
             return
             
-        if ctx.channel != bot.channels[ctx.guild.id]['gallery']:
-            gallery_channel = bot.channels[ctx.guild.id]['gallery']
-            await ctx.send(f"❌ Please use this command in {gallery_channel.mention}")
-            return
+        gallery_channel = bot.channels[ctx.guild.id]['gallery']
+        
+        # Determine search mode
+        is_collection_search = search_query and search_query.startswith("collection:")
+        bundle_name = search_query.split(":", 1)[1] if is_collection_search and ":" in search_query else None
+        is_tag_search = search_query and search_query.startswith("tags:")
 
         async with ctx.typing():
-            # Determine search mode
-            is_collection_search = stl_name and stl_name.startswith("collection:")
-            bundle_name = stl_name.split(":", 1)[1] if is_collection_search and ":" in stl_name else None
-
             async with mysql_storage.pool.acquire() as conn:
                 async with conn.cursor(aiomysql.DictCursor) as cursor:
                     if is_collection_search:
-                        # Collection/bundle search
                         if bundle_name:
                             await cursor.execute('''
                                 SELECT * FROM miniatures
@@ -495,9 +520,17 @@ async def show_miniature(ctx, stl_name: str = None):
                                 ORDER BY RAND()
                                 LIMIT 5
                             ''', (str(ctx.guild.id),))
+                    elif is_tag_search:
+                        tag = search_query.split(":", 1)[1] if ":" in search_query else ""
+                        await cursor.execute('''
+                            SELECT * FROM miniatures
+                            WHERE guild_id = %s
+                            AND tags LIKE %s
+                            ORDER BY RAND()
+                            LIMIT 5
+                        ''', (str(ctx.guild.id), f'%{tag}%'))
                     else:
-                        # Normal STL name search
-                        search_term = stl_name or ""
+                        search_term = search_query or ""
                         await cursor.execute('''
                             SELECT * FROM miniatures
                             WHERE guild_id = %s
@@ -509,10 +542,10 @@ async def show_miniature(ctx, stl_name: str = None):
                     submissions = await cursor.fetchall()
 
             if not submissions:
-                await ctx.send(f"❌ No miniatures found{f' in bundle {bundle_name}' if is_collection_search and bundle_name else ''}")
+                await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}")
                 return
 
-            # Send each result as separate embeds (better for image viewing)
+            # Send results to gallery channel
             for sub in submissions:
                 embed = discord.Embed(
                     title=f"STL: {sub['stl_name']}",
@@ -520,8 +553,21 @@ async def show_miniature(ctx, stl_name: str = None):
                     color=discord.Color.blue()
                 )
                 embed.set_image(url=sub['image_url'])
-                embed.set_footer(text=f"By: {sub['author']} | Tags: {sub['tags'] or 'None'}")
-                await ctx.send(embed=embed)
+                embed.set_footer(text=f"DELETION_ID:{sub['message_id']}:{sub['guild_id']}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
+                
+                # Send to gallery channel and store message ID
+                msg = await gallery_channel.send(embed=embed)
+                
+                # Update database with gallery message ID if needed
+                await cursor.execute('''
+                    UPDATE miniatures
+                    SET gallery_message_id = %s
+                    WHERE message_id = %s AND guild_id = %s
+                ''', (str(msg.id), sub['message_id'], str(ctx.guild.id)))
+                await conn.commit()
+
+        # Confirm in original channel
+        await ctx.send(f"✅ Displayed {len(submissions)} results in {gallery_channel.mention}")
 
     except Exception as e:
         logging.error(f"Show error: {e}")
@@ -584,22 +630,31 @@ async def show_by_tag(ctx, *, tag_query: str = None):
         await ctx.send("❌ Error searching by tags")
 @bot.command(name='del')
 async def delete_submission(ctx, deletion_id: str = None):
-    """Delete a submission using its deletion ID"""
+    """Delete a submission by replying to its gallery post"""
     try:
-        # Check if command is in the correct submission channel
-        if ctx.guild.id not in bot.channels or 'submit' not in bot.channels[ctx.guild.id]:
-            await ctx.send("❌ Submission channel not configured for this server!")
+        # Check if replying to a message
+        if not ctx.message.reference:
+            await ctx.send("❌ Please reply to the gallery post you want to delete")
             return
             
-        if ctx.channel != bot.channels[ctx.guild.id]['submit']:
-            submit_channel = bot.channels[ctx.guild.id]['submit']
-            await ctx.send(f"❌ Please use this command in {submit_channel.mention}")
+        replied_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+        
+        # Verify we're in gallery channel
+        if ctx.guild.id not in bot.channels or ctx.channel != bot.channels[ctx.guild.id]['gallery']:
+            await ctx.send("❌ Deletions must be done in gallery channel")
             return
 
-        if not deletion_id:
-            await ctx.send("❌ Please provide a deletion ID\n"
-                         "Find it in the footer of the submission embed")
+        # Extract deletion ID from embed footer
+        if not replied_msg.embeds:
+            await ctx.send("❌ No embed found in replied message")
             return
+            
+        embed = replied_msg.embeds[0]
+        if not embed.footer.text or "DELETION_ID:" not in embed.footer.text:
+            await ctx.send("❌ Invalid gallery post format")
+            return
+            
+        deletion_id = embed.footer.text.split("DELETION_ID:")[1].split(":")[0]
 
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cursor:
@@ -629,17 +684,18 @@ async def delete_submission(ctx, deletion_id: str = None):
                 ''', (str(ctx.guild.id), deletion_id))
                 await conn.commit()
 
-        # Try to delete the original message
-                try:
-                    submit_channel = bot.channels[ctx.guild.id]['submit']
-                    msg = await submit_channel.fetch_message(deletion_id)
-                    await msg.delete()
-                except discord.NotFound:
-                    pass  # Message already deleted
-                except discord.Forbidden:
-                    pass  # No permissions to delete
-
-            await ctx.send(f"✅ Successfully deleted submission {deletion_id}")
+        # Try to delete both original and gallery messages
+        try:
+            submit_channel = bot.channels[ctx.guild.id]['submit']
+            original_msg = await submit_channel.fetch_message(deletion_id)
+            await original_msg.delete()
+        except:
+            pass
+            
+        await replied_msg.delete()
+        await ctx.message.delete()
+        
+        await ctx.send("✅ Submission deleted successfully", delete_after=5)
 
     except Exception as e:
         logging.error(f"Delete error: {e}")
