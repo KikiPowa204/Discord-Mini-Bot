@@ -457,48 +457,19 @@ async def store_miniature(ctx):
         await ctx.send("❌ An error occurred - check your format and try again")
 
 @bot.command(name='show')
-async def show_miniature(ctx, stl_name: str):
-    """Display a specific miniature with deletion metadata"""
+async def show_miniature(ctx, stl_name: str = None):
+    """Display 5 random miniatures matching search (in guild's gallery channel)"""
     try:
-        async with ctx.typing():
-            # Search database
-            async with mysql_storage.pool.acquire() as conn:
-                async with conn.cursor(aiomysql.DictCursor) as cursor:
-                    await cursor.execute('''
-                        SELECT * FROM miniatures
-                        WHERE guild_id = %s
-                        AND stl_name LIKE %s
-                        LIMIT 5
-                    ''', (str(ctx.guild.id), f'%{stl_name}%'))
-                    submission = await cursor.fetchone()
-
-            if not submission:
-                await ctx.send(f"❌ No miniature found matching '{stl_name}'")
-                return
-
-            embed = discord.Embed(
-    title=f"STL: {submission['stl_name']}",
-    description=f"From bundle: {submission['bundle_name'] or 'No bundle specified'}",
-    color=discord.Color.blue()
-)
+        # Check if command is in the correct gallery channel
+        if ctx.guild.id not in bot.channels or 'gallery' not in bot.channels[ctx.guild.id]:
+            await ctx.send(f"❌ Gallery channel not configured! Please ask an admin to set one up.")
+            return
             
-            # Add visible fields
-            embed.set_author(name=f"Painted by {submission['author']}")
-            embed.set_image(url=submission['image_url'])
-            
-            # Add hidden metadata for deletion
-            embed.set_footer(text=f"DELETION_ID:{submission['message_id']}:{submission['guild_id']}")
+        if ctx.channel != bot.channels[ctx.guild.id]['gallery']:
+            gallery_channel = bot.channels[ctx.guild.id]['gallery']
+            await ctx.send(f"❌ Please use this command in {gallery_channel.mention}")
+            return
 
-            if submission['tags']:
-                embed.add_field(name="Tags", value=submission['tags'], inline=False)
-            
-            await ctx.send(embed=embed)
-
-    except Exception as e:
-        logging.error(f"Error showing miniature: {e}")
-        await ctx.send("❌ An error occurred while fetching this miniature")
-        
-    try:
         async with ctx.typing():
             # Determine search mode
             is_collection_search = stl_name and stl_name.startswith("collection:")
@@ -513,16 +484,16 @@ async def show_miniature(ctx, stl_name: str):
                                 SELECT * FROM miniatures
                                 WHERE guild_id = %s
                                 AND bundle_name LIKE %s
-                                ORDER BY stl_name
-                                LIMIT 25
+                                ORDER BY RAND()
+                                LIMIT 5
                             ''', (str(ctx.guild.id), f'%{bundle_name}%'))
                         else:
                             await cursor.execute('''
                                 SELECT * FROM miniatures
                                 WHERE guild_id = %s
                                 AND bundle_name IS NOT NULL
-                                ORDER BY bundle_name, stl_name
-                                LIMIT 25
+                                ORDER BY RAND()
+                                LIMIT 5
                             ''', (str(ctx.guild.id),))
                     else:
                         # Normal STL name search
@@ -531,8 +502,8 @@ async def show_miniature(ctx, stl_name: str):
                             SELECT * FROM miniatures
                             WHERE guild_id = %s
                             AND (stl_name LIKE %s OR tags LIKE %s)
-                            ORDER BY stl_name
-                            LIMIT 25
+                            ORDER BY RAND()
+                            LIMIT 5
                         ''', (str(ctx.guild.id), f'%{search_term}%', f'%{search_term}%'))
 
                     submissions = await cursor.fetchall()
@@ -541,26 +512,15 @@ async def show_miniature(ctx, stl_name: str):
                 await ctx.send(f"❌ No miniatures found{f' in bundle {bundle_name}' if is_collection_search and bundle_name else ''}")
                 return
 
-            # Format results
-            for i in range(0, len(submissions), 5):  # 5 results per embed
+            # Send each result as separate embeds (better for image viewing)
+            for sub in submissions:
                 embed = discord.Embed(
-                    title=f"Bundle: {bundle_name}" if is_collection_search and bundle_name 
-                          else "All Bundled Miniatures" if is_collection_search
-                          else f"Results for: {stl_name}" if stl_name
-                          else "Recent Miniatures",
+                    title=f"STL: {sub['stl_name']}",
+                    description=f"Bundle: {sub['bundle_name'] or 'None'}",
                     color=discord.Color.blue()
                 )
-
-                for sub in submissions[i:i+5]:
-                    embed.add_field(
-                        name=f"{sub['stl_name']}",
-                        value=f"Bundle: {sub['bundle_name'] or 'None'}\n"
-                              f"By: {sub['author']}\n"
-                              f"[Image]({sub['image_url']}) | "
-                              f"`ID: {sub['message_id']}`",
-                        inline=False
-                    )
-
+                embed.set_image(url=sub['image_url'])
+                embed.set_footer(text=f"By: {sub['author']} | Tags: {sub['tags'] or 'None'}")
                 await ctx.send(embed=embed)
 
     except Exception as e:
