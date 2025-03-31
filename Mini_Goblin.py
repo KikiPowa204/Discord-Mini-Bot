@@ -541,7 +541,75 @@ async def show_miniature(ctx, stl_name: str):
     except Exception as e:
         logging.error(f"Error showing miniature: {e}")
         await ctx.send("❌ An error occurred while fetching this miniature")
+        
+    try:
+        async with ctx.typing():
+            # Determine search mode
+            is_collection_search = stl_name and stl_name.startswith("collection:")
+            bundle_name = stl_name.split(":", 1)[1] if is_collection_search and ":" in stl_name else None
 
+            async with mysql_storage.pool.acquire() as conn:
+                async with conn.cursor(aiomysql.DictCursor) as cursor:
+                    if is_collection_search:
+                        # Collection/bundle search
+                        if bundle_name:
+                            await cursor.execute('''
+                                SELECT * FROM miniatures
+                                WHERE guild_id = %s
+                                AND bundle_name LIKE %s
+                                ORDER BY stl_name
+                                LIMIT 25
+                            ''', (str(ctx.guild.id), f'%{bundle_name}%'))
+                        else:
+                            await cursor.execute('''
+                                SELECT * FROM miniatures
+                                WHERE guild_id = %s
+                                AND bundle_name IS NOT NULL
+                                ORDER BY bundle_name, stl_name
+                                LIMIT 25
+                            ''', (str(ctx.guild.id),))
+                    else:
+                        # Normal STL name search
+                        search_term = stl_name or ""
+                        await cursor.execute('''
+                            SELECT * FROM miniatures
+                            WHERE guild_id = %s
+                            AND (stl_name LIKE %s OR tags LIKE %s)
+                            ORDER BY stl_name
+                            LIMIT 25
+                        ''', (str(ctx.guild.id), f'%{search_term}%', f'%{search_term}%'))
+
+                    submissions = await cursor.fetchall()
+
+            if not submissions:
+                await ctx.send(f"❌ No miniatures found{f' in bundle {bundle_name}' if is_collection_search and bundle_name else ''}")
+                return
+
+            # Format results
+            for i in range(0, len(submissions), 5):  # 5 results per embed
+                embed = discord.Embed(
+                    title=f"Bundle: {bundle_name}" if is_collection_search and bundle_name 
+                          else "All Bundled Miniatures" if is_collection_search
+                          else f"Results for: {stl_name}" if stl_name
+                          else "Recent Miniatures",
+                    color=discord.Color.blue()
+                )
+
+                for sub in submissions[i:i+5]:
+                    embed.add_field(
+                        name=f"{sub['stl_name']}",
+                        value=f"Bundle: {sub['bundle_name'] or 'None'}\n"
+                              f"By: {sub['author']}\n"
+                              f"[Image]({sub['image_url']}) | "
+                              f"`ID: {sub['message_id']}`",
+                        inline=False
+                    )
+
+                await ctx.send(embed=embed)
+
+    except Exception as e:
+        logging.error(f"Show error: {e}")
+        await ctx.send("❌ Error searching miniatures")
 @bot.command(name='del')
 async def delete_submission(ctx):
     if not ctx.message.reference:
