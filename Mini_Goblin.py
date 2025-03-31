@@ -588,12 +588,12 @@ async def show_miniature(ctx, *, search_query: str = None):
                                 ORDER BY RAND()
                                 LIMIT 5
                             ''', (str(ctx.guild.id), tags[0], f'%{tags[0]}%'))
-                            submissions = await cursor.fetchall()
+                    submissions = await cursor.fetchall()
                             
-                        if not submissions:
-                            await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}")
-                            return
-
+                    if not submissions:
+                        await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}")
+                        return
+        
             # New connection for gallery message updates
             async with mysql_storage.pool.acquire() as conn:
                 async with conn.cursor(aiomysql.DictCursor) as cursor:
