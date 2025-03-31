@@ -431,6 +431,51 @@ async def process_submission(submission: discord.Message):
             del bot.pending_subs[submission_id]
         await submission.channel.send("❌ Error processing submission", delete_after=15)
         return False
+
+@bot.command(name='amend')
+async def amend_submission(ctx, deletion_id: str,*,new_data: str):
+    try:
+        # Parse new_data (e.g., "STL:NewName Tags:new, tags")
+        metadata = {
+            'stl_name': None,
+            'bundle_name': None,
+            'tags': None
+        }
+        
+        # Split into lines and process
+        for line in new_data.split('\n'):
+            if ':' in line:
+                key, value = line.split(':', 1)
+                key = key.strip().lower()
+                value = value.strip()
+                if key == 'stl':
+                    metadata['stl_name'] = value
+                elif key == 'bundle':
+                    metadata['bundle_name'] = value
+                elif key == 'tags':
+                    metadata['tags'] = value
+        async with mysql_storage.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute('''
+                    UPDATE miniatures
+                    SET 
+                        stl_name = %s,
+                        bundle_name = %s,
+                        tags = %s
+                    WHERE message_id = %s AND guild_id = %s
+                ''', (
+                    metadata['stl_name'],
+                    metadata['bundle_name'],
+                    metadata['tags'],
+                    deletion_id,
+                    str(ctx.guild.id)
+                ))
+                await conn.commit()
+        
+        await ctx.message.add_reaction('✏️')  # Pencil emoji
+    except Exception as e:
+        await ctx.message.add_reaction('❌')
+
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong!")
@@ -706,17 +751,11 @@ async def delete_submission(ctx, deletion_id: str = None):
                 await conn.commit()
 
         # Try to delete both original and gallery messages
-        try:
-            submit_channel = bot.channels[ctx.guild.id]['submit']
-            original_msg = await submit_channel.fetch_message(deletion_id)
-            await original_msg.delete()
-        except:
-            pass
-            
+        
         await replied_msg.delete()
         await ctx.message.delete()
         
-        await ctx.send("✅ Submission deleted successfully", delete_after=5)
+        await ctx.send("🗑️ Submission deleted successfully", delete_after=15)
 
     except Exception as e:
         logging.error(f"Delete error: {e}")
