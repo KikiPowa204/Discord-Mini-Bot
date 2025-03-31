@@ -739,12 +739,12 @@ async def edit_submission(ctx):
     try:
         # Check if message has content after !edit
         if not ctx.message.content.strip()[5:]:  # 5 = len("!edit")
-            await ctx.send("❌ Please include edit parameters (STL:/Bundle:/Tags:)")
+            await ctx.send("❌ Please include edit parameters (STL:/Bundle:/Tags:)",delete_after = 15)
             return
 
         # Verify reply exists
         if not ctx.message.reference:
-            await ctx.send("❌ Please reply to the gallery post you want to edit")
+            await ctx.send("❌ Please reply to the gallery post you want to edit", delete_after = 15)
             return
             
         # Get replied message
@@ -752,12 +752,12 @@ async def edit_submission(ctx):
         
         # Extract deletion_id from embed footer
         if not replied_msg.embeds:
-            await ctx.send("❌ Replied message is not a valid gallery post")
+            await ctx.send("❌ Replied message is not a valid gallery post", delete_after = 15)
             return
             
         embed = replied_msg.embeds[0]
         if not embed.footer.text or "DELETION_ID:" not in embed.footer.text:
-            await ctx.send("❌ Could not find submission ID in this post")
+            await ctx.send("❌ Could not find submission ID in this post", delete_after = 15)
             return
             
         deletion_id = embed.footer.text.split("DELETION_ID:")[1].split(":")[0]
@@ -785,7 +785,7 @@ async def edit_submission(ctx):
 
         # Validate at least one field is being updated
         if not any(metadata.values()):
-            await ctx.send("❌ Provide at least one field to update (STL:/Bundle:/Tags:)")
+            await ctx.send("❌ Provide at least one field to update (STL:/Bundle:/Tags:)", delete_after = 15)
             return
 
         # Update database
@@ -807,7 +807,7 @@ async def edit_submission(ctx):
                 ))
                 
                 if cursor.rowcount == 0:
-                    await ctx.send("❌ Submission not found in database")
+                    await ctx.send("❌ Submission not found in database", delete_after = 10)
                     return
                     
                 await conn.commit()
@@ -823,7 +823,7 @@ async def edit_submission(ctx):
         await replied_msg.edit(embed=new_embed)
         
         await ctx.message.add_reaction('✏️')  # Pencil emoji
-        
+        await ctx.message.delete()
     except Exception as e:
         logging.error(f"Edit error: {e}", exc_info=True)
         await ctx.message.add_reaction('❌')
