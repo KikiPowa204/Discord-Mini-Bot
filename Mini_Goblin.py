@@ -135,24 +135,34 @@ async def get_db_connection():
 
 @bot.event
 async def on_ready():
-    bot.pending_subs = {}
-    print(f'{bot.user.name} online!')
-    
-    """Bot startup initialization"""
-    print(f'{bot.user.name} online in {len(bot.guilds)} guilds!')
+    # Initialize storage
+    bot.channels = {}  # Now stores channels for ALL servers
     bot.pending_subs = {}  # Reset pending submissions
     
-    # Find existing channels (first guild with both channels wins)
+    print(f'{bot.user.name} online in {len(bot.guilds)} servers!')
+    
+    # Scan all servers
     for guild in bot.guilds:
+        # Initialize database (if needed per server)
         await mysql_storage.init_db()
-        bot.submit_chan = discord.utils.get(guild.channels, name=DEFAULTS['submissions_chan'])
-        bot.gallery_chan = discord.utils.get(guild.channels, name=DEFAULTS['gallery_chan'])
-        if bot.submit_chan and bot.gallery_chan:
-            print(f"Found channels in {guild.name}")
-            break
-    else:
-        print("Warning: No submission/gallery channels found")
+        
+        # Find required channels
+        submit_chan = discord.utils.get(guild.channels, name=DEFAULTS['submissions_chan'])
+        gallery_chan = discord.utils.get(guild.channels, name=DEFAULTS['gallery_chan'])
+        
+        if submit_chan and gallery_chan:
+            bot.channels[guild.id] = {
+                'submit': submit_chan,
+                'gallery': gallery_chan
+            }
+            print(f"✅ Found channels in {guild.name} (ID: {guild.id})")
+        else:
+            print(f"⚠️ Missing channels in {guild.name} - need both:")
+            print(f"    - {DEFAULTS['submissions_chan']}")
+            print(f"    - {DEFAULTS['gallery_chan']}")
 
+    print(f"\nBot fully initialized in {len(bot.channels)}/{len(bot.guilds)} servers")
+    print("Servers with proper setup:", ', '.join([str(gid) for gid in bot.channels.keys()]))
 @bot.command(name='setup')
 @commands.has_permissions(administrator=True)
 async def setup_Channel(ctx, cleanup_mins: int = DEFAULTS['cleanup_mins']):
@@ -220,12 +230,15 @@ async def on_message(message):
         if bot.submit_chan and message.channel != bot.submit_chan:
             return
         # Handle image submissions
-        if message.attachments and any(
-            att.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))
-            for att in message.attachments
+        if message.guild.id in bot.channels:
+            if message.channel == bot.channels[message.guild.id]['submit']:    
+            
+                if message.attachments and any(
+                att.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))
+                for att in message.attachments
         ):
-            print ("Bot recognises message in submit_chan")
-            await process_submission(message)
+                    print ("Bot recognises message in submit_chan")
+                    await process_submission(message)
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)    
 
