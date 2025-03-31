@@ -583,68 +583,67 @@ async def show_by_tag(ctx, *, tag_query: str = None):
         logging.error(f"Tag search error: {e}")
         await ctx.send("❌ Error searching by tags")
 @bot.command(name='del')
-async def delete_submission(ctx):
-    if not ctx.message.reference:
-        await ctx.send("❌ Please reply to a !show result")
-        return
-
+async def delete_submission(ctx, deletion_id: str = None):
+    """Delete a submission using its deletion ID"""
     try:
-        if not ctx.author.guild_permissions.manage_messages:
-            await ctx.send("❌ Permission denied")
+        # Check if command is in the correct submission channel
+        if ctx.guild.id not in bot.channels or 'submit' not in bot.channels[ctx.guild.id]:
+            await ctx.send("❌ Submission channel not configured for this server!")
+            return
+            
+        if ctx.channel != bot.channels[ctx.guild.id]['submit']:
+            submit_channel = bot.channels[ctx.guild.id]['submit']
+            await ctx.send(f"❌ Please use this command in {submit_channel.mention}")
             return
 
-        show_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-        
-        if show_message.author != bot.user or not show_message.embeds:
-            await ctx.send("❌ Invalid target message")
+        if not deletion_id:
+            await ctx.send("❌ Please provide a deletion ID\n"
+                         "Find it in the footer of the submission embed")
             return
 
-        # Extract hidden metadata from footer
-        footer_text = show_message.embeds[0].footer.text
-        if not footer_text.startswith("DELETION_ID:"):
-            await ctx.send("❌ Not a deletable submission")
-            return
-
-        _, message_id, guild_id = footer_text.split(":")
-        
-        if guild_id != str(ctx.guild.id):
-            await ctx.send("❌ Cross-server deletion not allowed")
-            return
-
-        # Database deletion
         async with mysql_storage.pool.acquire() as conn:
-            async with conn.cursor() as cursor:
+            async with conn.cursor(aiomysql.DictCursor) as cursor:
+                # Find the submission
                 await cursor.execute('''
-                    DELETE FROM miniatures 
-                    WHERE message_id = %s AND guild_id = %s
-                ''', (message_id, guild_id))
+                    SELECT * FROM miniatures
+                    WHERE guild_id = %s
+                    AND message_id = %s
+                    LIMIT 1
+                ''', (str(ctx.guild.id), deletion_id))
+                submission = await cursor.fetchone()
+
+                if not submission:
+                    await ctx.send("❌ No submission found with that ID")
+                    return
+
+                # Verify author or admin
+                if (str(ctx.author.id) != submission['author_id'] and not ctx.author.guild_permissions.administrator):
+                    await ctx.send("❌ You can only delete your own submissions!")
+                    return
+
+                # Delete from database
+                await cursor.execute('''
+                    DELETE FROM miniatures
+                    WHERE guild_id = %s
+                    AND message_id = %s
+                ''', (str(ctx.guild.id), deletion_id))
                 await conn.commit()
 
-        # Cleanup messages
-        try:
-            await ctx.channel.fetch_message(message_id).delete()
-        except:
-            pass
-            
-        await ctx.message.delete()
-        await show_message.delete()
-        await ctx.send("✅ Deleted", delete_after=2)
+        # Try to delete the original message
+                try:
+                    submit_channel = bot.channels[ctx.guild.id]['submit']
+                    msg = await submit_channel.fetch_message(deletion_id)
+                    await msg.delete()
+                except discord.NotFound:
+                    pass  # Message already deleted
+                except discord.Forbidden:
+                    pass  # No permissions to delete
+
+            await ctx.send(f"✅ Successfully deleted submission {deletion_id}")
 
     except Exception as e:
         logging.error(f"Delete error: {e}")
-        await ctx.send("❌ Deletion failed", delete_after=5)
-        
-
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('bot_debug.log'),
-        logging.StreamHandler()
-    ]
-)
-# to always keep the gallery channel empty
+        await ctx.send("❌ Error deleting submission")
 
 @bot.command()
 async def debug_pending(ctx):
