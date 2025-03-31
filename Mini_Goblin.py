@@ -13,13 +13,7 @@ from mysql.connector import Error
 # Remove: import sqlite3
 from mini_storage import mysql_storage
 
-connection = mysql.connector.connect(
-    host="gondola.proxy.rlwy.net",
-    user="root",
-    password="VFPUYdKKzWeFagKmSOPyINxNqFUnwIRt",
-    port=19512,
-    database="railway"
-)
+
 
 # Use the connection to execute queries
 cursor = connection.cursor()
