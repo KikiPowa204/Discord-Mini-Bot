@@ -570,29 +570,29 @@ async def show_miniature(ctx, *, search_query: str = None):
                                 LIMIT 5
                             ''', (str(ctx.guild.id),))
                     elif is_tag_search:
-                        tag = search_query.split(":", 1)[1] if ":" in search_query else ""
-                        await cursor.execute('''
-                            SELECT * FROM miniatures
-                            WHERE guild_id = %s
-                            AND tags LIKE %s
-                            ORDER BY RAND()
-                            LIMIT 5
-                        ''', (str(ctx.guild.id), f'%{tag}%'))
-                    else:
-                        search_term = search_query or ""
-                        await cursor.execute('''
-                            SELECT * FROM miniatures
-                            WHERE guild_id = %s
-                            AND (stl_name LIKE %s OR tags LIKE %s)
-                            ORDER BY RAND()
-                            LIMIT 5
-                        ''', (str(ctx.guild.id), f'%{search_term}%', f'%{search_term}%'))
-
-                    submissions = await cursor.fetchall()
-
-            if not submissions:
-                await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}")
-                return
+                        tag_input = search_query.split(":", 1)[1].strip()
+                        tags = [t.strip().lower() for t in tag_input.split(",") if t.strip()]
+                        
+                        async with conn.cursor() as cursor:
+                            # For MySQL/MariaDB
+                            await cursor.execute('''
+                                SELECT * FROM miniatures
+                                WHERE guild_id = %s
+                                AND (
+                                    -- Exact tag match (comma-separated)
+                                    FIND_IN_SET(%s, tags)
+                                    OR
+                                    -- Broad search (tags LIKE %%)
+                                    tags LIKE %s
+                                )
+                                ORDER BY RAND()
+                                LIMIT 5
+                            ''', (str(ctx.guild.id), tags[0], f'%{tags[0]}%'))
+                            submissions = await cursor.fetchall()
+                            
+                        if not submissions:
+                            await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}")
+                            return
 
             # New connection for gallery message updates
             async with mysql_storage.pool.acquire() as conn:
