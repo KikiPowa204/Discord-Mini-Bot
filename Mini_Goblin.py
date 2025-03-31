@@ -729,7 +729,7 @@ async def show_miniature(ctx, *, search_query: str = None):
         logging.error(f"Show error: {e}", exc_info=True)
         await ctx.send("❌ Error searching miniatures")
 
-@bot.command(name='amend')
+@bot.command(name='edit')
 async def amend_submission(ctx, *, args: str):
     """Edit a submission's metadata. Usage: Reply to a gallery post with: !amend STL:NewName Bundle:NewBundle Tags:new,tags"""
     try:
