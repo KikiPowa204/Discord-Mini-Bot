@@ -113,13 +113,6 @@ async def test_guild_info(ctx):
 async def test_dm(ctx):
     """Verify DM handling"""
     await ctx.send(f"In DMs: ID={await get_guild_id(ctx)}, Name={await get_guild_name(ctx)}")
-class SubmissionButtons(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=3600)  # 1 hour timeout
-    
-    @discord.ui.button(label="Add Tags", style=discord.ButtonStyle.blurple)
-    async def add_tags(self, interaction, button):
-        await interaction.response.send_modal(TaggingModal())
 
 async def get_db_connection():
     max_retries = 3
@@ -380,56 +373,7 @@ async def clear_pending_submission(
         logging.debug(f"Submission {submission_id} completed early")
     except Exception as e:
         logging.error(f"Failed to clear submission {submission_id}: {str(e)}")
-    
-@discord.ui.button(label="Add Tags", style=discord.ButtonStyle.blurple)
-async def add_tags(self, interaction, button):
-    await interaction.response.send_modal(TaggingModal())
-class TaggingModal(discord.ui.Modal):
-    def __init__(self):
-        super().__init__(title="Tag This Miniature")
-        self.add_item(discord.ui.TextInput(label="STL Name", placeholder="Lucian the Paladin", required=True))
-        self.add_item(discord.ui.TextInput(label="Bundle Name", placeholder="Fantasy Heroes Vol. 3", required=True))
-        self.add_item(discord.ui.TextInput(label="Tags (optional)", placeholder="NMM, OSL, freehand", required=False))
-    
-    async def on_submit(self, interaction):
-        submission = next(
-            (v for k,v in bot.pending_subs.items() 
-            if v['prompt_id'] == interaction.message.id),
-            None
-            )
-    
-        if not submission:
-            return await interaction.response.send_message("❌ Submission expired", ephemeral=True)
-    
-        try:
-            success = mysql_storage.store_submission(
-                guild_id=submission['guild_id'],
-                user_id=submission['user_id'],
-                message_id=submission['original_msg_id'],
-                image_url=submission['image_url'],
-                stl_name=self.children[0].value,  # From STL input
-                bundle_name=self.children[1].value,  # From Bundle input
-                tags=self.children[2].value  # From Tags input
-        )
-            await connection.commit()
-            logging.info(f"Stored submission: {submission['stl_name']}")
-            if success:
-                await interaction.response.send_message("✅ Saved to database!", ephemeral=True)
-            else:
-                await interaction.response.send_message("❌ Failed to save", ephemeral=True)
-            
-        except Exception as e:
-            logging.error(f"Storage failed: {e}")
-            await interaction.response.send_message("⚠️ Database error occurred", ephemeral=True)
-    
-    # Cleanup
-        try:
-            pass  # No action needed for message deletion
-            channel = bot.get_channel(submission['channel_id'])
-            if channel:
-                msg = await channel.fetch_message(submission['original_msg_id'])
-        except Exception as e:
-            logging.error(f"Cleanup error: {e}")
+
 @bot.command(name='store')
 async def store_miniature(ctx):
     """Store a miniature from a replied-to message with metadata"""
@@ -610,6 +554,62 @@ async def show_miniature(ctx, stl_name: str):
     except Exception as e:
         logging.error(f"Show error: {e}")
         await ctx.send("❌ Error searching miniatures")
+@bot.command(name='show tag')
+async def show_by_tag(ctx, *, tag_query: str = None):
+    """Show random miniatures matching tags
+    
+    Examples:
+    !show tag fantasy
+    !show tag fantasy,creature
+    !show tag       (shows completely random)
+    """
+    try:
+        async with ctx.typing():
+            async with mysql_storage.pool.acquire() as conn:
+                async with conn.cursor(aiomysql.DictCursor) as cursor:
+                    if tag_query:
+                        # Search by specific tags
+                        tags = [tag.strip() for tag in tag_query.split(",")]
+                        await cursor.execute('''
+                            SELECT * FROM miniatures
+                            WHERE guild_id = %s
+                            AND tags REGEXP %s
+                            ORDER BY RAND()
+                            LIMIT 5
+                        ''', (str(ctx.guild.id), "|".join(tags)))
+                    else:
+                        # Show completely random if no tag specified
+                        await cursor.execute('''
+                            SELECT * FROM miniatures
+                            WHERE guild_id = %s
+                            ORDER BY RAND()
+                            LIMIT 5
+                        ''', (str(ctx.guild.id),))
+
+                    submissions = await cursor.fetchall()
+
+            if not submissions:
+                await ctx.send(f"❌ No miniatures found{f' with tags: {tag_query}' if tag_query else ''}")
+                return
+
+            # Display each result as its own embed
+            for sub in submissions:
+                embed = discord.Embed(
+                    title=f"{sub['stl_name']}",
+                    description=f"From bundle: {sub['bundle_name'] or 'No bundle'}",
+                    color=discord.Color.blue()
+                )
+                embed.set_image(url=sub['image_url'])
+                
+                if sub['tags']:
+                    embed.add_field(name="Tags", value=sub['tags'], inline=False)
+                
+                embed.set_footer(text=f"ID: {sub['message_id']} | Found via tag search")
+                await ctx.send(embed=embed)
+
+    except Exception as e:
+        logging.error(f"Tag search error: {e}")
+        await ctx.send("❌ Error searching by tags")
 @bot.command(name='del')
 async def delete_submission(ctx):
     if not ctx.message.reference:

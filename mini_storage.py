@@ -181,28 +181,6 @@ class MySQLStorage:
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
-    async def get_submissions(self, guild_id: str, search_query: str = "", limit: int = 5):
-        """Retrieve submissions with search"""
-        try:
-            async with self.pool.acquire() as conn:
-                async with conn.cursor() as cursor:
-                    await cursor.execute('''
-                    SELECT m.*, g.guild_name 
-                    FROM miniatures m
-                    JOIN guilds g ON m.guild_id = g.guild_id
-                    WHERE m.guild_id = %s
-                    AND (m.stl_name LIKE %s OR m.bundle_name LIKE %s OR m.tags LIKE %s)
-                    LIMIT %s
-                ''', (
-                    str(guild_id),
-                    f'%{search_query}%',
-                    f'%{search_query}%',
-                    f'%{search_query}%',
-                    limit
-                ))
-                return cursor.fetchall()
-        except Error as e:
-            print(f"❌ Query failed: {e}")
             
 
 # Singleton instance
