@@ -617,7 +617,7 @@ async def store_miniature(ctx):
             if success:
                 # Add checkmark reaction to the command message
                 await ctx.message.add_reaction('✅')
-                
+                await original_msg.add_reaction('✅')
                 # Send confirmation (will auto-delete)
                 confirmation = await ctx.send(f"✅ Saved {metadata['stl_name']}!", delete_after=10)
                 
