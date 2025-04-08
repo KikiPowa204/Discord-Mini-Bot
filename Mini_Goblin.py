@@ -392,7 +392,6 @@ async def process_submission(submission: discord.Message):
                     pass  # Messages already deleted
                 
                 await submission.add_reaction('✅')
-                await prompt_msg.delete
                 return True
             else:
                 await submission.channel.send("❌ Failed to store submission", delete_after=15)
