@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import os
-import hashlib
 from datetime import datetime
 import logging
 import asyncio
@@ -14,18 +13,6 @@ from mysql.connector import Error
 from mini_storage import mysql_storage
 import aiomysql
 
-connection = mysql.connector.connect(
-    host="gondola.proxy.rlwy.net",
-    user="root",
-    password="VFPUYdKKzWeFagKmSOPyINxNqFUnwIRt",
-    port=19512,
-    database="railway"
-)
-
-# Use the connection to execute querie
-cursor = connection.cursor()
-cursor.execute("SELECT * FROM miniatures")
-result = cursor.fetchall()  # Close cursor after fetching data
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
 intents = discord.Intents.default()
