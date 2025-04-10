@@ -475,11 +475,14 @@ async def delete_submission(ctx):
                     return
                 
                 # Delete gallery post if exists
-                await cursor.execute('''
+                success = await cursor.execute('''
                     SELECT channel_id FROM miniatures 
                     WHERE message_id = %s AND guild_id = %s
                 ''', (message_id, guild_id))
                 
+                if success:
+                    await ctx.replied_message.delete()
+
                 if gallery_result := await cursor.fetchone():
                     gallery_msg_id = gallery_result[0]
                     if gallery_msg_id:
