@@ -428,160 +428,78 @@ async def process_submission(submission: discord.Message):
         await submission.channel.send("❌ Error processing submission", delete_after=15)
         return False
 
-async def validate_entry(ctx, deletion_id:str) -> bool:
-    """checks to make sure that bot caller has permissions"""
-    async with mysql_storage.pool.acquire() as conn:
-        async with conn.cursor as cursor:
-            if ctx.author.guild_permissions.manage_messages:
-                return True
-            await cursor.execute(
-                "SELECT user_id FROM miniatures WHERE id = %s",
-                (deletion_id)
-            )
-            result = await cursor.fetchone()
-            return result and result[0] == ctx.author.id
 @bot.command(name='del')
-async def delete_entry(ctx):
-    """Delete an entry by replying to its bot-posted message"""
-    if not ctx.message.reference:
-        return await ctx.send("❌ Please reply to the entry you want to delete", delete_after=10)
-    
+async def delete_submission(ctx):
+    """Delete a submission. Usage: Reply to a gallery post"""
     try:
-        # Fetch the referenced message
-        ref_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-        
-        # Only allow deletion of bot's messages
-        if ref_msg.author != bot.user:
-            return await ctx.send("❌ You can only delete entries posted by the bot", delete_after=10)
-        
-        # Extract the submission ID from the embed footer
-        if not ref_msg.embeds or not ref_msg.embeds[0].footer.text:
-            return await ctx.send("❌ No database entry found in this message", delete_after=10)
+        # Verify reply exists
+        if not ctx.message.reference:
+            await ctx.send("❌ Please reply to the gallery post you want to delete", delete_after=15)
+            return
             
-        embed = ref_msg.embeds[0]
-        match = re.search(r'DELETION_ID:(\d+)', embed.footer.text)
-        if not match:
-            return await ctx.send("❌ Couldn't find entry ID", delete_after=10)
+        # Get replied message
+        replied_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+        
+        # Extract deletion_id from embed footer
+        if not replied_msg.embeds:
+            await ctx.send("❌ Replied message is not a valid gallery post", delete_after=15)
+            return
             
-        submission_id = match.group(1)
-
+        embed = replied_msg.embeds[0]
+        if not embed.footer.text or "DELETION_ID:" not in embed.footer.text:
+            await ctx.send("❌ Could not find submission ID in this post", delete_after=15)
+            return
+            
+        # Parse DELETION_ID:message_id:guild_id
+        deletion_info = embed.footer.text.split('\n')[0]  # Get first line
+        _, message_id, guild_id = deletion_info.split(":")
+        
         # Verify permissions and delete
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                # First check permissions and get image_url
+                # Check permissions (owner or admin) and delete
                 await cursor.execute('''
-                    SELECT image_url FROM miniatures 
-                    WHERE id = %s AND (user_id = %s OR %s)
+                    DELETE FROM miniatures 
+                    WHERE message_id = %s 
+                    AND guild_id = %s
+                    AND (user_id = %s OR %s = TRUE)
                 ''', (
-                    submission_id,
-                    ctx.author.id,
+                    message_id,
+                    guild_id,
+                    str(ctx.author.id),
                     ctx.author.guild_permissions.manage_messages
                 ))
                 
-                result = await cursor.fetchone()
-                if not result:
-                    return await ctx.send("❌ You don't have permission to delete this", delete_after=10)
-                
-                image_url = result[0]
-                
-                # Then perform deletion
-                await cursor.execute(
-                    "DELETE FROM miniatures WHERE id = %s",
-                    (submission_id,)
-                )
-                await conn.commit()
-                
-                # Remove from gallery by image_url (more reliable than ID)
-                gallery_channel = bot.channels[ctx.guild.id]['gallery']
-                async for message in gallery_channel.history(limit=200):
-                    if message.embeds and message.embeds[0].image.url == image_url:
-                        await message.delete()
-                        break
-                
-                await ctx.send(f"✅ Deleted entry #{submission_id}", delete_after=10)
-                await ref_msg.delete()
-                
-    except Exception as e:
-        await ctx.send(f"❌ Error: {str(e)}", delete_after=10)
-
-@bot.command(name='amend')
-async def amend_submission(ctx, deletion_id: str,*,new_data: str):
-    try:
-        # Parse new_data (e.g., "STL:NewName Tags:new, tags")
-        metadata = {
-            'stl_name': None,
-            'bundle_name': None,
-            'tags': None
-        }
-        
-        # Split into lines and process
-        for line in new_data.split('\n'):
-            if ':' in line:
-                key, value = line.split(':', 1)
-                key = key.strip().lower()
-                value = value.strip()
-                if key == 'stl':
-                    metadata['stl_name'] = value
-                elif key == 'bundle':
-                    metadata['bundle_name'] = value
-                elif key == 'tags':
-                    metadata['tags'] = value
-        # Validate at least one field is being updated
-        if not any(metadata.values()):
-            await ctx.send("❌ Provide at least one field to update (STL:/Bundle:/Tags:)")
-            return
-
-        async with mysql_storage.pool.acquire() as conn:
-            async with conn.cursor() as cursor:
-                # Update only provided fields
-                await cursor.execute('''
-                    UPDATE miniatures
-                    SET
-                        stl_name = COALESCE(%s, stl_name),
-                        bundle_name = COALESCE(%s, bundle_name),
-                        tags = COALESCE(%s, tags)
-                    WHERE message_id = %s AND guild_id = %s
-                ''', (
-                    metadata['stl_name'],
-                    metadata['bundle_name'],
-                    metadata['tags'],
-                    deletion_id,
-                    str(ctx.guild.id)
-                ))
-                
                 if cursor.rowcount == 0:
-                    await ctx.send("❌ No submission found with that ID")
+                    await ctx.send("❌ Entry not found or no permission", delete_after=15)
                     return
-                    
+                
+                # Delete gallery post if exists
+                await cursor.execute('''
+                    SELECT channel_id FROM miniatures 
+                    WHERE message_id = %s AND guild_id = %s
+                ''', (message_id, guild_id))
+                
+                if gallery_result := await cursor.fetchone():
+                    gallery_msg_id = gallery_result[0]
+                    if gallery_msg_id:
+                        gallery_channel = bot.channels[ctx.guild.id]['gallery_chan']
+                        try:
+                            gallery_msg = await gallery_channel.fetch_message(int(gallery_msg_id))
+                            await gallery_msg.delete()
+                        except:
+                            pass  # Message already deleted or not found
+                
                 await conn.commit()
         
-        # Update gallery embed if exists
-    
-            # Update gallery embed
-        gallery_channel = bot.channels[ctx.guild.id]['gallery']
-        async for message in gallery_channel.history(limit=200):
-            if message.embeds and f"DELETION_ID:{ctx.message.id}" in message.embeds[0].footer.text:
-                embed = message.embeds[0]
-                new_embed = discord.Embed(
-                    title=f"STL: {metadata['stl_name'] or embed.title.split(':')[1].strip()}",
-                    description=f"Bundle: {metadata['bundle_name'] or embed.description.split(':')[1].strip()}",
-                    color=embed.color
-                )
-                new_embed.set_image(url=embed.image.url)
-                new_embed.set_footer(text=embed.footer.text)
-                await message.edit(embed=new_embed)
-                break
-                
-        await ctx.message.add_reaction('✏️')
+        # Clean up messages
+        await replied_msg.delete()
+        await ctx.message.add_reaction('🗑️')  # Trash can emoji
+        await ctx.message.delete(delay=2)
         
     except Exception as e:
-        logging.error(f"Amend error: {e}", exc_info=True)
+        logging.error(f"Delete error: {e}", exc_info=True)
         await ctx.message.add_reaction('❌')
-    except:
-        pass  # Skip if gallery update fails
-            
-        await ctx.message.add_reaction('✏️')  # Pencil emoji
-        
     
 @bot.command()
 async def ping(ctx):
