@@ -468,10 +468,10 @@ async def delete_entry(ctx):
         # Verify permissions and delete
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                # Check permissions and ownership
+                # First check permissions and get image_url
                 await cursor.execute('''
-                    DELETE FROM miniatures 
-                    WHERE id = %s AND (user_id = %s OR %s)
+                    SELECT image_url FROM miniatures 
+                    WHERE id = %s AND (submitter_id = %s OR %s)
                 ''', (
                     submission_id,
                     ctx.author.id,
@@ -482,12 +482,19 @@ async def delete_entry(ctx):
                 if not result:
                     return await ctx.send("❌ You don't have permission to delete this", delete_after=10)
                 
+                image_url = result[0]
+                
+                # Then perform deletion
+                await cursor.execute(
+                    "DELETE FROM miniatures WHERE id = %s",
+                    (submission_id,)
+                )
                 await conn.commit()
                 
-                # Remove from gallery
+                # Remove from gallery by image_url (more reliable than ID)
                 gallery_channel = bot.channels[ctx.guild.id]['gallery']
                 async for message in gallery_channel.history(limit=200):
-                    if message.embeds and f"DELETION_ID:{submission_id}" in message.embeds[0].footer.text:
+                    if message.embeds and message.embeds[0].image.url == image_url:
                         await message.delete()
                         break
                 
