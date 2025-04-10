@@ -472,7 +472,6 @@ async def delete_entry(ctx):
                 await cursor.execute('''
                     DELETE FROM miniatures 
                     WHERE id = %s AND (submitter_id = %s OR %s)
-                    RETURNING image_url
                 ''', (
                     submission_id,
                     ctx.author.id,
