@@ -463,12 +463,12 @@ async def delete_entry(ctx):
         
         # Simple ID extraction from embed footer or description
         if embed.footer.text:
-            match = re.search(r'ID: (\d+)', embed.footer.text)
+            match = re.search(r'DELETION_ID: (\d+)', embed.footer.text)
             if match:
                 submission_id = match.group(1)
         
         if not submission_id and embed.description:
-            match = re.search(r'ID: (\d+)', embed.description)
+            match = re.search(r'DELETION_ID: (\d+)', embed.description)
             if match:
                 submission_id = match.group(1)
         
