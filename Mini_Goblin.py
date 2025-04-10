@@ -7,12 +7,11 @@ import asyncio
 from typing import Optional
 from discord.ext.commands import Bot
 # Load environment variables first
-import mysql.connector
 from mysql.connector import Error
 # Remove: import sqlite3
 from mini_storage import mysql_storage
 import aiomysql
-import re
+import base64
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
 intents = discord.Intents.default()
@@ -288,7 +287,7 @@ async def get_help(ctx):
         value=(
             "Search for miniatures in the gallery channel. Examples:\n"
             "• `!show Dragon` - Finds dragon miniatures\n"
-            "• `!show collection:BundleName` - Shows bundle contents\n"
+            "• `!show Bundle: BundleName` - Shows bundle contents\n"
             "• `!show tags:fantasy` - Finds fantasy-tagged miniatures"
         ),
         inline=False
@@ -451,8 +450,9 @@ async def delete_submission(ctx):
             return
             
         # Parse DELETION_ID:message_id:guild_id
-        deletion_info = embed.footer.text.split('\n')[0]  # Get first line
-        _, message_id, guild_id = deletion_info.split(":")
+        encoded_id = embed.footer.text.split("DELETION_ID:")[1].split("\n")[0]
+        decoded_id = base64.b64decode(encoded_id).decode()
+        _,message_id, guild_id = decoded_id.split(":")
         
         # Verify permissions and delete
         async with mysql_storage.pool.acquire() as conn:
@@ -637,7 +637,7 @@ async def show_miniature(ctx, *, search_query: str = None):
         gallery_channel = bot.channels[ctx.guild.id]['gallery']
         
         # Determine search mode
-        is_collection_search = search_query and search_query.startswith("collection:")
+        is_collection_search = search_query and search_query.startswith("Bundle:")
         is_tag_search = search_query and search_query.startswith("tags:")
         
         async with ctx.typing():
@@ -704,7 +704,8 @@ async def show_miniature(ctx, *, search_query: str = None):
                             color=discord.Color.blue()
                         )
                         embed.set_image(url=sub['image_url'])
-                        embed.set_footer(text=f"DELETION_ID:{sub['message_id']}:{sub['guild_id']}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
+                        encoded_id = base64.b64encode(f"{sub['message_id']}:{sub['guild_id']}".encode()).decode()
+                        embed.set_footer(text=f"DELETION_ID:{encoded_id}:{sub['guild_id']}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
                         
                         msg = await gallery_channel.send(embed=embed)
                         
@@ -748,11 +749,9 @@ async def edit_submission(ctx):
             return
             
         embed = replied_msg.embeds[0]
-        if not embed.footer.text or "DELETION_ID:" not in embed.footer.text:
-            await ctx.send("❌ Could not find submission ID in this post", delete_after = 15)
-            return
-            
-        deletion_id = embed.footer.text.split("DELETION_ID:")[1].split(":")[0]
+        encoded_id = embed.footer.text.split("DELETION_ID:")[1].split("\n")[0]
+        decoded_id = base64.b64decode(encoded_id).decode()
+        deletion_id = decoded_id.split(":")
         
         # Parse metadata from command content (skip "!edit")
         args = ctx.message.content.strip()[5:].strip()
