@@ -427,6 +427,23 @@ async def process_submission(submission: discord.Message):
             del bot.pending_subs[submission_id]
         await submission.channel.send("❌ Error processing submission", delete_after=15)
         return False
+@bot.command(name='del')
+async def delete_entry(ctx, deletion_id:str):
+    if not ctx.message.reference:
+        return await ctx.send("Please reply to a database entry you wish removed.")
+    
+    try:
+        async with mysql_storage.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                # Update only provided fields
+                await cursor.execute("DELETE FROM miniatures WHERE id = %s", (deletion_id,))
+                conn.commit()
+                if cursor.rowcount == 0:
+                    return await ctx.send(f"❌ No entry found with ID {deletion_id}", delete_after=10)
+                return await ctx.send(f"✅ Deleted entry #{deletion_id}", delete_after=10)
+    except Exception as e:
+        return await ctx.send(f"❌ Database error: {str(e)}", delete_after=10)
+                
 
 @bot.command(name='amend')
 async def amend_submission(ctx, deletion_id: str,*,new_data: str):
