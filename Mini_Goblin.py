@@ -12,6 +12,8 @@ from mysql.connector import Error
 from mini_storage import mysql_storage
 import aiomysql
 import base64
+import re
+import binascii
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
 intents = discord.Intents.default()
@@ -452,7 +454,7 @@ async def delete_submission(ctx):
         # Parse DELETION_ID:message_id:guild_id
         encoded_id = embed.footer.text.split("DELETION_ID:")[1].split("\n")[0]
         decoded_id = base64.b64decode(encoded_id).decode()
-        _,message_id, guild_id = decoded_id.split(":")
+        message_id, guild_id = decoded_id.split(":")
         
         # Verify permissions and delete
         async with mysql_storage.pool.acquire() as conn:
@@ -728,38 +730,59 @@ async def show_miniature(ctx, *, search_query: str = None):
         logging.error(f"Show error: {e}", exc_info=True)
         await ctx.send("❌ Error searching miniatures")
 
+def fix_base64_padding(encoded_str):
+    """Ensure base64 string has correct padding"""
+    padding = len(encoded_str) % 4
+    if padding:
+        encoded_str += '=' * (4 - padding)
+    return encoded_str
+
 @bot.command(name='edit')
 async def edit_submission(ctx):
-    """Edit a submission's metadata. Usage: Reply to a gallery post and include:
-    !edit STL:NewName
-    !edit Bundle:NewBundle
-    !edit Tags:new,tags
-    Or combine them with line breaks"""
+    """Edit a submission's metadata"""
     try:
-        # Check if message has content after !edit
+        # Validate command format
         if not ctx.message.content.strip()[5:]:  # 5 = len("!edit")
-            await ctx.send("❌ Please include edit parameters (STL:/Bundle:/Tags:)",delete_after = 15)
+            await ctx.send("❌ Please include edit parameters (STL:/Bundle:/Tags:)", delete_after=15)
             return
 
-        # Verify reply exists
+        # Validate reply exists
         if not ctx.message.reference:
-            await ctx.send("❌ Please reply to the gallery post you want to edit", delete_after = 15)
+            await ctx.send("❌ Please reply to the gallery post you want to edit", delete_after=15)
             return
+
         # Get replied message
         replied_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
         
-        # Extract deletion_id from embed footer
-        if not replied_msg.embeds:
-            await ctx.send("❌ Replied message is not a valid gallery post", delete_after = 15)
+        # Extract and decode deletion ID
+        embed = replied_msg.embeds[0]
+        footer = embed.footer.text
+        
+        # More robust ID extraction
+        match = re.search(r'DELETION_ID:([^\s:]+)', footer)
+        if not match:
+            await ctx.send("❌ Could not find valid deletion ID", delete_after=15)
             return
             
-        embed = replied_msg.embeds[0]
-        encoded_id = embed.footer.text.split("DELETION_ID:")[1].split("\n")[0]
-        encoded_id = fix_base64_padding(encoded_id)
-        decoded_id = base64.b64decode(encoded_id).decode()
-        deletion_id = decoded_id.split(":")
+        encoded_id = match.group(1)
         
-        # Parse metadata from command content (skip "!edit")
+        try:
+            # Fix padding and decode
+            encoded_id = fix_base64_padding(encoded_id)
+            decoded_id = base64.b64decode(encoded_id).decode('utf-8')
+            
+            # Split into components (assuming format "message_id:guild_id")
+            deletion_parts = decoded_id.split(':')
+            if len(deletion_parts) != 2:
+                raise ValueError("Invalid ID format")
+                
+            message_id, guild_id = deletion_parts
+            
+        except (binascii.Error, ValueError) as e:
+            await ctx.send(f"❌ Invalid ID format: {str(e)}", delete_after=15)
+            return
+
+        # Parse edit parameters
         args = ctx.message.content.strip()[5:].strip()
         metadata = {
             'stl_name': None,
@@ -768,7 +791,6 @@ async def edit_submission(ctx):
         }
         
         for line in args.split('\n'):
-            line = line.strip()
             if ':' in line:
                 key, value = line.split(':', 1)
                 key = key.strip().lower()
@@ -782,29 +804,34 @@ async def edit_submission(ctx):
 
         # Validate at least one field is being updated
         if not any(metadata.values()):
-            await ctx.send("❌ Provide at least one field to update (STL:/Bundle:/Tags:)", delete_after = 15)
+            await ctx.send("❌ Provide at least one field to update (STL:/Bundle:/Tags:)", delete_after=15)
             return
 
         # Update database
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
+                # Verify permissions and update
                 await cursor.execute('''
                     UPDATE miniatures
                     SET
                         stl_name = COALESCE(%s, stl_name),
                         bundle_name = COALESCE(%s, bundle_name),
                         tags = COALESCE(%s, tags)
-                    WHERE message_id = %s AND guild_id = %s
+                    WHERE message_id = %s 
+                    AND guild_id = %s
+                    AND (user_id = %s OR %s)
                 ''', (
                     metadata['stl_name'],
                     metadata['bundle_name'],
                     metadata['tags'],
-                    deletion_id,
-                    str(ctx.guild.id)
+                    message_id,
+                    guild_id,
+                    str(ctx.author.id),
+                    ctx.author.guild_permissions.manage_messages
                 ))
                 
                 if cursor.rowcount == 0:
-                    await ctx.send("❌ Submission not found in database", delete_after = 10)
+                    await ctx.send("❌ Submission not found or no permission", delete_after=10)
                     return
                     
                 await conn.commit()
@@ -819,8 +846,9 @@ async def edit_submission(ctx):
         new_embed.set_footer(text=embed.footer.text)
         await replied_msg.edit(embed=new_embed)
         
-        await ctx.message.add_reaction('✏️')  # Pencil emoji
-        await ctx.message.delete()
+        await ctx.message.add_reaction('✏️')
+        await ctx.message.delete(delay=2)
+        
     except Exception as e:
         logging.error(f"Edit error: {e}", exc_info=True)
         await ctx.message.add_reaction('❌')
