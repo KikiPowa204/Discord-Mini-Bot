@@ -12,7 +12,7 @@ from mysql.connector import Error
 # Remove: import sqlite3
 from mini_storage import mysql_storage
 import aiomysql
-
+import re
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
 intents = discord.Intents.default()
@@ -427,33 +427,82 @@ async def process_submission(submission: discord.Message):
             del bot.pending_subs[submission_id]
         await submission.channel.send("❌ Error processing submission", delete_after=15)
         return False
+
+async def validate_entry(ctx, deletion_id:str) -> bool:
+    """checks to make sure that bot caller has permissions"""
+    async with mysql_storage.pool.acquire() as conn:
+        async with conn.cursor as cursor:
+            if ctx.author.guild_permissions.manage_messages:
+                return True
+            await cursor.execute(
+                "SELECT user_id FROM miniatures WHERE id = %s",
+                (deletion_id)
+            )
+            result = await cursor.fetchone()
+            return result and result[0] == ctx.author.id
 @bot.command(name='del')
-async def delete_entry(ctx, deletion_id:str):
+async def delete_entry(ctx):
+    """Delete an entry by replying to its bot-posted message"""
     if not ctx.message.reference:
-        return await ctx.send("Please reply to a database entry you wish removed.")
-    if not (ctx.message.author == ctx.author or ctx.author.guild_permissions.manage_messages):
-        return await ctx.send("❌ You need Manage Messages permissions or must be the entry owner to delete.", delete_after=10)
+        return await ctx.send("❌ Please reply to the entry you want to delete", delete_after=10)
+    
     try:
+        # Fetch the referenced message
+        ref_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+        
+        # Only allow deletion of bot's messages
+        if ref_msg.author != bot.user:
+            return await ctx.send("❌ You can only delete entries posted by the bot", delete_after=10)
+        
+        # Extract the submission ID from the embed
+        if not ref_msg.embeds:
+            return await ctx.send("❌ No database entry found in this message", delete_after=10)
+            
+        embed = ref_msg.embeds[0]
+        submission_id = None
+        
+        # Simple ID extraction from embed footer or description
+        if embed.footer.text:
+            match = re.search(r'ID: (\d+)', embed.footer.text)
+            if match:
+                submission_id = match.group(1)
+        
+        if not submission_id and embed.description:
+            match = re.search(r'ID: (\d+)', embed.description)
+            if match:
+                submission_id = match.group(1)
+        
+        if not submission_id:
+            return await ctx.send("❌ Couldn't find entry ID", delete_after=10)
+
+        # Verify permissions
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                # Update only provided fields
-                if not ctx.author.guild_permissions.manage_messages:
-                    await cursor.execute(
-                        "SELECT user_id FROM miniatures WHERE id = %s",
-                        (deletion_id,)
-                    )
-                    result = await cursor.fetchone()
-                    if not result or result[0] != ctx.author.id:
-                        return await ctx.send("❌ You can only delete your own entries.", delete_after=10)
+                # Check if user is submitter OR has manage_messages
+                await cursor.execute('''
+                    SELECT 1 FROM miniatures 
+                    WHERE id = %s AND (submitter_id = %s OR %s)
+                ''', (
+                    submission_id,
+                    ctx.author.id,
+                    ctx.author.guild_permissions.manage_messages
+                ))
                 
-                await cursor.execute("DELETE FROM miniatures WHERE id = %s", (deletion_id,))
-                conn.commit()
-                if cursor.rowcount == 0:
-                    return await ctx.send(f"❌ No entry found with ID {deletion_id}", delete_after=10)
-                return await ctx.send(f"✅ Deleted entry #{deletion_id}", delete_after=10)
+                if not await cursor.fetchone():
+                    return await ctx.send("❌ You don't own this entry", delete_after=10)
+                
+                # Perform deletion
+                await cursor.execute(
+                    "DELETE FROM miniatures WHERE id = %s",
+                    (submission_id,)
+                )
+                await conn.commit()
+                
+                await ctx.send(f"✅ Deleted entry #{submission_id}", delete_after=10)
+                await ref_msg.delete()
+                
     except Exception as e:
-        return await ctx.send(f"❌ Database error: {str(e)}", delete_after=10)
-                
+        await ctx.send(f"❌ Error: {str(e)}", delete_after=10)
 
 @bot.command(name='amend')
 async def amend_submission(ctx, deletion_id: str,*,new_data: str):
