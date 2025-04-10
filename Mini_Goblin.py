@@ -504,7 +504,7 @@ async def delete_submission(ctx):
                 if gallery_result := await cursor.fetchone():
                     gallery_msg_id = gallery_result[0]
                     if gallery_msg_id:
-                        gallery_channel = bot.channels[ctx.guild.id]['gallery_chan']
+                        gallery_channel = bot.channels[ctx.guild.id]['gallery']
                         try:
                             gallery_msg = await gallery_channel.fetch_message(int(gallery_msg_id))
                             await gallery_msg.delete()
