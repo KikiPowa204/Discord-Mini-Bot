@@ -471,7 +471,7 @@ async def delete_entry(ctx):
                 # Check permissions and ownership
                 await cursor.execute('''
                     DELETE FROM miniatures 
-                    WHERE id = %s AND (submitter_id = %s OR %s)
+                    WHERE id = %s AND (user_id = %s OR %s)
                 ''', (
                     submission_id,
                     ctx.author.id,
