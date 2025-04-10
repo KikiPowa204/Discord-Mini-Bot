@@ -625,6 +625,10 @@ async def store_miniature(ctx):
     except Exception as e:
         logging.error(f"Store error: {e}")
         await ctx.send("❌ An error occurred - check your format and try again")
+
+def fix_base64_padding(encoded_str):
+    return encoded_str + "=" * ((4 - len(encoded_str) % 4) % 4)
+
 @bot.command(name='show')
 async def show_miniature(ctx, *, search_query: str = None):
     """Display 5 random miniatures in gallery channel"""
@@ -705,6 +709,7 @@ async def show_miniature(ctx, *, search_query: str = None):
                         )
                         embed.set_image(url=sub['image_url'])
                         encoded_id = base64.b64encode(f"{sub['message_id']}:{sub['guild_id']}".encode()).decode()
+                        encoded_id = fix_base64_padding(encoded_id)
                         embed.set_footer(text=f"DELETION_ID:{encoded_id}:{sub['guild_id']}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
                         
                         msg = await gallery_channel.send(embed=embed)
@@ -750,6 +755,7 @@ async def edit_submission(ctx):
             
         embed = replied_msg.embeds[0]
         encoded_id = embed.footer.text.split("DELETION_ID:")[1].split("\n")[0]
+        encoded_id = fix_base64_padding(encoded_id)
         decoded_id = base64.b64decode(encoded_id).decode()
         deletion_id = decoded_id.split(":")
         
