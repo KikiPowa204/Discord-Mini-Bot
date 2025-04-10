@@ -471,7 +471,7 @@ async def delete_entry(ctx):
                 # First check permissions and get image_url
                 await cursor.execute('''
                     SELECT image_url FROM miniatures 
-                    WHERE id = %s AND (submitter_id = %s OR %s)
+                    WHERE id = %s AND (user_id = %s OR %s)
                 ''', (
                     submission_id,
                     ctx.author.id,
