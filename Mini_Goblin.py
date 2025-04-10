@@ -446,26 +446,29 @@ async def delete_submission(ctx):
             await ctx.send("❌ Replied message is not a valid gallery post", delete_after=15)
             return
             
+        # Extract and decode deletion ID
         embed = replied_msg.embeds[0]
         footer = embed.footer.text
         
-        # Extract and decode the deletion ID
-        if "DELETION_ID:" not in footer:
-            await ctx.send("❌ Could not find submission ID in this post", delete_after=15)
+        # More robust ID extraction
+        match = re.search(r'DELETION_ID:([^\s:]+)', footer)
+        if not match:
+            await ctx.send("❌ Could not find valid deletion ID", delete_after=15)
             return
             
+        encoded_id = match.group(1)
+        
         try:
-            # Get the encoded part between DELETION_ID: and the first newline
-            encoded_id = footer.split("DELETION_ID:")[1].split("\n")[0].strip()
-            
-            # Add padding if needed (base64 requires length to be multiple of 4)
-            padding = len(encoded_id) % 4
-            if padding:
-                encoded_id += '=' * (4 - padding)
-                
-            # Decode the ID
+            # Fix padding and decode
+            encoded_id = fix_base64_padding(encoded_id)
             decoded_id = base64.b64decode(encoded_id).decode('utf-8')
-            message_id, guild_id = decoded_id.split(":")
+            
+            # Split into components (assuming format "message_id:guild_id")
+            deletion_parts = decoded_id.split(':')
+            if len(deletion_parts) != 2:
+                raise ValueError("Invalid ID format")
+                
+            message_id, guild_id = deletion_parts
             
         except (binascii.Error, ValueError) as e:
             await ctx.send(f"❌ Invalid ID format: {str(e)}", delete_after=15)
