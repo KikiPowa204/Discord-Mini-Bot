@@ -493,6 +493,7 @@ async def delete_submission(ctx):
                 result = await cursor.fetchone()
                 if not result:
                     await ctx.send("❌ Entry not found or no permission", delete_after=15)
+                    await replied_msg.delete()
                     return
                 
                 # Delete gallery post if exists
@@ -728,7 +729,7 @@ async def show_miniature(ctx, *, search_query: str = None):
                         embed.set_image(url=sub['image_url'])
                         encoded_id = base64.b64encode(f"{sub['message_id']}:{sub['guild_id']}".encode()).decode()
                         encoded_id = fix_base64_padding(encoded_id)
-                        embed.set_footer(text=f"DELETION_ID:{encoded_id}:{sub['guild_id']}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
+                        embed.set_footer(text=f"DELETION_ID:{encoded_id}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
                         
                         msg = await gallery_channel.send(embed=embed)
                         
