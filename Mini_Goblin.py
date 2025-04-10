@@ -431,11 +431,21 @@ async def process_submission(submission: discord.Message):
 async def delete_entry(ctx, deletion_id:str):
     if not ctx.message.reference:
         return await ctx.send("Please reply to a database entry you wish removed.")
-    
+    if not (ctx.message.author == ctx.author or ctx.author.guild_permissions.manage_messages):
+        return await ctx.send("❌ You need Manage Messages permissions or must be the entry owner to delete.", delete_after=10)
     try:
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 # Update only provided fields
+                if not ctx.author.guild_permissions.manage_messages:
+                    await cursor.execute(
+                        "SELECT user_id FROM miniatures WHERE id = %s",
+                        (deletion_id,)
+                    )
+                    result = await cursor.fetchone()
+                    if not result or result[0] != ctx.author.id:
+                        return await ctx.send("❌ You can only delete your own entries.", delete_after=10)
+                
                 await cursor.execute("DELETE FROM miniatures WHERE id = %s", (deletion_id,))
                 conn.commit()
                 if cursor.rowcount == 0:
