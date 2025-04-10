@@ -431,7 +431,7 @@ async def process_submission(submission: discord.Message):
 
 @bot.command(name='del')
 async def delete_submission(ctx):
-    """Delete a submission. Usage: Reply to a gallery post"""
+    """Delete a submission by replying to its gallery post"""
     try:
         # Verify reply exists
         if not ctx.message.reference:
@@ -441,30 +441,45 @@ async def delete_submission(ctx):
         # Get replied message
         replied_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
         
-        # Extract deletion_id from embed footer
-        if not replied_msg.embeds:
+        # Extract and validate embed
+        if not replied_msg.embeds or not replied_msg.embeds[0].footer:
             await ctx.send("❌ Replied message is not a valid gallery post", delete_after=15)
             return
             
         embed = replied_msg.embeds[0]
-        if not embed.footer.text or "DELETION_ID:" not in embed.footer.text:
+        footer = embed.footer.text
+        
+        # Extract and decode the deletion ID
+        if "DELETION_ID:" not in footer:
             await ctx.send("❌ Could not find submission ID in this post", delete_after=15)
             return
             
-        # Parse DELETION_ID:message_id:guild_id
-        encoded_id = embed.footer.text.split("DELETION_ID:")[1].split("\n")[0]
-        decoded_id = base64.b64decode(encoded_id).decode()
-        message_id, guild_id = decoded_id.split(":")
-        
+        try:
+            # Get the encoded part between DELETION_ID: and the first newline
+            encoded_id = footer.split("DELETION_ID:")[1].split("\n")[0].strip()
+            
+            # Add padding if needed (base64 requires length to be multiple of 4)
+            padding = len(encoded_id) % 4
+            if padding:
+                encoded_id += '=' * (4 - padding)
+                
+            # Decode the ID
+            decoded_id = base64.b64decode(encoded_id).decode('utf-8')
+            message_id, guild_id = decoded_id.split(":")
+            
+        except (binascii.Error, ValueError) as e:
+            await ctx.send(f"❌ Invalid ID format: {str(e)}", delete_after=15)
+            return
+            
         # Verify permissions and delete
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                # Check permissions (owner or admin) and delete
+                # First check permissions and get gallery message ID
                 await cursor.execute('''
-                    DELETE FROM miniatures 
+                    SELECT gallery_message_id FROM miniatures 
                     WHERE message_id = %s 
                     AND guild_id = %s
-                    AND (user_id = %s OR %s = TRUE)
+                    AND (user_id = %s OR %s)
                 ''', (
                     message_id,
                     guild_id,
@@ -472,30 +487,30 @@ async def delete_submission(ctx):
                     ctx.author.guild_permissions.manage_messages
                 ))
                 
-                if cursor.rowcount == 0:
+                result = await cursor.fetchone()
+                if not result:
                     await ctx.send("❌ Entry not found or no permission", delete_after=15)
                     return
+                    
+                gallery_msg_id = result[0]
                 
-                # Delete gallery post if exists
-                success = await cursor.execute('''
-                    SELECT channel_id FROM miniatures 
-                    WHERE message_id = %s AND guild_id = %s
+                # Perform deletion
+                await cursor.execute('''
+                    DELETE FROM miniatures 
+                    WHERE message_id = %s 
+                    AND guild_id = %s
                 ''', (message_id, guild_id))
                 
-                if success:
-                    await ctx.replied_message.delete()
-
-                if gallery_result := await cursor.fetchone():
-                    gallery_msg_id = gallery_result[0]
-                    if gallery_msg_id:
-                        gallery_channel = bot.channels[ctx.guild.id]['gallery_chan']
-                        try:
-                            gallery_msg = await gallery_channel.fetch_message(int(gallery_msg_id))
-                            await gallery_msg.delete()
-                        except:
-                            pass  # Message already deleted or not found
-                
                 await conn.commit()
+                
+                # Delete gallery post if exists
+                if gallery_msg_id:
+                    try:
+                        gallery_channel = bot.get_channel(ctx.guild.id)  # Adjust to your gallery channel ID
+                        gallery_msg = await gallery_channel.fetch_message(int(gallery_msg_id))
+                        await gallery_msg.delete()
+                    except:
+                        pass  # Message already deleted or not found
         
         # Clean up messages
         await replied_msg.delete()
@@ -503,7 +518,7 @@ async def delete_submission(ctx):
         await ctx.message.delete(delay=2)
         
     except Exception as e:
-        logging.error(f"Delete error: {e}", exc_info=True)
+        logging.error(f"Delete error: {str(e)}", exc_info=True)
         await ctx.message.add_reaction('❌')
     
 @bot.command()
