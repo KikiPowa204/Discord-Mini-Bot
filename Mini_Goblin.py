@@ -454,49 +454,43 @@ async def delete_entry(ctx):
         if ref_msg.author != bot.user:
             return await ctx.send("❌ You can only delete entries posted by the bot", delete_after=10)
         
-        # Extract the submission ID from the embed
-        if not ref_msg.embeds:
+        # Extract the submission ID from the embed footer
+        if not ref_msg.embeds or not ref_msg.embeds[0].footer.text:
             return await ctx.send("❌ No database entry found in this message", delete_after=10)
             
         embed = ref_msg.embeds[0]
-        submission_id = None
-        
-        # Simple ID extraction from embed footer or description
-        if embed.footer.text:
-            match = re.search(r'DELETION_ID: (\d+)', embed.footer.text)
-            if match:
-                submission_id = match.group(1)
-        
-        if not submission_id and embed.description:
-            match = re.search(r'DELETION_ID: (\d+)', embed.description)
-            if match:
-                submission_id = match.group(1)
-        
-        if not submission_id:
+        match = re.search(r'DELETION_ID:(\d+)', embed.footer.text)
+        if not match:
             return await ctx.send("❌ Couldn't find entry ID", delete_after=10)
+            
+        submission_id = match.group(1)
 
-        # Verify permissions
+        # Verify permissions and delete
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                # Check if user is submitter OR has manage_messages
+                # Check permissions and ownership
                 await cursor.execute('''
-                    SELECT 1 FROM miniatures 
+                    DELETE FROM miniatures 
                     WHERE id = %s AND (submitter_id = %s OR %s)
+                    RETURNING image_url
                 ''', (
                     submission_id,
                     ctx.author.id,
                     ctx.author.guild_permissions.manage_messages
                 ))
                 
-                if not await cursor.fetchone():
-                    return await ctx.send("❌ You don't own this entry", delete_after=10)
+                result = await cursor.fetchone()
+                if not result:
+                    return await ctx.send("❌ You don't have permission to delete this", delete_after=10)
                 
-                # Perform deletion
-                await cursor.execute(
-                    "DELETE FROM miniatures WHERE id = %s",
-                    (submission_id,)
-                )
                 await conn.commit()
+                
+                # Remove from gallery
+                gallery_channel = bot.channels[ctx.guild.id]['gallery']
+                async for message in gallery_channel.history(limit=200):
+                    if message.embeds and f"DELETION_ID:{submission_id}" in message.embeds[0].footer.text:
+                        await message.delete()
+                        break
                 
                 await ctx.send(f"✅ Deleted entry #{submission_id}", delete_after=10)
                 await ref_msg.delete()
