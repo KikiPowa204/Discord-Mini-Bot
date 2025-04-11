@@ -30,15 +30,6 @@ DEFAULTS = {
     'gallery_chan': 'miniature-gallery'
 }
 
-# In your database configuration (e.g., config.py or main bot file)
-DB_CONFIG = {
-    'host': 'your_mysql_host',  # Replace with actual host
-    'user': 'your_username',
-    'password': 'your_password',
-    'db': 'your_database_name',
-    'port': 3306  # Default MySQL port
-}
-
 # Runtime storage
 intents=discord.Intents.all()
 intents.message_content = True
