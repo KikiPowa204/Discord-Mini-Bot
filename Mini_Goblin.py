@@ -473,23 +473,24 @@ async def delete_submission(ctx):
                     await ctx.message.delete()
                     return
                 
+                gallery_msg_id= result['gallery_message_id']
+
+                if gallery_msg_id:
+                    try:
+                        gallery_channel = bot.channels[ctx.guild.id]['gallery']
+                        gallery_msg = await gallery_channel.fetch_message(int(gallery_msg_id))
+                        await gallery_msg.delete()
+                    except discord.NotFound:
+                        pass  # Message already deleted
+                    except discord.Forbidden:
+                        await ctx.send("❌ Bot lacks permissions to delete gallery message", delete_after=15)
+                        return
+
                 # Delete gallery post if exists
                 await cursor.execute('''
-                    SELECT channel_id FROM miniatures 
+                    DELETE FROM miniatures 
                     WHERE message_id = %s AND guild_id = %s
                 ''', (message_id, guild_id))
-                
-                if gallery_result := await cursor.fetchone():
-                    gallery_msg_id = gallery_result[0]
-                    if gallery_msg_id:
-                        gallery_channel = bot.channels[ctx.guild.id]['gallery']
-                        try:
-                            gallery_msg = await gallery_channel.fetch_message(int(gallery_msg_id))
-                            await gallery_msg.delete()
-                        except:
-                            pass  # Message already deleted or not found
-                else:
-                    raise
                 await conn.commit()
         
         # Clean up messages
