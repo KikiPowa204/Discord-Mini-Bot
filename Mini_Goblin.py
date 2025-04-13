@@ -14,6 +14,7 @@ import aiomysql
 import base64
 import re
 import binascii
+
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
 intents = discord.Intents.default()
@@ -436,6 +437,7 @@ async def delete_submission(ctx):
         # Verify reply exists
         if not ctx.message.reference:
             await ctx.send("❌ Please reply to the gallery post you want to delete", delete_after=15)
+            await ctx.message.delete()
             return
             
         # Get replied message
@@ -444,6 +446,7 @@ async def delete_submission(ctx):
         # Extract and validate embed
         if not replied_msg.embeds or not replied_msg.embeds[0].footer:
             await ctx.send("❌ Replied message is not a valid gallery post", delete_after=15)
+            await ctx.message.delete()
             return
             
         # Extract and decode deletion ID
@@ -454,6 +457,7 @@ async def delete_submission(ctx):
         match = re.search(r'DELETION_ID:([^\s:]+)', footer)
         if not match:
             await ctx.send("❌ Could not find valid deletion ID", delete_after=15)
+            await ctx.message.delete()
             return
             
         encoded_id = match.group(1)
@@ -472,6 +476,7 @@ async def delete_submission(ctx):
             
         except (binascii.Error, ValueError) as e:
             await ctx.send(f"❌ Invalid ID format: {str(e)}", delete_after=15)
+            await ctx.message.delete()
             return
             
         # Verify permissions and delete
@@ -522,6 +527,7 @@ async def delete_submission(ctx):
     except Exception as e:
         logging.error(f"Delete error: {str(e)}", exc_info=True)
         await ctx.message.add_reaction('❌')
+        await ctx.message.delete()
     
 @bot.command()
 async def ping(ctx):
@@ -533,33 +539,13 @@ async def clear_pending_submission(submission_id, timeout):
         del bot.pending_subs[submission_id]
         logging.info(f"Cleared timed out submission {submission_id}")
 
-async def clear_pending_submission(
-    submission_id: str, 
-    timeout: float,
-    bot_instance: Optional[Bot] = None
-) -> None:
-    """Safely clear submission after timeout with cancellation support."""
-    try:
-        await asyncio.sleep(timeout)
-        
-        if not hasattr(bot_instance, 'pending_subs'):
-            logging.warning("No pending_subs dictionary found")
-            return
-
-        if submission_id in bot_instance.pending_subs:
-            del bot_instance.pending_subs[submission_id]
-            logging.info(f"Cleared submission {submission_id}")
-            
-    except asyncio.CancelledError:
-        logging.debug(f"Submission {submission_id} completed early")
-    except Exception as e:
-        logging.error(f"Failed to clear submission {submission_id}: {str(e)}")
 @bot.command(name='store')
 async def store_miniature(ctx):
     """Store a miniature from a replied-to message with metadata"""
     # Check if message is a reply
     if not ctx.message.reference:
-        await ctx.send("❌ Please reply to an image message first")
+        await ctx.send("❌ Please reply to an image message first", delete_after=10)
+        await ctx.message.delete()
         return
 
     try:
@@ -568,7 +554,8 @@ async def store_miniature(ctx):
         
         # Verify image exists
         if not original_msg.attachments:
-            await ctx.send("❌ Replied message has no image attachment")
+            await ctx.send("❌ Replied message has no image attachment", delete_after=10)
+            await ctx.message.delete()
             return
 
         # Parse command content
@@ -716,6 +703,7 @@ async def show_miniature(ctx, *, search_query: str = None):
 
                     submissions = await cursor.fetchall()
                     if not submissions:
+                        await ctx.message.delete()
                         await ctx.send(f"❌ No miniatures found{f' matching: {search_query}' if search_query else ''}", delete_after = 10)
                         return
 
@@ -746,6 +734,7 @@ async def show_miniature(ctx, *, search_query: str = None):
     except Exception as e:
         logging.error(f"Show error: {e}", exc_info=True)
         await ctx.send("❌ Error searching miniatures")
+        await ctx.message.delete()
 
 def fix_base64_padding(encoded_str):
     """Ensure base64 string has correct padding"""
@@ -761,11 +750,13 @@ async def edit_submission(ctx):
         # Validate command format
         if not ctx.message.content.strip()[5:]:  # 5 = len("!edit")
             await ctx.send("❌ Please include edit parameters (STL:/Bundle:/Tags:)", delete_after=15)
+            await ctx.message.delete()
             return
 
         # Validate reply exists
         if not ctx.message.reference:
             await ctx.send("❌ Please reply to the gallery post you want to edit", delete_after=15)
+            await ctx.message.delete()
             return
 
         # Get replied message
@@ -779,6 +770,7 @@ async def edit_submission(ctx):
         match = re.search(r'DELETION_ID:([^\s:]+)', footer)
         if not match:
             await ctx.send("❌ Could not find valid deletion ID", delete_after=15)
+            await ctx.message.delete()
             return
             
         encoded_id = match.group(1)
@@ -797,6 +789,7 @@ async def edit_submission(ctx):
             
         except (binascii.Error, ValueError) as e:
             await ctx.send(f"❌ Invalid ID format: {str(e)}", delete_after=15)
+            await ctx.message.delete()
             return
 
         # Parse edit parameters
@@ -822,6 +815,7 @@ async def edit_submission(ctx):
         # Validate at least one field is being updated
         if not any(metadata.values()):
             await ctx.send("❌ Provide at least one field to update (STL:/Bundle:/Tags:)", delete_after=15)
+            await ctx.message.delete()
             return
 
         # Update database
@@ -849,6 +843,7 @@ async def edit_submission(ctx):
                 
                 if cursor.rowcount == 0:
                     await ctx.send("❌ Submission not found or no permission", delete_after=10)
+                    await ctx.message.delete()
                     return
                     
                 await conn.commit()
