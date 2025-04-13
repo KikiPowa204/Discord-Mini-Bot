@@ -488,7 +488,8 @@ async def delete_submission(ctx):
                             await gallery_msg.delete()
                         except:
                             pass  # Message already deleted or not found
-                
+                else:
+                    raise
                 await conn.commit()
         
         # Clean up messages
