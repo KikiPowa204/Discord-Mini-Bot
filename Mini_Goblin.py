@@ -94,25 +94,6 @@ async def test_dm(ctx):
     """Verify DM handling"""
     await ctx.send(f"In DMs: ID={await get_guild_id(ctx)}, Name={await get_guild_name(ctx)}")
 
-async def get_db_connection():
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            conn = await aiomysql.connect(
-                host=DB_CONFIG['host'],
-                port=DB_CONFIG['port'],
-                user=DB_CONFIG['user'],
-                password=DB_CONFIG['password'],
-                db=DB_CONFIG['db'],
-                cursorclass=aiomysql.DictCursor
-            )
-            return conn
-        except Exception as e:
-            logging.error(f"Connection attempt {attempt + 1} failed: {e}")
-            if attempt == max_retries - 1:
-                raise
-            await asyncio.sleep(1)
-
 @bot.event
 async def on_ready():
     # Initialize storage
