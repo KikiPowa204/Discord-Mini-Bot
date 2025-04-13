@@ -470,7 +470,7 @@ async def delete_submission(ctx):
                 result = await cursor.fetchone()
                 if not result:
                     await ctx.send("❌ Entry not found or no permission", delete_after=15)
-                    await replied_msg.delete()
+                    await ctx.message.delete()
                     return
                 
                 # Delete gallery post if exists
