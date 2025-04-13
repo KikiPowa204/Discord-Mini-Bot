@@ -692,15 +692,7 @@ async def show_miniature(ctx, *, search_query: str = None):
                         encoded_id = fix_base64_padding(encoded_id)
                         embed.set_footer(text=f"DELETION_ID:{encoded_id}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
                         
-                        msg = await gallery_channel.send(embed=embed)
                         
-                        # Update gallery_message_id in database
-                        await cursor.execute('''
-                            UPDATE miniatures
-                            SET gallery_message_id = %s
-                            WHERE message_id = %s AND guild_id = %s
-                        ''', (str(msg.id), sub['message_id'], str(ctx.guild.id)))
-                    
                     await conn.commit()
                     await ctx.send(f"✅ Displayed {len(submissions)} results in {gallery_channel.mention}",delete_after = 10)
                     await ctx.message.delete(delay=5)  # Delete command message after 5 seconds
