@@ -495,16 +495,16 @@ async def delete_submission(ctx):
                 ''', (message_id, guild_id))
                 
                 await conn.commit()        
-        # Clean up messages
-        await replied_msg.delete()
-        await ctx.message.add_reaction('🗑️')  # Trash can emoji
-        await ctx.message.delete(delay=2)
+
         
     except Exception as e:
         logging.error(f"Delete error: {str(e)}", exc_info=True)
         await ctx.message.add_reaction('❌')
         await ctx.message.delete()
-    
+        # Clean up messages
+    await replied_msg.delete()
+    await ctx.message.add_reaction('🗑️')  # Trash can emoji
+    await ctx.message.delete(delay=2)    
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong!")
