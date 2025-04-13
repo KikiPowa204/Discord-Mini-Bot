@@ -499,12 +499,30 @@ async def delete_submission(ctx):
         
     except Exception as e:
         logging.error(f"Delete error: {str(e)}", exc_info=True)
+    try:
         await ctx.message.add_reaction('❌')
-        await ctx.message.delete()
-        # Clean up messages
-    await replied_msg.delete()
-    await ctx.message.add_reaction('🗑️')  # Trash can emoji
-    await ctx.message.delete(delay=2)    
+        # DON'T delete here - let unified cleanup handle it
+    except:
+        pass
+
+# Unified cleanup (runs whether success or error)
+    try:
+        if 'replied_msg' in locals() and replied_msg:  # Safer existence check
+            await replied_msg.delete()
+    except discord.NotFound:
+        pass
+
+    try:
+    # Only add reaction if we didn't already add ❌
+        if not isinstance(e, Exception):  # Only on success
+            await ctx.message.add_reaction('🗑️')
+    except:
+        pass
+
+    try:
+        await ctx.message.delete(delay=2)
+    except discord.NotFound:
+        pass
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong!")
