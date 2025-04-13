@@ -450,49 +450,51 @@ async def delete_submission(ctx):
             await ctx.send(f"❌ Invalid ID format: {str(e)}", delete_after=15)
             await ctx.message.delete()
             return
-            
         # Verify permissions and delete
         async with mysql_storage.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                # First check permissions and get gallery message ID
+                # Just verify permission and existence - we already have the IDs we need
                 await cursor.execute('''
-                    SELECT gallery_message_id FROM miniatures 
+                    SELECT 1 FROM miniatures 
                     WHERE message_id = %s 
                     AND guild_id = %s
                     AND (user_id = %s OR %s)
                 ''', (
-                    message_id,
-                    guild_id,
+                    message_id,  # From earlier extraction
+                    guild_id,   # From earlier extraction
                     str(ctx.author.id),
                     ctx.author.guild_permissions.manage_messages
                 ))
                 
-                result = await cursor.fetchone()
-                if not result:
+                if not await cursor.fetchone():
                     await ctx.send("❌ Entry not found or no permission", delete_after=15)
                     await ctx.message.delete()
                     return
-                
-                gallery_msg_id= result['gallery_message_id']
 
-                if gallery_msg_id:
+                # Delete gallery post if exists (using known IDs)
+                await cursor.execute('''
+                    SELECT gallery_message_id FROM miniatures
+                    WHERE message_id = %s AND guild_id = %s
+                ''', (message_id, guild_id))
+                
+                if gallery_msg_id := (await cursor.fetchone())[0]:
                     try:
                         gallery_channel = bot.channels[ctx.guild.id]['gallery']
                         gallery_msg = await gallery_channel.fetch_message(int(gallery_msg_id))
                         await gallery_msg.delete()
                     except discord.NotFound:
-                        pass  # Message already deleted
+                        pass
                     except discord.Forbidden:
                         await ctx.send("❌ Bot lacks permissions to delete gallery message", delete_after=15)
                         return
 
-                # Delete gallery post if exists
+                # Delete the database record
                 await cursor.execute('''
-                    DELETE FROM miniatures 
+                    DELETE FROM miniatures
                     WHERE message_id = %s AND guild_id = %s
                 ''', (message_id, guild_id))
-                await conn.commit()
-        
+                
+                await conn.commit()        
         # Clean up messages
         await replied_msg.delete()
         await ctx.message.add_reaction('🗑️')  # Trash can emoji
@@ -507,11 +509,11 @@ async def delete_submission(ctx):
 async def ping(ctx):
     await ctx.send("Pong!")
 
-async def clear_pending_submission(submission_id, timeout):
-    await asyncio.sleep(timeout)
-    if submission_id in bot.pending_subs:
-        del bot.pending_subs[submission_id]
-        logging.info(f"Cleared timed out submission {submission_id}")
+# async def clear_pending_submission(submission_id, timeout):
+#     await asyncio.sleep(timeout)
+#     if submission_id in bot.pending_subs:
+#         del bot.pending_subs[submission_id]
+#         logging.info(f"Cleared timed out submission {submission_id}")
 
 @bot.command(name='store')
 async def store_miniature(ctx):
