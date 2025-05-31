@@ -727,7 +727,7 @@ async def show_miniature(ctx, *, search_query: str = None):
                     await ctx.message.delete(delay=5)  # Delete command message after 5 seconds
     except Exception as e:
         logging.error(f"Show error: {e}", exc_info=True)
-        await ctx.send("❌ Error searching miniatures")
+        await ctx.send("❌ Error searching miniatures", delete_after=15)
         await ctx.message.delete()
 
 def fix_base64_padding(encoded_str):

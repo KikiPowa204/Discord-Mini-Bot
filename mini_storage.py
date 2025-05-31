@@ -4,11 +4,8 @@ import os
 from mysql.connector import connect, Error  # Import MySQL connector
 import os
 from typing import Optional
-import mysql.connector
 from mysql.connector import Error
-from datetime import datetime
 import aiomysql
-import re
 from urllib.parse import urlparse
 import logging
 class MySQLStorage:
