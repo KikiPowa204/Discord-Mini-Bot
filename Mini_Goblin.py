@@ -415,6 +415,47 @@ async def process_submission(submission: discord.Message):
         await submission.channel.send("❌ Error processing submission", delete_after=15)
         return False
 
+class ConfirmOptOutView(View):
+    def __init__(self, author):
+        super().__init__(timeout=60)
+        self.author = author
+        self.value = None
+
+    @discord.ui.button(label="Yes, Opt Me Out", style=discord.ButtonStyle.danger)
+    async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # Only allow the command author to confirm
+        if interaction.user.id != self.author.id:
+            await interaction.response.send_message("You can't confirm for someone else!", ephemeral=True)
+            return
+
+        await interaction.response.edit_message(content="✅ You have opted out. Removing your submissions...", view=None)
+        # Perform opt-out and removal logic here
+        await remove_submissions(interaction, self.author)
+        # Insert into exclude table here:
+        async with mysql_storage.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(
+                    "INSERT IGNORE INTO exclude (guild_id, user_id) VALUES (%s, %s)",
+                    (str(interaction.guild.id), str(self.author.id))
+                )
+                await conn.commit()
+        # (Optional) DM confirmation
+        try:
+            await self.author.send("You have opted out and your submissions have been removed.")
+        except:
+            pass
+        self.value = True
+        self.stop()
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary)
+    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            await interaction.response.send_message("You can't cancel for someone else!", ephemeral=True)
+            return
+        await interaction.response.edit_message(content="❎ Opt-out cancelled.", view=None)
+        self.value = False
+        self.stop()
+
 class AlbumView(View):
     def __init__(self, image_url):
         super().__init__(timeout=180)
@@ -909,9 +950,12 @@ async def edit_submission(ctx):
 
 @bot.command(name="opt_out")
 async def opt_out(ctx):
-    """User opts out of having their submission stored"""
-    await ctx.send("Are you sure you wish to opt out? All your previous submissions will be removed from the database. To opt in again, type !opt_in.")
-    
+    """User opts out of having their submission stored (with confirmation)"""
+    view = ConfirmOptOutView(ctx.author)
+    await ctx.send(
+        "⚠️ Are you sure you wish to opt out? **All your previous submissions will be removed from the database.**\nTo opt in again, type `!opt_in`.",
+        view=view
+    )
     async with mysql_storage.pool.acquire() as conn:
         async with conn.cursor() as cursor:
             await cursor.execute(
