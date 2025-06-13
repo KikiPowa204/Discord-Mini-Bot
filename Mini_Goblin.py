@@ -404,9 +404,9 @@ async def process_submission(submission: discord.Message):
         return False
 
 class AlbumView(View):
-    def __init__(self, image_urls):
+    def __init__(self, image_url):
         super().__init__(timeout=180)
-        self.image_urls = image_urls
+        self.image_urls = image_url
         self.index = 0
 
     async def update_embed(self, interaction):
@@ -730,7 +730,7 @@ async def show_miniature(ctx, *, search_query: str = None):
                             description=f"Bundle: {sub['bundle_name'] or 'None'}",
                             color=discord.Color.blue()
                         )
-                        image_urls = json.loads(sub['image_urls'])  # This is now a list of URLs
+                        image_urls = json.loads(sub['image_url'])  # This is now a list of URLs
                         embed.set_image(url=image_urls[0])  # Show the first image by default
                         encoded_id = base64.b64encode(f"{sub['message_id']}:{sub['guild_id']}".encode()).decode()
                         encoded_id = fix_base64_padding(encoded_id)
