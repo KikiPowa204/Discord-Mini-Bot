@@ -291,12 +291,24 @@ async def get_help(ctx):
 
 async def process_submission(submission: discord.Message):
     """Process a submission from the submissions channel"""
+    async with mysql_storage.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "SELECT 1 FROM exclude WHERE guild_id=%s AND user_id=%s",
+                (str(submission.guild.id), str(submission.author.id))
+            )
+            result = await cursor.fetchone()
+            if result:
+                # User has opted out; do NOT store the submission
+                await submission.channel.send("❌ You have opted out. Submission not stored.", delete_after=10)
+                return False
+    
     try:
         # Validate message has attachments
         if not submission.attachments:
             await submission.channel.send("❌ Please include an image attachment", delete_after=10)
             return False
-
+        
         submission_id = f"{submission.id}-{submission.author.id}"
         submission_data = {
             'guild_id': str(submission.guild.id),
@@ -310,7 +322,7 @@ async def process_submission(submission: discord.Message):
             'tags': None
         }
         bot.pending_subs[submission_id] = submission_data
-
+        
         # Send prompt for metadata (don't auto-delete this one)
         prompt_msg = await submission.channel.send(
             f"{submission.author.mention} Please reply with:\n"
@@ -559,6 +571,8 @@ async def ping(ctx):
 async def store_miniature(ctx):
     """Store a miniature from a replied-to message with metadata"""
     # Check if message is a reply
+    
+    
     if not ctx.message.reference:
         await ctx.send("❌ Please reply to an image message first", delete_after=10)
         await ctx.message.delete()
@@ -567,7 +581,18 @@ async def store_miniature(ctx):
     try:
         # Get original message
         original_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-        
+        async with mysql_storage.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(
+                    "SELECT 1 FROM exclude WHERE guild_id=%s AND user_id=%s",
+                    (str(original_msg.guild.id), str(original_msg.author.id))
+                )
+                result = await cursor.fetchone()
+                if result:
+                    # User has opted out; do NOT store the submission
+                    await original_msg.channel.send("❌ This person has opted out. Submission not stored.", delete_after=10)
+                    return False
+            
         # Verify image exists
         if not original_msg.attachments:
             await ctx.send("❌ Replied message has no image attachment", delete_after=10)
@@ -882,10 +907,62 @@ async def edit_submission(ctx):
         logging.error(f"Edit error: {e}", exc_info=True)
         await ctx.message.add_reaction('❌')
 
-@bot.command(name="opt out")
+@bot.command(name="opt_out")
 async def opt_out(ctx):
     """User opts out of having their submission stored"""
-    pass
+    await ctx.send("Are you sure you wish to opt out? All your previous submissions will be removed from the database. To opt in again, type !opt_in.")
+    
+    async with mysql_storage.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "SELECT 1 FROM exclude WHERE guild_id=%s AND user_id=%s",
+                (str(ctx.guild.id), str(ctx.author.id))
+            )
+            result = await cursor.fetchone()
+            if result:
+                await ctx.send("❌ You are already opted out.", delete_after=10)
+            else:                
+                await cursor.execute(
+                    "INSERT INTO exclude (guild_id, user_id) VALUES (%s, %s)",
+                    (str(ctx.guild.id), str(ctx.author.id))
+                )
+                await remove_submissions(ctx, ctx.author)
+                await conn.commit()
+                await ctx.send("✅ You have opted out. Your submissions will not be stored.", delete_after=10)
+
+@bot.command(name="opt_in")
+async def opt_in(ctx):
+    """User opts back in to having their submission stored"""
+    async with mysql_storage.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "SELECT 1 FROM exclude WHERE guild_id=%s AND user_id=%s",
+                (str(ctx.guild.id), str(ctx.author.id))
+            )
+            result = await cursor.fetchone()
+            if result:
+                await cursor.execute(
+                    "DELETE 1 FROM exclude WHERE guild_id=%s AND user_id=%s",
+                    (str(ctx.guild.id), str(ctx.author.id))
+                )            
+                await ctx.send("✅ You have opted back in. Your submissions will now be stored.", delete_after=10)
+            else:
+                ctx.send("❌ You are already opted in.", delete_after=10)
+
+            await conn.commit()
+
+async def remove_submissions(ctx, author):
+    """
+    Remove all submissions by this author in the current guild.
+    Call this after opt-out.
+    """
+    async with mysql_storage.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute('''
+                DELETE FROM miniatures
+                WHERE user_id = %s AND guild_id = %s
+            ''', (str(author.id), str(ctx.guild.id)))
+            await conn.commit()
 
 @bot.command()
 async def debug_pending(ctx):
