@@ -817,7 +817,14 @@ async def show_miniature(ctx, *, search_query: str = None):
                         encoded_id = fix_base64_padding(encoded_id)
                         embed.set_footer(text=f"DELETION_ID:{encoded_id}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
                         
-                        view = AlbumView(image_urls)
+                        view = AlbumView(
+                            image_urls,
+                            encoded_id,
+                            sub['author'],
+                            sub['tags'],
+                            sub['stl_name'],
+                            sub['bundle_name']
+                        )
                         msg = await gallery_channel.send(embed=embed, view=view)
                         # Update gallery_message_id in database
                         await cursor.execute('''
