@@ -103,6 +103,14 @@ class MySQLStorage:
                         FOREIGN KEY (guild_id) REFERENCES guilds(guild_id)
                     )
                 ''')
+                await cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS exclude (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        guild_id VARCHAR(255) NOT NULL,
+                        user_id VARCHAR(255) NOT NULL,
+                        FOREIGN KEY (guild_id) REFERENCES guilds(guild_id)
+                        )
+                ''')
                 await conn.commit()
         return True
     

@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ui import View, Button
 import os
 from datetime import datetime
 import logging
@@ -14,6 +15,7 @@ import aiomysql
 import base64
 import re
 import binascii
+import json
 
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
@@ -57,24 +59,23 @@ async def setup_DB(ctx):
 
     # Send confirmation message
     await ctx.send(f"✅ Server database initialized for **{guild_name}**!")
-from discord.ext import commands
-from typing import Optional
 
-async def get_guild_id(ctx: commands.Context) -> Optional[int]:
+#async def get_guild_id(ctx: commands.Context) -> Optional[int]:
     """Safely retrieves the guild ID with proper typing and error handling."""
     if not ctx.guild:  # Check if in DMs
         await ctx.send("❌ This command only works in servers!")
         return False
     return ctx.guild.id
 
-async def get_guild_name(ctx: commands.Context) -> Optional[str]:
+#async def get_guild_name(ctx: commands.Context) -> Optional[str]:
     """Safely retrieves the guild name with proper typing and error handling."""
     if not ctx.guild:
         await ctx.send("❌ This command only works in servers!")
         return False
     return ctx.guild.name
-@bot.command()
-async def test_guild_info(ctx):
+
+#@bot.command()
+#async def test_guild_info(ctx):
     """Test both functions in one command"""
     guild_id = await get_guild_id(ctx)
     guild_name = await get_guild_name(ctx)
@@ -89,8 +90,8 @@ async def test_guild_info(ctx):
     
     await ctx.send(embed=embed)
 
-@bot.command()
-async def test_dm(ctx):
+#@bot.command()
+#async def test_dm(ctx):
     """Verify DM handling"""
     await ctx.send(f"In DMs: ID={await get_guild_id(ctx)}, Name={await get_guild_name(ctx)}")
 
@@ -271,7 +272,7 @@ async def get_help(ctx):
         name="!edit [STL:/Bundle:/Tags:]",
         value=(
             "Reply to a message and use command with above format.\n"
-            "• `!edit STL: (new name)\n"
+            "• `!edit STL: (new name)`\n"
             "• `!edit Bundle: (new bundle name)`\n"
             "• `!edit tags: (new tags)`"
         ),
@@ -302,7 +303,7 @@ async def process_submission(submission: discord.Message):
             'user_id': str(submission.author.id),
             'message_id': str(submission.id),
             'author': str(submission.author),
-            'image_url': submission.attachments[0].url,
+            'image_url': json.dumps([a.url for a in submission.attachments]),
             'channel_id': str(submission.channel.id),
             'stl_name': None,
             'bundle_name': None,
@@ -401,6 +402,27 @@ async def process_submission(submission: discord.Message):
             del bot.pending_subs[submission_id]
         await submission.channel.send("❌ Error processing submission", delete_after=15)
         return False
+
+class AlbumView(View):
+    def __init__(self, image_urls):
+        super().__init__(timeout=180)
+        self.image_urls = image_urls
+        self.index = 0
+
+    async def update_embed(self, interaction):
+        embed = discord.Embed(title=f"Image {self.index+1} of {len(self.image_urls)}")
+        embed.set_image(url=self.image_urls[self.index])
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    @Button(label="Previous", style=discord.ButtonStyle.secondary)
+    async def previous(self, interaction, button):
+        self.index = (self.index - 1) % len(self.image_urls)
+        await self.update_embed(interaction)
+
+    @Button(label="Next", style=discord.ButtonStyle.primary)
+    async def next(self, interaction, button):
+        self.index = (self.index + 1) % len(self.image_urls)
+        await self.update_embed(interaction)
 
 @bot.command(name='del')
 async def delete_submission(ctx):
@@ -708,13 +730,14 @@ async def show_miniature(ctx, *, search_query: str = None):
                             description=f"Bundle: {sub['bundle_name'] or 'None'}",
                             color=discord.Color.blue()
                         )
-                        embed.set_image(url=sub['image_url'])
+                        image_urls = json.loads(sub['image_urls'])  # This is now a list of URLs
+                        embed.set_image(url=image_urls[0])  # Show the first image by default
                         encoded_id = base64.b64encode(f"{sub['message_id']}:{sub['guild_id']}".encode()).decode()
                         encoded_id = fix_base64_padding(encoded_id)
                         embed.set_footer(text=f"DELETION_ID:{encoded_id}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
                         
-                        msg = await gallery_channel.send(embed=embed)
-                        
+                        view = AlbumView(image_urls)
+                        msg = await gallery_channel.send(embed=embed, view=view)
                         # Update gallery_message_id in database
                         await cursor.execute('''
                             UPDATE miniatures
@@ -859,6 +882,11 @@ async def edit_submission(ctx):
         logging.error(f"Edit error: {e}", exc_info=True)
         await ctx.message.add_reaction('❌')
 
+@bot.command(name="opt out")
+async def opt_out(ctx):
+    """User opts out of having their submission stored"""
+    pass
+
 @bot.command()
 async def debug_pending(ctx):
     """Show current pending submissions"""
@@ -866,6 +894,7 @@ async def debug_pending(ctx):
     for msg_id, data in bot.pending_subs.items():
         output.append(f"- Prompt ID: {msg_id}, Data: {data}")
     await ctx.send('\n'.join(output)[:2000])
+
 @bot.command()
 async def debug_db(ctx):
     """Show database status"""
