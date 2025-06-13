@@ -414,12 +414,12 @@ class AlbumView(View):
         embed.set_image(url=self.image_urls[self.index])
         await interaction.response.edit_message(embed=embed, view=self)
 
-    @Button(label="Previous", style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label="Previous", style=discord.ButtonStyle.secondary)
     async def previous(self, interaction, button):
         self.index = (self.index - 1) % len(self.image_urls)
         await self.update_embed(interaction)
 
-    @Button(label="Next", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.primary)
     async def next(self, interaction, button):
         self.index = (self.index + 1) % len(self.image_urls)
         await self.update_embed(interaction)
