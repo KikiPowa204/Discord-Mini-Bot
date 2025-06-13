@@ -605,7 +605,7 @@ async def store_miniature(ctx):
             'user_id': str(ctx.author.id),
             'message_id': str(original_msg.id),
             'author': str(original_msg.author),
-            'image_url': original_msg.attachments[0].url,
+            'image_url': json.dumps([a.url for a in original_msg.attachments]),
             'channel_id': str(ctx.channel.id),
             'stl_name': metadata['stl_name'],
             'bundle_name': metadata['bundle_name'],
