@@ -457,14 +457,28 @@ class ConfirmOptOutView(View):
         self.stop()
 
 class AlbumView(View):
-    def __init__(self, image_url):
+    def __init__(self, image_urls, encoded_id, author, tags, stl_name, bundle_name):
         super().__init__(timeout=180)
-        self.image_urls = image_url
+        self.image_urls = image_urls
         self.index = 0
+        self.encoded_id = encoded_id
+        self.author = author
+        self.tags = tags
+        self.stl_name = stl_name
+        self.bundle_name = bundle_name
+
+    def build_embed(self):
+        embed = discord.Embed(
+            title=f"STL: {self.stl_name}",
+            description=f"Bundle: {self.bundle_name or 'None'}\nImage {self.index + 1} of {len(self.image_urls)}",
+            color=discord.Color.blue()
+        )
+        embed.set_image(url=self.image_urls[self.index])
+        embed.set_footer(text=f"DELETION_ID:{self.encoded_id}\nBy: {self.author} | Tags: {self.tags or 'None'}")
+        return embed
 
     async def update_embed(self, interaction):
-        embed = discord.Embed(title=f"Image {self.index+1} of {len(self.image_urls)}")
-        embed.set_image(url=self.image_urls[self.index])
+        embed = self.build_embed()
         await interaction.response.edit_message(embed=embed, view=self)
 
     @discord.ui.button(label="Previous", style=discord.ButtonStyle.secondary)
@@ -476,6 +490,7 @@ class AlbumView(View):
     async def next(self, interaction, button):
         self.index = (self.index + 1) % len(self.image_urls)
         await self.update_embed(interaction)
+
 
 @bot.command(name='del')
 async def delete_submission(ctx):
@@ -973,6 +988,7 @@ async def opt_out(ctx):
                 await remove_submissions(ctx, ctx.author)
                 await conn.commit()
                 await ctx.send("✅ You have opted out. Your submissions will not be stored.", delete_after=10)
+                await ctx.message.delete()
 
 @bot.command(name="opt_in")
 async def opt_in(ctx):
@@ -992,7 +1008,7 @@ async def opt_in(ctx):
                 await ctx.send("✅ You have opted back in. Your submissions will now be stored.", delete_after=10)
             else:
                 ctx.send("❌ You are already opted in.", delete_after=10)
-
+            await ctx.message.delete()
             await conn.commit()
 
 async def remove_submissions(ctx, author):
