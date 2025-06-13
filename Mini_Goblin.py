@@ -300,7 +300,7 @@ async def process_submission(submission: discord.Message):
             result = await cursor.fetchone()
             if result:
                 # User has opted out; do NOT store the submission
-                await submission.channel.send("❌ You have opted out. Submission not stored.", delete_after=10)
+                #await submission.channel.send("❌ You have opted out. Submission not stored.", delete_after=10)
                 return False
     
     try:
@@ -986,7 +986,7 @@ async def opt_in(ctx):
             result = await cursor.fetchone()
             if result:
                 await cursor.execute(
-                    "DELETE 1 FROM exclude WHERE guild_id=%s AND user_id=%s",
+                    "DELETE FROM exclude WHERE guild_id=%s AND user_id=%s",
                     (str(ctx.guild.id), str(ctx.author.id))
                 )            
                 await ctx.send("✅ You have opted back in. Your submissions will now be stored.", delete_after=10)
