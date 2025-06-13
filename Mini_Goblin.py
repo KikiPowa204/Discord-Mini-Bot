@@ -245,7 +245,14 @@ async def get_help(ctx):
         value="Admin only. Configures the submission and gallery channels for this server.",
         inline=False
     )
-    
+
+    embed.add_field(
+        name="!opt_out/!opt_in",
+        value="You are opted in by default. If you wish to not have any of your submissions stored, please use !opt_out. Use !opt_in to rejoin.",
+        inline=False
+    )
+
+
     embed.add_field(
         name="!store",
         value=(
@@ -285,6 +292,12 @@ async def get_help(ctx):
         inline=False
     )
     
+    embed.add_field(
+        name="Important detail:",
+        value="Please only store images that are permitted (such as sculpts developed by the discord server owners).",
+        inline=False
+    )
+
     embed.set_footer(text="Bot created by kiann.ardalan")
     
     await ctx.send(embed=embed)
@@ -300,7 +313,6 @@ async def process_submission(submission: discord.Message):
             result = await cursor.fetchone()
             if result:
                 # User has opted out; do NOT store the submission
-                #await submission.channel.send("❌ You have opted out. Submission not stored.", delete_after=10)
                 return False
     
     try:
@@ -350,7 +362,10 @@ async def process_submission(submission: discord.Message):
                 elif line.startswith('bundle:'):
                     bot.pending_subs[submission_id]['bundle_name'] = line[7:].strip()
                 elif line.startswith('tags:'):
-                    bot.pending_subs[submission_id]['tags'] = line[5:].strip()
+                    # Normalize tags for consistent searching
+                    tag_line = line[5:].strip()
+                    tags = [t.strip().lower() for t in tag_line.split(',') if t.strip()]
+                    bot.pending_subs[submission_id]['tags'] = ','.join(tags)
 
             # Validate required STL name
             if not bot.pending_subs[submission_id]['stl_name']:
@@ -772,14 +787,14 @@ async def show_miniature(ctx, *, search_query: str = None):
                     elif is_tag_search:
                         tag_input = search_query.split(":", 1)[1].strip()
                         tags = [t.strip().lower() for t in tag_input.split(",") if t.strip()]
-                        
+
                         # Build dynamic OR conditions for tags
                         conditions = []
                         params = [str(ctx.guild.id)]
                         for tag in tags:
-                            conditions.append("(FIND_IN_SET(%s, tags) OR tags LIKE %s")
-                            params.extend([tag, f'%{tag}%'])
-                        
+                            conditions.append("CONCAT(',', LOWER(tags), ',') LIKE %s")
+                            params.append(f'%,{tag},%')
+
                         await cursor.execute(f'''
                             SELECT * FROM miniatures
                             WHERE guild_id = %s
@@ -787,7 +802,7 @@ async def show_miniature(ctx, *, search_query: str = None):
                             ORDER BY RAND()
                             LIMIT 5
                         ''', params)
-                        
+    
                     else:  # Default STL name search
                         search_term = search_query or ""
                         await cursor.execute('''
@@ -1014,7 +1029,7 @@ async def opt_in(ctx):
                 )            
                 await ctx.send("✅ You have opted back in. Your submissions will now be stored.", delete_after=10)
             else:
-                ctx.send("❌ You are already opted in.", delete_after=10)
+                await ctx.send("❌ You are already opted in.", delete_after=10)
             await ctx.message.delete()
             await conn.commit()
 
