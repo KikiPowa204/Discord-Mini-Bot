@@ -524,6 +524,7 @@ class RefreshView(discord.ui.View):
 
     @discord.ui.button(label="🔁 Refresh", style=discord.ButtonStyle.success)
     async def refresh(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # Build a new, reset AlbumView (re-enables buttons)
         new_view = AlbumView(
             self.old_view.image_urls,
             self.old_view.encoded_id,
@@ -532,10 +533,10 @@ class RefreshView(discord.ui.View):
             self.old_view.stl_name,
             self.old_view.bundle_name
         )
-        new_msg = await interaction.channel.send(embed=new_view.build_embed(), view=new_view)
-        new_view.message = new_msg
-        await interaction.response.send_message("✅ Album refreshed.", ephemeral=True)
-
+        # Edit the *same* message, not a new one!
+        await self.old_view.message.edit(embed=new_view.build_embed(), view=new_view)
+        new_view.message = self.old_view.message  # So the view can again expire, etc.
+        await interaction.response.send_message("✅ Album refreshed.", ephemeral=True, delete_after=15)
 @bot.command(name='del')
 async def delete_submission(ctx):
     """Delete a submission by replying to its gallery post"""
