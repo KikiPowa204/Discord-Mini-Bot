@@ -505,7 +505,36 @@ class AlbumView(View):
     async def next(self, interaction, button):
         self.index = (self.index + 1) % len(self.image_urls)
         await self.update_embed(interaction)
+    async def on_timeout(self):
+        # Called when view times out
+        for item in self.children:
+            item.disabled = True
+        try:
+            await self.message.edit(
+                embed=self.build_embed().set_footer(text="❌ Album expired.\nClick 🔁 to refresh."),
+                view=RefreshView(self)
+            )
+        except Exception as e:
+            logging.warning(f"Failed to update expired album view: {e}")
 
+class RefreshView(discord.ui.View):
+    def __init__(self, old_view: AlbumView):
+        super().__init__(timeout=None)
+        self.old_view = old_view
+
+    @discord.ui.button(label="🔁 Refresh", style=discord.ButtonStyle.success)
+    async def refresh(self, interaction: discord.Interaction, button: discord.ui.Button):
+        new_view = AlbumView(
+            self.old_view.image_urls,
+            self.old_view.encoded_id,
+            self.old_view.author,
+            self.old_view.tags,
+            self.old_view.stl_name,
+            self.old_view.bundle_name
+        )
+        new_msg = await interaction.channel.send(embed=new_view.build_embed(), view=new_view)
+        new_view.message = new_msg
+        await interaction.response.send_message("✅ Album refreshed.", ephemeral=True)
 
 @bot.command(name='del')
 async def delete_submission(ctx):
@@ -840,7 +869,8 @@ async def show_miniature(ctx, *, search_query: str = None):
                             sub['stl_name'],
                             sub['bundle_name']
                         )
-                        msg = await gallery_channel.send(embed=embed, view=view)
+                        msg = await gallery_channel.send(embed=view.build_embed(), view=view)
+                        view.message = msg
                         # Update gallery_message_id in database
                         await cursor.execute('''
                             UPDATE miniatures
