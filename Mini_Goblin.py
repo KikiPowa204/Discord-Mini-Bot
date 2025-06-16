@@ -67,34 +67,6 @@ async def setup_DB(ctx):
         return False
     return ctx.guild.id
 
-#async def get_guild_name(ctx: commands.Context) -> Optional[str]:
-    """Safely retrieves the guild name with proper typing and error handling."""
-    if not ctx.guild:
-        await ctx.send("❌ This command only works in servers!")
-        return False
-    return ctx.guild.name
-
-#@bot.command()
-#async def test_guild_info(ctx):
-    """Test both functions in one command"""
-    guild_id = await get_guild_id(ctx)
-    guild_name = await get_guild_name(ctx)
-    
-    if None in (guild_id, guild_name):
-        return  # Errors already handled
-    
-    embed = discord.Embed(title="Guild Info Test")
-    embed.add_field(name="ID", value=f"`{guild_id}`", inline=False)
-    embed.add_field(name="Name", value=guild_name, inline=False)
-    embed.set_footer(text=f"Tested at {datetime.now().isoformat()}")
-    
-    await ctx.send(embed=embed)
-
-#@bot.command()
-#async def test_dm(ctx):
-    """Verify DM handling"""
-    await ctx.send(f"In DMs: ID={await get_guild_id(ctx)}, Name={await get_guild_name(ctx)}")
-
 @bot.event
 async def on_ready():
     # Initialize storage
