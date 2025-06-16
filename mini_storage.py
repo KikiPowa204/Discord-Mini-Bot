@@ -192,12 +192,4 @@ class MySQLStorage:
 mysql_storage = MySQLStorage()
 
 if __name__ == "__main__":
-    # Test guild info storage
-    mysql_storage.store_guild_info(
-        guild_id="12345",
-        guild_name="Test Guild",
-        system_channel=67890
-    )
-    # Test retrieval
-    results = mysql_storage.get_submissions("12345", "Test")
-    print(f"Test results: {results}")   
+    pass
