@@ -16,6 +16,7 @@ import base64
 import re
 import binascii
 import json
+from collections import Counter, defaultdict
 
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
@@ -274,6 +275,48 @@ async def get_help(ctx):
     
     await ctx.send(embed=embed)
 
+class PrintHelper:
+    def __init__(self, guild):
+        self.guild = guild
+
+    async def gather_tags(self):
+        tags_counter = Counter()
+        async with mysql_storage.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(
+                    "SELECT tags FROM miniatures WHERE guild_id=%s",
+                    (str(self.guild.id),)
+                )
+                results = await cursor.fetchall()
+                for row in results:
+                    if row[0]:  # tags field not None/empty
+                        taglist = [t.strip().lower() for t in row[0].split(",") if t.strip()]
+                        tags_counter.update(taglist)
+        return tags_counter
+
+# Bot command (not inside the class)
+@bot.command(name="tags")
+async def print_tags(ctx):
+    printer = PrintHelper(ctx.guild)
+    tags_counter = await printer.gather_tags()
+    if not tags_counter:
+        await ctx.send("No tags found for this server.")
+        return
+    # Make sorted string: tag - count
+    tag_lines = [f"`{tag}` — {count}" for tag, count in tags_counter.most_common()]
+    msg = "**Registered Tags (usage count):**\n" + "\n".join(tag_lines)
+    await ctx.send(msg[:1999])  # Discord message limit
+
+def is_valid_name(name):
+    """Checks for allowed chars and length in STL/bundle name."""
+    pattern = r'^[\w\s\-]{1,100}$'
+    return bool(re.match(pattern, name)) and bool(name.strip())
+
+def is_valid_tag(tag):
+    """Checks for allowed chars and length for a single tag."""
+    pattern = r'^[\w\s\-]{1,30}$'
+    return bool(re.match(pattern, tag)) and bool(tag.strip())
+
 async def process_submission(submission: discord.Message):
     """Process a submission from the submissions channel"""
     async with mysql_storage.pool.acquire() as conn:
@@ -325,27 +368,67 @@ async def process_submission(submission: discord.Message):
 
         try:
             reply = await bot.wait_for('message', check=check, timeout=300)
-            
-            # Parse reply
+
+            stl_name = None
+            bundle_name = None
+            tags_list = None
+
             for line in reply.content.split('\n'):
-                line = line.strip().lower()
-                if line.startswith('stl:'):
-                    bot.pending_subs[submission_id]['stl_name'] = line[4:].strip()
-                elif line.startswith('bundle:'):
-                    bot.pending_subs[submission_id]['bundle_name'] = line[7:].strip()
-                elif line.startswith('tags:'):
-                    # Normalize tags for consistent searching
-                    tag_line = line[5:].strip()
-                    tags = [t.strip().lower() for t in tag_line.split(',') if t.strip()]
-                    bot.pending_subs[submission_id]['tags'] = ','.join(tags)
+                line_stripped = line.strip()
+                lower_line = line_stripped.lower()
+                if lower_line.startswith('stl:'):
+                    stl_name = line_stripped[4:].strip()
+                elif lower_line.startswith('bundle:'):
+                    bundle_name = line_stripped[7:].strip()
+                elif lower_line.startswith('tags:'):
+                    tag_line = line_stripped[5:].strip()
+                    tags_list = [t.strip().lower() for t in tag_line.split(',') if t.strip()]
 
             # Validate required STL name
-            if not bot.pending_subs[submission_id]['stl_name']:
+            if not stl_name:
                 await prompt_msg.delete()
                 await reply.delete()
                 await submission.channel.send("❌ STL name is required", delete_after=15)
                 del bot.pending_subs[submission_id]
                 return False
+
+            if not is_valid_name(stl_name):
+                await prompt_msg.delete()
+                await reply.delete()
+                await submission.channel.send(
+                    "❌ Invalid STL name! Only letters, numbers, spaces, hyphens, and underscores allowed (max 100 chars).",
+                    delete_after=15
+                )
+                del bot.pending_subs[submission_id]
+                return False
+
+            if bundle_name and not is_valid_name(bundle_name):
+                await prompt_msg.delete()
+                await reply.delete()
+                await submission.channel.send(
+                    "❌ Invalid bundle name! Only letters, numbers, spaces, hyphens, and underscores allowed (max 100 chars).",
+                    delete_after=15
+                )
+                del bot.pending_subs[submission_id]
+                return False
+
+            if tags_list:
+                if not all(is_valid_tag(tag) for tag in tags_list):
+                    await prompt_msg.delete()
+                    await reply.delete()
+                    await submission.channel.send(
+                        "❌ Invalid tag(s)! Each tag must be 1–30 chars, using only letters, numbers, spaces, hyphens, or underscores.",
+                        delete_after=15
+                    )
+                    del bot.pending_subs[submission_id]
+                    return False
+                # Deduplicate tags
+                tags_list = list(dict.fromkeys(tags_list))
+
+            # Assign validated values back
+            bot.pending_subs[submission_id]['stl_name'] = stl_name
+            bot.pending_subs[submission_id]['bundle_name'] = bundle_name
+            bot.pending_subs[submission_id]['tags'] = ','.join(tags_list) if tags_list else None
 
             # Store in database
             success = await mysql_storage.store_submission(**{
@@ -672,7 +755,7 @@ async def store_miniature(ctx):
             await ctx.message.delete()
             return
 
-        # Parse command content
+                # Parse command content
         lines = [line.strip() for line in ctx.message.content.split('\n') if line.strip()]
         metadata = {
             'stl_name': None,
@@ -690,12 +773,32 @@ async def store_miniature(ctx):
                 elif key == 'bundle':
                     metadata['bundle_name'] = value
                 elif key == 'tags':
-                    metadata['tags'] = value
+                    # Normalize tags
+                    tag_list = [t.strip().lower() for t in value.split(',') if t.strip()]
+                    metadata['tags'] = ','.join(tag_list) if tag_list else None
 
-        # Validate required fields
+        # Validate STL name
         if not metadata['stl_name']:
-            await ctx.send("❌ STL name is required (format: `STL: ModelName`)", delete_after = 15)
+            await ctx.send("❌ STL name is required (format: `STL: ModelName`)", delete_after=15)
             return
+        if not is_valid_name(metadata['stl_name']):
+            await ctx.send("❌ Invalid STL name! Only letters, numbers, spaces, hyphens, and underscores (max 100 chars).", delete_after=15)
+            return
+
+        # Validate bundle name
+        if metadata['bundle_name'] and not is_valid_name(metadata['bundle_name']):
+            await ctx.send("❌ Invalid bundle name! Only letters, numbers, spaces, hyphens, and underscores (max 100 chars).", delete_after=15)
+            return
+
+        # Validate tags
+        if metadata['tags']:
+            tag_list = [t.strip().lower() for t in metadata['tags'].split(',') if t.strip()]
+            if not all(is_valid_tag(tag) for tag in tag_list):
+                await ctx.send("❌ Invalid tag(s)! Each tag must be 1–30 chars, using only letters, numbers, spaces, hyphens, or underscores.", delete_after=15)
+                return
+            # Deduplicate tags
+            tag_list = list(dict.fromkeys(tag_list))
+            metadata['tags'] = ','.join(tag_list)
 
         # Prepare submission data
         submission_data = {
@@ -922,7 +1025,6 @@ async def edit_submission(ctx):
             'bundle_name': None,
             'tags': None
         }
-        
         for line in args.split('\n'):
             if ':' in line:
                 key, value = line.split(':', 1)
@@ -933,13 +1035,37 @@ async def edit_submission(ctx):
                 elif key == 'bundle':
                     metadata['bundle_name'] = value
                 elif key == 'tags':
-                    metadata['tags'] = value
+                    tag_list = [t.strip().lower() for t in value.split(',') if t.strip()]
+                    metadata['tags'] = ','.join(tag_list) if tag_list else None
 
         # Validate at least one field is being updated
         if not any(metadata.values()):
             await ctx.send("❌ Provide at least one field to update (STL:/Bundle:/Tags:)", delete_after=15)
             await ctx.message.delete()
             return
+
+        # Validate stl_name
+        if metadata['stl_name'] and not is_valid_name(metadata['stl_name']):
+            await ctx.send("❌ Invalid STL name! Only letters, numbers, spaces, hyphens, and underscores allowed (max 100 chars).", delete_after=15)
+            await ctx.message.delete()
+            return
+
+        # Validate bundle_name
+        if metadata['bundle_name'] and not is_valid_name(metadata['bundle_name']):
+            await ctx.send("❌ Invalid bundle name! Only letters, numbers, spaces, hyphens, and underscores allowed (max 100 chars).", delete_after=15)
+            await ctx.message.delete()
+            return
+
+        # Validate tags
+        if metadata['tags']:
+            tag_list = [t.strip().lower() for t in metadata['tags'].split(',') if t.strip()]
+            if not all(is_valid_tag(tag) for tag in tag_list):
+                await ctx.send("❌ Invalid tag(s)! Each tag must be 1–30 chars, using only letters, numbers, spaces, hyphens, or underscores.", delete_after=15)
+                await ctx.message.delete()
+                return
+            # Remove duplicates and normalize
+            tag_list = list(dict.fromkeys(tag_list))
+            metadata['tags'] = ','.join(tag_list)
 
         # Update database
         async with mysql_storage.pool.acquire() as conn:
