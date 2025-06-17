@@ -343,6 +343,7 @@ class ManualView(discord.ui.View):
 async def get_help(ctx):
     view = ManualView(ctx)
     await ctx.send(embed=view.build_embed(), view=view)
+    await ctx.message.delete()
 
 class PrintHelper:
     def __init__(self, guild):
