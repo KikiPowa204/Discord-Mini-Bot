@@ -312,27 +312,23 @@ class ManualView(discord.ui.View):
             self.page += 1
             await self.update_message(interaction)
 
-    # Contents page jumps
-    @discord.ui.button(label="Setup", style=discord.ButtonStyle.primary, row=0)
-    async def jump_setup(self, interaction, button): self.page = 2; await self.update_message(interaction)
-
-    @discord.ui.button(label="Store", style=discord.ButtonStyle.primary, row=0)
-    async def jump_store(self, interaction, button): self.page = 3; await self.update_message(interaction)
+    @discord.ui.button(label="Store", style=discord.ButtonStyle.primary, row=1)
+    async def jump_store(self, interaction, button): self.page = 2; await self.update_message(interaction)
 
     @discord.ui.button(label="Gallery", style=discord.ButtonStyle.primary, row=1)
-    async def jump_gallery(self, interaction, button): self.page = 4; await self.update_message(interaction)
+    async def jump_gallery(self, interaction, button): self.page = 3; await self.update_message(interaction)
 
-    @discord.ui.button(label="Edit/Del", style=discord.ButtonStyle.primary, row=1)
-    async def jump_edit(self, interaction, button): self.page = 5; await self.update_message(interaction)
+    @discord.ui.button(label="Edit/Del", style=discord.ButtonStyle.primary, row=2)
+    async def jump_edit(self, interaction, button): self.page = 4; await self.update_message(interaction)
 
     @discord.ui.button(label="Lists", style=discord.ButtonStyle.primary, row=2)
-    async def jump_lists(self, interaction, button): self.page = 6; await self.update_message(interaction)
+    async def jump_lists(self, interaction, button): self.page = 5; await self.update_message(interaction)
 
     @discord.ui.button(label="Privacy", style=discord.ButtonStyle.success, row=3)
-    async def jump_privacy(self, interaction, button): self.page = 7; await self.update_message(interaction)
+    async def jump_privacy(self, interaction, button): self.page = 6; await self.update_message(interaction)
 
     @discord.ui.button(label="Rules", style=discord.ButtonStyle.danger, row=3)
-    async def jump_rules(self, interaction, button): self.page = 8; await self.update_message(interaction)
+    async def jump_rules(self, interaction, button): self.page = 7; await self.update_message(interaction)
 
 
     async def interaction_check(self, interaction):
@@ -342,7 +338,7 @@ class ManualView(discord.ui.View):
 @bot.command(name='guide')
 async def get_help(ctx):
     view = ManualView(ctx)
-    await ctx.send(embed=view.build_embed(), view=view)
+    await ctx.send(embed=view.build_embed(), view=view, delete_after = 300)
     await ctx.message.delete()
 
 class PrintHelper:
