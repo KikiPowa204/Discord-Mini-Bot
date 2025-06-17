@@ -330,6 +330,11 @@ class ManualView(discord.ui.View):
         # Only allow the author to navigate
         return interaction.user == self.ctx.author
 
+@bot.command(name='guide')
+async def get_help(ctx):
+    view = ManualView(ctx)
+    await ctx.send(embed=view.build_embed(), view=view)
+
 class PrintHelper:
     def __init__(self, guild):
         self.guild = guild
