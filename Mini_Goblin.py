@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ui import View, Button
 import os
 from datetime import datetime
 import logging
@@ -14,6 +15,7 @@ import aiomysql
 import base64
 import re
 import binascii
+import json
 
 # Initialize global variables
 pending_submissions = {}  # Format: {prompt_message_id: original_message_data}
@@ -57,24 +59,23 @@ async def setup_DB(ctx):
 
     # Send confirmation message
     await ctx.send(f"✅ Server database initialized for **{guild_name}**!")
-from discord.ext import commands
-from typing import Optional
 
-async def get_guild_id(ctx: commands.Context) -> Optional[int]:
+#async def get_guild_id(ctx: commands.Context) -> Optional[int]:
     """Safely retrieves the guild ID with proper typing and error handling."""
     if not ctx.guild:  # Check if in DMs
         await ctx.send("❌ This command only works in servers!")
         return False
     return ctx.guild.id
 
-async def get_guild_name(ctx: commands.Context) -> Optional[str]:
+#async def get_guild_name(ctx: commands.Context) -> Optional[str]:
     """Safely retrieves the guild name with proper typing and error handling."""
     if not ctx.guild:
         await ctx.send("❌ This command only works in servers!")
         return False
     return ctx.guild.name
-@bot.command()
-async def test_guild_info(ctx):
+
+#@bot.command()
+#async def test_guild_info(ctx):
     """Test both functions in one command"""
     guild_id = await get_guild_id(ctx)
     guild_name = await get_guild_name(ctx)
@@ -89,8 +90,8 @@ async def test_guild_info(ctx):
     
     await ctx.send(embed=embed)
 
-@bot.command()
-async def test_dm(ctx):
+#@bot.command()
+#async def test_dm(ctx):
     """Verify DM handling"""
     await ctx.send(f"In DMs: ID={await get_guild_id(ctx)}, Name={await get_guild_name(ctx)}")
 
@@ -244,7 +245,14 @@ async def get_help(ctx):
         value="Admin only. Configures the submission and gallery channels for this server.",
         inline=False
     )
-    
+
+    embed.add_field(
+        name="!opt_out/!opt_in",
+        value="You are opted in by default. If you wish to not have any of your submissions stored, please use !opt_out. Use !opt_in to rejoin.",
+        inline=False
+    )
+
+
     embed.add_field(
         name="!store",
         value=(
@@ -271,7 +279,7 @@ async def get_help(ctx):
         name="!edit [STL:/Bundle:/Tags:]",
         value=(
             "Reply to a message and use command with above format.\n"
-            "• `!edit STL: (new name)\n"
+            "• `!edit STL: (new name)`\n"
             "• `!edit Bundle: (new bundle name)`\n"
             "• `!edit tags: (new tags)`"
         ),
@@ -284,32 +292,49 @@ async def get_help(ctx):
         inline=False
     )
     
+    embed.add_field(
+        name="Important detail:",
+        value="Please only store images that are permitted (such as sculpts developed by the discord server owners).",
+        inline=False
+    )
+
     embed.set_footer(text="Bot created by kiann.ardalan")
     
     await ctx.send(embed=embed)
 
 async def process_submission(submission: discord.Message):
     """Process a submission from the submissions channel"""
+    async with mysql_storage.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "SELECT 1 FROM exclude WHERE guild_id=%s AND user_id=%s",
+                (str(submission.guild.id), str(submission.author.id))
+            )
+            result = await cursor.fetchone()
+            if result:
+                # User has opted out; do NOT store the submission
+                return False
+    
     try:
         # Validate message has attachments
         if not submission.attachments:
             await submission.channel.send("❌ Please include an image attachment", delete_after=10)
             return False
-
+        
         submission_id = f"{submission.id}-{submission.author.id}"
         submission_data = {
             'guild_id': str(submission.guild.id),
             'user_id': str(submission.author.id),
             'message_id': str(submission.id),
             'author': str(submission.author),
-            'image_url': submission.attachments[0].url,
+            'image_url': json.dumps([a.url for a in submission.attachments]),
             'channel_id': str(submission.channel.id),
             'stl_name': None,
             'bundle_name': None,
             'tags': None
         }
         bot.pending_subs[submission_id] = submission_data
-
+        
         # Send prompt for metadata (don't auto-delete this one)
         prompt_msg = await submission.channel.send(
             f"{submission.author.mention} Please reply with:\n"
@@ -337,7 +362,10 @@ async def process_submission(submission: discord.Message):
                 elif line.startswith('bundle:'):
                     bot.pending_subs[submission_id]['bundle_name'] = line[7:].strip()
                 elif line.startswith('tags:'):
-                    bot.pending_subs[submission_id]['tags'] = line[5:].strip()
+                    # Normalize tags for consistent searching
+                    tag_line = line[5:].strip()
+                    tags = [t.strip().lower() for t in tag_line.split(',') if t.strip()]
+                    bot.pending_subs[submission_id]['tags'] = ','.join(tags)
 
             # Validate required STL name
             if not bot.pending_subs[submission_id]['stl_name']:
@@ -402,6 +430,113 @@ async def process_submission(submission: discord.Message):
         await submission.channel.send("❌ Error processing submission", delete_after=15)
         return False
 
+class ConfirmOptOutView(View):
+    def __init__(self, author):
+        super().__init__(timeout=60)
+        self.author = author
+        self.value = None
+
+    @discord.ui.button(label="Yes, Opt Me Out", style=discord.ButtonStyle.danger)
+    async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # Only allow the command author to confirm
+        if interaction.user.id != self.author.id:
+            await interaction.response.send_message("You can't confirm for someone else!", ephemeral=True)
+            return
+
+        await interaction.response.edit_message(content="✅ You have opted out. Removing your submissions...", view=None)
+        # Perform opt-out and removal logic here
+        await remove_submissions(interaction, self.author)
+        # Insert into exclude table here:
+        async with mysql_storage.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(
+                    "INSERT IGNORE INTO exclude (guild_id, user_id) VALUES (%s, %s)",
+                    (str(interaction.guild.id), str(self.author.id))
+                )
+                await conn.commit()
+        # (Optional) DM confirmation
+        try:
+            await self.author.send("You have opted out and your submissions have been removed.")
+        except:
+            pass
+        self.value = True
+        self.stop()
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary)
+    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            await interaction.response.send_message("You can't cancel for someone else!", ephemeral=True)
+            return
+        await interaction.response.edit_message(content="❎ Opt-out cancelled.", view=None)
+        self.value = False
+        self.stop()
+
+class AlbumView(View):
+    def __init__(self, image_urls, encoded_id, author, tags, stl_name, bundle_name):
+        super().__init__(timeout=180)
+        self.image_urls = image_urls
+        self.index = 0
+        self.encoded_id = encoded_id
+        self.author = author
+        self.tags = tags
+        self.stl_name = stl_name
+        self.bundle_name = bundle_name
+
+    def build_embed(self):
+        embed = discord.Embed(
+            title=f"STL: {self.stl_name}",
+            description=f"Bundle: {self.bundle_name or 'None'}\nImage {self.index + 1} of {len(self.image_urls)}",
+            color=discord.Color.blue()
+        )
+        embed.set_image(url=self.image_urls[self.index])
+        embed.set_footer(text=f"DELETION_ID:{self.encoded_id}\nBy: {self.author} | Tags: {self.tags or 'None'}")
+        return embed
+
+    async def update_embed(self, interaction):
+        embed = self.build_embed()
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    @discord.ui.button(label="Previous", style=discord.ButtonStyle.secondary)
+    async def previous(self, interaction, button):
+        self.index = (self.index - 1) % len(self.image_urls)
+        await self.update_embed(interaction)
+
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.primary)
+    async def next(self, interaction, button):
+        self.index = (self.index + 1) % len(self.image_urls)
+        await self.update_embed(interaction)
+    async def on_timeout(self):
+        # Called when view times out
+        for item in self.children:
+            item.disabled = True
+        try:
+            await self.message.edit(
+                embed=self.build_embed().set_footer(text="❌ Album expired.\nClick 🔁 to refresh."),
+                view=RefreshView(self)
+            )
+        except Exception as e:
+            logging.warning(f"Failed to update expired album view: {e}")
+
+class RefreshView(discord.ui.View):
+    def __init__(self, old_view: AlbumView):
+        super().__init__(timeout=None)
+        self.old_view = old_view
+
+    @discord.ui.button(label="🔁 Refresh", style=discord.ButtonStyle.success)
+    async def refresh(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # Build a new, reset AlbumView (re-enables buttons)
+        new_view = AlbumView(
+            self.old_view.image_urls,
+            self.old_view.encoded_id,
+            self.old_view.author,
+            self.old_view.tags,
+            self.old_view.stl_name,
+            self.old_view.bundle_name
+        )
+        # Edit the *same* message, not a new one!
+        await self.old_view.message.edit(embed=new_view.build_embed(), view=new_view)
+        new_view.message = self.old_view.message  # So the view can again expire, etc.
+        await interaction.response.send_message("✅ Album refreshed.", ephemeral=True, delete_after=15)
 @bot.command(name='del')
 async def delete_submission(ctx):
     """Delete a submission by replying to its gallery post"""
@@ -537,6 +672,8 @@ async def ping(ctx):
 async def store_miniature(ctx):
     """Store a miniature from a replied-to message with metadata"""
     # Check if message is a reply
+    
+    
     if not ctx.message.reference:
         await ctx.send("❌ Please reply to an image message first", delete_after=10)
         await ctx.message.delete()
@@ -545,7 +682,18 @@ async def store_miniature(ctx):
     try:
         # Get original message
         original_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-        
+        async with mysql_storage.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(
+                    "SELECT 1 FROM exclude WHERE guild_id=%s AND user_id=%s",
+                    (str(original_msg.guild.id), str(original_msg.author.id))
+                )
+                result = await cursor.fetchone()
+                if result:
+                    # User has opted out; do NOT store the submission
+                    await original_msg.channel.send("❌ This person has opted out. Submission not stored.", delete_after=10)
+                    return False
+            
         # Verify image exists
         if not original_msg.attachments:
             await ctx.send("❌ Replied message has no image attachment", delete_after=10)
@@ -583,7 +731,7 @@ async def store_miniature(ctx):
             'user_id': str(ctx.author.id),
             'message_id': str(original_msg.id),
             'author': str(original_msg.author),
-            'image_url': original_msg.attachments[0].url,
+            'image_url': json.dumps([a.url for a in original_msg.attachments]),
             'channel_id': str(ctx.channel.id),
             'stl_name': metadata['stl_name'],
             'bundle_name': metadata['bundle_name'],
@@ -669,14 +817,14 @@ async def show_miniature(ctx, *, search_query: str = None):
                     elif is_tag_search:
                         tag_input = search_query.split(":", 1)[1].strip()
                         tags = [t.strip().lower() for t in tag_input.split(",") if t.strip()]
-                        
+
                         # Build dynamic OR conditions for tags
                         conditions = []
                         params = [str(ctx.guild.id)]
                         for tag in tags:
-                            conditions.append("(FIND_IN_SET(%s, tags) OR tags LIKE %s")
-                            params.extend([tag, f'%{tag}%'])
-                        
+                            conditions.append("CONCAT(',', LOWER(tags), ',') LIKE %s")
+                            params.append(f'%,{tag},%')
+
                         await cursor.execute(f'''
                             SELECT * FROM miniatures
                             WHERE guild_id = %s
@@ -684,7 +832,7 @@ async def show_miniature(ctx, *, search_query: str = None):
                             ORDER BY RAND()
                             LIMIT 5
                         ''', params)
-                        
+    
                     else:  # Default STL name search
                         search_term = search_query or ""
                         await cursor.execute('''
@@ -708,13 +856,22 @@ async def show_miniature(ctx, *, search_query: str = None):
                             description=f"Bundle: {sub['bundle_name'] or 'None'}",
                             color=discord.Color.blue()
                         )
-                        embed.set_image(url=sub['image_url'])
+                        image_urls = json.loads(sub['image_url'])  # This is now a list of URLs
+                        embed.set_image(url=image_urls[0])  # Show the first image by default
                         encoded_id = base64.b64encode(f"{sub['message_id']}:{sub['guild_id']}".encode()).decode()
                         encoded_id = fix_base64_padding(encoded_id)
                         embed.set_footer(text=f"DELETION_ID:{encoded_id}\nBy: {sub['author']} | Tags: {sub['tags'] or 'None'}")
                         
-                        msg = await gallery_channel.send(embed=embed)
-                        
+                        view = AlbumView(
+                            image_urls,
+                            encoded_id,
+                            sub['author'],
+                            sub['tags'],
+                            sub['stl_name'],
+                            sub['bundle_name']
+                        )
+                        msg = await gallery_channel.send(embed=view.build_embed(), view=view)
+                        view.message = msg
                         # Update gallery_message_id in database
                         await cursor.execute('''
                             UPDATE miniatures
@@ -859,6 +1016,67 @@ async def edit_submission(ctx):
         logging.error(f"Edit error: {e}", exc_info=True)
         await ctx.message.add_reaction('❌')
 
+@bot.command(name="opt_out")
+async def opt_out(ctx):
+    """User opts out of having their submission stored (with confirmation)"""
+    view = ConfirmOptOutView(ctx.author)
+    await ctx.send(
+        "⚠️ Are you sure you wish to opt out? **All your previous submissions will be removed from the database.**\nTo opt in again, type `!opt_in`.",
+        view=view
+    )
+    async with mysql_storage.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "SELECT 1 FROM exclude WHERE guild_id=%s AND user_id=%s",
+                (str(ctx.guild.id), str(ctx.author.id))
+            )
+            result = await cursor.fetchone()
+            if result:
+                await ctx.send("❌ You are already opted out.", delete_after=10)
+            else:                
+                await cursor.execute(
+                    "INSERT INTO exclude (guild_id, user_id) VALUES (%s, %s)",
+                    (str(ctx.guild.id), str(ctx.author.id))
+                )
+                await remove_submissions(ctx, ctx.author)
+                await conn.commit()
+                await ctx.send("✅ You have opted out. Your submissions will not be stored.", delete_after=10)
+                await ctx.message.delete()
+
+@bot.command(name="opt_in")
+async def opt_in(ctx):
+    """User opts back in to having their submission stored"""
+    async with mysql_storage.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "SELECT 1 FROM exclude WHERE guild_id=%s AND user_id=%s",
+                (str(ctx.guild.id), str(ctx.author.id))
+            )
+            result = await cursor.fetchone()
+            if result:
+                await cursor.execute(
+                    "DELETE FROM exclude WHERE guild_id=%s AND user_id=%s",
+                    (str(ctx.guild.id), str(ctx.author.id))
+                )            
+                await ctx.send("✅ You have opted back in. Your submissions will now be stored.", delete_after=10)
+            else:
+                await ctx.send("❌ You are already opted in.", delete_after=10)
+            await ctx.message.delete()
+            await conn.commit()
+
+async def remove_submissions(ctx, author):
+    """
+    Remove all submissions by this author in the current guild.
+    Call this after opt-out.
+    """
+    async with mysql_storage.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute('''
+                DELETE FROM miniatures
+                WHERE user_id = %s AND guild_id = %s
+            ''', (str(author.id), str(ctx.guild.id)))
+            await conn.commit()
+
 @bot.command()
 async def debug_pending(ctx):
     """Show current pending submissions"""
@@ -866,6 +1084,7 @@ async def debug_pending(ctx):
     for msg_id, data in bot.pending_subs.items():
         output.append(f"- Prompt ID: {msg_id}, Data: {data}")
     await ctx.send('\n'.join(output)[:2000])
+
 @bot.command()
 async def debug_db(ctx):
     """Show database status"""
