@@ -397,12 +397,15 @@ class TagAlbumView(View):
         self.page = (self.page + 1) % (self.max_page+1)
         await interaction.response.edit_message(embed=self.build_embed(), view=self)
 
-    @discord.ui.button(label="Sort: A-Z", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Sort: Most Used", style=discord.ButtonStyle.primary)
     async def toggle_sort(self, interaction, button):
         # Toggle sorting mode
-        self.sort_mode = "count" if self.sort_mode == "alpha" else "alpha"
-        # Update button label
-        button.label = "Sort: Most Used" if self.sort_mode == "alpha" else "Sort: A-Z"
+        if self.sort_mode == "alpha":
+            self.sort_mode = "count"
+            button.label = "Sort: A-Z"
+        else:
+            self.sort_mode = "alpha"
+            button.label = "Sort: Most Used"
         self.page = 0  # Reset to first page
         await interaction.response.edit_message(embed=self.build_embed(), view=self)
 
@@ -471,7 +474,7 @@ async def process_submission(submission: discord.Message):
         
         # Send prompt for metadata (don't auto-delete this one)
         prompt_msg = await submission.channel.send(
-            f"{submission.author.mention} Please reply with:\n"
+            f"{submission.author.mention} Please reply to this message with:\n"
             "`STL: ModelName` (required)\n"
             "`Bundle: BundleName`\n"
             "`Tags: tag1,tag2`\n"
