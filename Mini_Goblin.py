@@ -456,12 +456,13 @@ class TagAlbumView(View):
             end = start + self.per_page
             tag_lines = [f"`{tag}` — {count}" for tag, count in tag_list[start:end]]
             desc = "\n".join(tag_lines)
+        sort_str = "A-Z" if self.sort_mode == "alpha" else "Most Used"
         embed = discord.Embed(
-            title="Registered Tags",
+            title=f"Registered Tags ({sort_str})",
             description=desc or "No tags found.",
             color=discord.Color.green()
         )
-        embed.set_footer(text=f"Page {self.page+1}/{self.max_page+1} • Sorted: {'A-Z' if self.sort_mode=='alpha' else 'Most Used'}")
+        embed.set_footer(text=f"Page {self.page+1}/{self.max_page+1}")
         return embed
 
     @discord.ui.button(label="◀", style=discord.ButtonStyle.secondary)
