@@ -196,7 +196,7 @@ async def on_message(message):
         
         if submit_channel and message.channel == submit_channel:
             if message.attachments and any(
-                att.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))
+                att.filename.lower().endswith(('.png', '.jpg', '.jpeg'))
                 for att in message.attachments
             ):
                 print("Bot recognises message in submit_chan")
