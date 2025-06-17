@@ -220,13 +220,6 @@ async def get_help(ctx):
     )
 
     embed.add_field(
-        name="!opt_out/!opt_in",
-        value="You are opted in by default. If you wish to not have any of your submissions stored, please use !opt_out. Use !opt_in to rejoin.",
-        inline=False
-    )
-
-
-    embed.add_field(
         name="!store",
         value=(
             "Reply to a submission with this command, then include:\n"
@@ -251,7 +244,7 @@ async def get_help(ctx):
     embed.add_field(
         name="!edit [STL:/Bundle:/Tags:]",
         value=(
-            "Reply to a message and use command with above format.\n"
+            "Reply to a message and use command with this format.\n"
             "• `!edit STL: (new name)`\n"
             "• `!edit Bundle: (new bundle name)`\n"
             "• `!edit tags: (new tags)`"
@@ -262,6 +255,12 @@ async def get_help(ctx):
     embed.add_field(
         name="!del",
         value="Reply to a gallery post with this command to delete your submission (authors and admins only).",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="!opt_out/!opt_in",
+        value="You are opted in by default. If you wish to not have any of your submissions stored, please use !opt_out. Use !opt_in to rejoin.",
         inline=False
     )
     
@@ -293,8 +292,120 @@ class PrintHelper:
                         taglist = [t.strip().lower() for t in row[0].split(",") if t.strip()]
                         tags_counter.update(taglist)
         return tags_counter
+    
+    async def gather_bundles(self):
+        bundles_counter = Counter()
+        async with mysql_storage.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(
+                    "SELECT bundle_name FROM miniatures WHERE guild_id=%s",
+                    (str(self.guild.id),)
+                )
+                results = await cursor.fetchall()
+                for row in results:
+                    if row[0]:  # bundles field not None/empty
+                        bundleslist = [t.strip().lower() for t in row[0].split(",") if t.strip()]
+                        bundles_counter.update(bundleslist)
+        return bundles_counter
 
-# Bot command (not inside the class)
+class BundleAlbumView(discord.ui.View):
+    def __init__(self, bundles_counter, per_page=20):
+        super().__init__(timeout=120)
+        self.per_page = per_page
+        self.bundles_alpha = sorted(bundles_counter.items())
+        self.bundles_count = sorted(bundles_counter.items(), key=lambda x: (-x[1], x[0]))
+        self.sort_mode = "alpha"
+        self.page = 0
+        self.max_page = (len(self.bundles_alpha) - 1) // per_page
+
+    def _get_current_list(self):
+        return self.bundles_alpha if self.sort_mode == "alpha" else self.bundles_count
+
+    def build_embed(self):
+        bundle_list = self._get_current_list()
+        if not bundle_list:
+            desc = "No bundles found."
+        else:
+            start = self.page * self.per_page
+            end = start + self.per_page
+            bundle_lines = [f"`{bundle}` — {count}" for bundle, count in bundle_list[start:end]]
+            desc = "\n".join(bundle_lines)
+        embed = discord.Embed(
+            title="Registered Bundles",
+            description=desc or "No bundles found.",
+            color=discord.Color.gold()
+        )
+        embed.set_footer(text=f"Page {self.page+1}/{self.max_page+1} • Sorted: {'A-Z' if self.sort_mode=='alpha' else 'Most Used'}")
+        return embed
+
+    @discord.ui.button(label="◀", style=discord.ButtonStyle.secondary)
+    async def previous(self, interaction, button):
+        self.page = (self.page - 1) % (self.max_page+1)
+        await interaction.response.edit_message(embed=self.build_embed(), view=self)
+
+    @discord.ui.button(label="▶", style=discord.ButtonStyle.secondary)
+    async def next(self, interaction, button):
+        self.page = (self.page + 1) % (self.max_page+1)
+        await interaction.response.edit_message(embed=self.build_embed(), view=self)
+
+    @discord.ui.button(label="Sort: A-Z", style=discord.ButtonStyle.primary)
+    async def toggle_sort(self, interaction, button):
+        self.sort_mode = "count" if self.sort_mode == "alpha" else "alpha"
+        button.label = "Sort: Most Used" if self.sort_mode == "alpha" else "Sort: A-Z"
+        self.page = 0
+        await interaction.response.edit_message(embed=self.build_embed(), view=self)
+
+
+class TagAlbumView(View):
+    def __init__(self, tags_counter, per_page=20):
+        super().__init__(timeout=120)
+        self.per_page = per_page
+        # Store the tags both ways
+        self.tags_alpha = sorted(tags_counter.items())
+        self.tags_count = sorted(tags_counter.items(), key=lambda x: (-x[1], x[0]))
+        self.sort_mode = "alpha"  # or "count"
+        self.page = 0
+        self.max_page = (len(self.tags_alpha) - 1) // per_page
+
+    def _get_current_list(self):
+        return self.tags_alpha if self.sort_mode == "alpha" else self.tags_count
+
+    def build_embed(self):
+        tag_list = self._get_current_list()
+        if not tag_list:
+            desc = "No tags found."
+        else:
+            start = self.page * self.per_page
+            end = start + self.per_page
+            tag_lines = [f"`{tag}` — {count}" for tag, count in tag_list[start:end]]
+            desc = "\n".join(tag_lines)
+        embed = discord.Embed(
+            title="Registered Tags",
+            description=desc or "No tags found.",
+            color=discord.Color.green()
+        )
+        embed.set_footer(text=f"Page {self.page+1}/{self.max_page+1} • Sorted: {'A-Z' if self.sort_mode=='alpha' else 'Most Used'}")
+        return embed
+
+    @discord.ui.button(label="◀", style=discord.ButtonStyle.secondary)
+    async def previous(self, interaction, button):
+        self.page = (self.page - 1) % (self.max_page+1)
+        await interaction.response.edit_message(embed=self.build_embed(), view=self)
+
+    @discord.ui.button(label="▶", style=discord.ButtonStyle.secondary)
+    async def next(self, interaction, button):
+        self.page = (self.page + 1) % (self.max_page+1)
+        await interaction.response.edit_message(embed=self.build_embed(), view=self)
+
+    @discord.ui.button(label="Sort: A-Z", style=discord.ButtonStyle.primary)
+    async def toggle_sort(self, interaction, button):
+        # Toggle sorting mode
+        self.sort_mode = "count" if self.sort_mode == "alpha" else "alpha"
+        # Update button label
+        button.label = "Sort: Most Used" if self.sort_mode == "alpha" else "Sort: A-Z"
+        self.page = 0  # Reset to first page
+        await interaction.response.edit_message(embed=self.build_embed(), view=self)
+
 @bot.command(name="tags")
 async def print_tags(ctx):
     printer = PrintHelper(ctx.guild)
@@ -302,10 +413,18 @@ async def print_tags(ctx):
     if not tags_counter:
         await ctx.send("No tags found for this server.")
         return
-    # Make sorted string: tag - count
-    tag_lines = [f"`{tag}` — {count}" for tag, count in tags_counter.most_common()]
-    msg = "**Registered Tags (usage count):**\n" + "\n".join(tag_lines)
-    await ctx.send(msg[:1999])  # Discord message limit
+    view = TagAlbumView(tags_counter, per_page=20)
+    msg = await ctx.send(embed=view.build_embed(), view=view)
+
+@bot.command(name="bundles")
+async def print_bundles(ctx):
+    printer = PrintHelper(ctx.guild)
+    bundles_counter = await printer.gather_bundles()
+    if not bundles_counter:
+        await ctx.send("No bundles found for this server.")
+        return
+    view = BundleAlbumView(bundles_counter, per_page=20)
+    await ctx.send(embed=view.build_embed(), view=view)
 
 def is_valid_name(name):
     """Checks for allowed chars and length in STL/bundle name."""
