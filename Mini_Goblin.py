@@ -397,13 +397,15 @@ class BundleAlbumView(discord.ui.View):
             end = start + self.per_page
             bundle_lines = [f"`{bundle}` — {count}" for bundle, count in bundle_list[start:end]]
             desc = "\n".join(bundle_lines)
+        sort_str = "A-Z" if self.sort_mode == "alpha" else "Most Used"
         embed = discord.Embed(
-            title="Registered Bundles ({sort_str})",
+            title=f"Registered Bundles ({sort_str})",
             description=desc or "No bundles found.",
             color=discord.Color.gold()
         )
         embed.set_footer(text=f"Page {self.page+1}/{self.max_page+1}")
         return embed
+
 
     @discord.ui.button(label="◀", style=discord.ButtonStyle.secondary)
     async def previous(self, interaction, button):
