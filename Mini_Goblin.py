@@ -421,8 +421,10 @@ async def print_tags(ctx):
 
 @bot.command(name="bundles")
 async def print_bundles(ctx):
+    print("print_bundles CALLED")  # <--- Add this
     printer = PrintHelper(ctx.guild)
     bundles_counter = await printer.gather_bundles()
+    print("print_bundles CALLED")  # <--- Add this
     if not bundles_counter:
         await ctx.send("No bundles found for this server.")
         return
