@@ -230,7 +230,7 @@ BOT_MANUAL = [
         "title": "Storing Submissions",
         "description": (
             "By default, posting your latest work in the designated submission channel will have the bot ask you for information on the miniature/miniatures. This will be STL name, bundle name, and tags. Reply to the message with the shown format and it will handle the rest!\n"
-            "If you happen to want to save an image outside of this designated channel, use the bellow command. This can work anywhere! Even outside of the submission channel.\n"
+            "If you happen to want to save an image outside of this designated channel, use the below command. This can work anywhere! Even outside of the submission channel.\n"
             "**!store** (used as a reply)\n"
             "Reply to an image message, then enter:\n"
             "```STL: ModelName (required)\nBundle: BundleName (optional)\nTags: tag1,tag2 (optional)```\n"
@@ -257,7 +257,7 @@ BOT_MANUAL = [
         "title": "Editing & Deleting",
         "description": (
             "**!edit [STL:/Bundle:/Tags:]**\n"
-            "Reply to a message and use this format:\n"
+            "Reply to a posted gallery album and use this format:\n"
             "• `!edit STL: (new name)`\n"
             "• `!edit Bundle: (new bundle name)`\n"
             "• `!edit tags: (new tags)`\n"
