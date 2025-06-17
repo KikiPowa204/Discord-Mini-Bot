@@ -204,75 +204,131 @@ async def on_message(message):
     except Exception as e:
         logging.error(f"Error: {str(e)}", exc_info=True)    
 
-@bot.command(name='guide')
-async def get_help(ctx):
-    """Display help information about bot commands"""
-    embed = discord.Embed(
-        title="Miniature Gallery Bot Help",
-        description="Here are all the available commands:",
-        color=discord.Color.blue()
-    )
-    
-    embed.add_field(
-        name="!setup",
-        value="Admin only. Configures the submission and gallery channels for this server.",
-        inline=False
-    )
-
-    embed.add_field(
-        name="!store",
-        value=(
-            "Reply to a submission with this command, then include:\n"
-            "```STL: ModelName (required)\n"
-            "Bundle: BundleName (optional)\n"
-            "Tags: tag1,tag2 (optional)```\n"
+BOT_MANUAL = [
+    {   # Page 0: Summary
+        "title": "Miniature Gallery Bot",
+        "description": "Welcome! This bot helps organize, tag, and display your miniature submissions.\n\nUse the navigation below to browse all features."
+    },
+    {   # Page 1: Contents
+        "title": "Manual Contents",
+        "description": (
+            "Use the buttons below to jump to a section:\n"
+            "• [Setup] - Admin setup commands\n"
+            "• [Storing Submissions] - How to store and tag\n"
+            "• [Gallery & Search] - Browsing and searching\n"
+            "• [Lists] - For taking a look at stored tags/bundles\n"
+            "• [Editing & Deleting] - Changing or removing\n"
+            "• [Privacy] - Opt-out options\n"
+            "• [Rules] - Usage notes"
+        )
+    },
+    {   # Page 2: Setup
+        "title": "Setup Commands",
+        "description": "**!setup**\nAdmin only. Configures the submission and gallery channels for this server."
+    },
+    {   # Page 3: Storing Submissions
+        "title": "Storing Submissions",
+        "description": (
+            "**!store** (used as a reply)\n"
+            "Reply to an image message, then enter:\n"
+            "```STL: ModelName (required)\nBundle: BundleName (optional)\nTags: tag1,tag2 (optional)```\n"
             "Each field should be on a new line."
-        ),
-        inline=False
-    )
-    
-    embed.add_field(
-        name="!show [search]",
-        value=(
-            "Search for miniatures in the gallery channel. Examples:\n"
+        )
+    },
+    {   # Page 4: Gallery & Search
+        "title": "Gallery & Search",
+        "description": (
+            "**!show [search]**\n"
             "• `!show Dragon` - Finds dragon miniatures\n"
-            "• `!show Bundle: BundleName` - Shows bundle contents\n"
-            "• `!show tags:fantasy` - Finds fantasy-tagged miniatures"
-        ),
-        inline=False
-    )
-    embed.add_field(
-        name="!edit [STL:/Bundle:/Tags:]",
-        value=(
-            "Reply to a message and use command with this format.\n"
+            "• `!show Bundle: BundleName` - Shows a bundle\n"
+            "• `!show tags:fantasy` - Finds by tag"
+        )
+    },
+    {   # Page 5: Lists
+        "title": "Lists",
+        "description": (
+            "**!tags/!bundles**\n"
+            "Use either of these above commands to get a list of what is stored in the database."
+        )
+    },
+        {   # Page 6: Editing & Deleting
+        "title": "Editing & Deleting",
+        "description": (
+            "**!edit [STL:/Bundle:/Tags:]**\n"
+            "Reply to a message and use this format:\n"
             "• `!edit STL: (new name)`\n"
             "• `!edit Bundle: (new bundle name)`\n"
-            "• `!edit tags: (new tags)`"
-        ),
-        inline=False
-    )
+            "• `!edit tags: (new tags)`\n"
+            "\n**!del**\nReply to a gallery post to delete (authors/admins only)."
+        )
+    },
+    {   # Page 7: Privacy
+        "title": "Privacy",
+        "description": (
+            "**!opt_out / !opt_in**\n"
+            "Opt-out to prevent your submissions being stored. Use !opt_in to rejoin."
+        )
+    },
+    {   # Page 8: Rules
+        "title": "Important Rules",
+        "description": (
+            "Please only store permitted images (such as your own sculpts or those allowed by server owners).\n"
+            "Contact staff for copyright issues."
+        )
+    }
+]
 
-    embed.add_field(
-        name="!del",
-        value="Reply to a gallery post with this command to delete your submission (authors and admins only).",
-        inline=False
-    )
-    
-    embed.add_field(
-        name="!opt_out/!opt_in",
-        value="You are opted in by default. If you wish to not have any of your submissions stored, please use !opt_out. Use !opt_in to rejoin.",
-        inline=False
-    )
-    
-    embed.add_field(
-        name="Important detail:",
-        value="Please only store images that are permitted (such as sculpts developed by the discord server owners).",
-        inline=False
-    )
+class ManualView(discord.ui.View):
+    def __init__(self, ctx, page=0):
+        super().__init__(timeout=300)
+        self.ctx = ctx
+        self.page = page
 
-    embed.set_footer(text="Bot created by kiann.ardalan")
-    
-    await ctx.send(embed=embed)
+    async def update_message(self, interaction):
+        embed = self.build_embed()
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    def build_embed(self):
+        data = BOT_MANUAL[self.page]
+        embed = discord.Embed(
+            title=data["title"],
+            description=data["description"],
+            color=discord.Color.blue()
+        )
+        embed.set_footer(text=f"Page {self.page+1}/{len(BOT_MANUAL)} • Bot by kiann.ardalan")
+        return embed
+
+    @discord.ui.button(label="◀ Prev", style=discord.ButtonStyle.secondary, row=4)
+    async def prev(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.page > 0:
+            self.page -= 1
+            await self.update_message(interaction)
+
+    @discord.ui.button(label="Next ▶", style=discord.ButtonStyle.secondary, row=4)
+    async def next(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.page < len(BOT_MANUAL)-1:
+            self.page += 1
+            await self.update_message(interaction)
+
+    # Contents page jumps
+    @discord.ui.button(label="Setup", style=discord.ButtonStyle.primary, row=1)
+    async def jump_setup(self, interaction, button): self.page = 2; await self.update_message(interaction)
+    @discord.ui.button(label="Store", style=discord.ButtonStyle.primary, row=1)
+    async def jump_store(self, interaction, button): self.page = 3; await self.update_message(interaction)
+    @discord.ui.button(label="Gallery", style=discord.ButtonStyle.primary, row=2)
+    async def jump_gallery(self, interaction, button): self.page = 4; await self.update_message(interaction)
+    @discord.ui.button(label="Lists", style=discord.ButtonStyle.primary, row=2)
+    async def jump_edit(self, interaction, button): self.page = 5; await self.update_message(interaction)
+    @discord.ui.button(label="Edit/Del", style=discord.ButtonStyle.primary, row=2)
+    async def jump_edit(self, interaction, button): self.page = 6; await self.update_message(interaction)
+    @discord.ui.button(label="Privacy", style=discord.ButtonStyle.success, row=3)
+    async def jump_privacy(self, interaction, button): self.page = 7; await self.update_message(interaction)
+    @discord.ui.button(label="Rules", style=discord.ButtonStyle.danger, row=3)
+    async def jump_rules(self, interaction, button): self.page = 8; await self.update_message(interaction)
+
+    async def interaction_check(self, interaction):
+        # Only allow the author to navigate
+        return interaction.user == self.ctx.author
 
 class PrintHelper:
     def __init__(self, guild):
@@ -423,6 +479,7 @@ async def print_tags(ctx):
         await ctx.send("No tags found for this server.")
         return
     view = TagAlbumView(tags_counter, per_page=20)
+    await ctx.message.delete()
     msg = await ctx.send(embed=view.build_embed(), view=view, delete_after=300)
 
 @bot.command(name="bundles")
@@ -433,6 +490,7 @@ async def print_bundles(ctx):
         await ctx.send("No bundles found for this server.")
         return
     view = BundleAlbumView(bundles_counter, per_page=20)
+    await ctx.message.delete()
     await ctx.send(embed=view.build_embed(), view=view, delete_after=300)
 
 def is_valid_name(name):
