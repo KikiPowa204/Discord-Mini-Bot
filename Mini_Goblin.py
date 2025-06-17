@@ -348,10 +348,10 @@ class BundleAlbumView(discord.ui.View):
         self.page = (self.page + 1) % (self.max_page+1)
         await interaction.response.edit_message(embed=self.build_embed(), view=self)
 
-    @discord.ui.button(label="Sort: A-Z", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Sort: Most Used", style=discord.ButtonStyle.primary)
     async def toggle_sort(self, interaction, button):
         self.sort_mode = "count" if self.sort_mode == "alpha" else "alpha"
-        button.label = "Sort: Most Used" if self.sort_mode == "alpha" else "Sort: A-Z"
+        button.label = "Sort: A-Z" if self.sort_mode == "alpha" else "Sort: Most Used"
         self.page = 0
         await interaction.response.edit_message(embed=self.build_embed(), view=self)
 
