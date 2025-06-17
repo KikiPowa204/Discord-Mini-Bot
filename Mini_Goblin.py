@@ -350,11 +350,17 @@ class BundleAlbumView(discord.ui.View):
 
     @discord.ui.button(label="Sort: Most Used", style=discord.ButtonStyle.primary)
     async def toggle_sort(self, interaction, button):
-        self.sort_mode = "count" if self.sort_mode == "alpha" else "alpha"
-        button.label = "Sort: A-Z" if self.sort_mode == "alpha" else "Sort: Most Used"
-        self.page = 0
+        # Toggle sorting mode
+        if self.sort_mode == "alpha":
+            self.sort_mode = "count"
+            button.label = "Sort: A-Z"
+            self.max_page = (len(self.bundles_count) - 1) // self.per_page
+        else:
+            self.sort_mode = "alpha"
+            button.label = "Sort: Most Used"
+            self.max_page = (len(self.bundles_alpha) - 1) // self.per_page
+        self.page = 0  # Reset to first page
         await interaction.response.edit_message(embed=self.build_embed(), view=self)
-
 
 class TagAlbumView(View):
     def __init__(self, tags_counter, per_page=20):
@@ -417,19 +423,17 @@ async def print_tags(ctx):
         await ctx.send("No tags found for this server.")
         return
     view = TagAlbumView(tags_counter, per_page=20)
-    msg = await ctx.send(embed=view.build_embed(), view=view)
+    msg = await ctx.send(embed=view.build_embed(), view=view, delete_after=300)
 
 @bot.command(name="bundles")
 async def print_bundles(ctx):
-    print("print_bundles CALLED")  # <--- Add this
     printer = PrintHelper(ctx.guild)
     bundles_counter = await printer.gather_bundles()
-    print("print_bundles CALLED")  # <--- Add this
     if not bundles_counter:
         await ctx.send("No bundles found for this server.")
         return
     view = BundleAlbumView(bundles_counter, per_page=20)
-    await ctx.send(embed=view.build_embed(), view=view)
+    await ctx.send(embed=view.build_embed(), view=view, delete_after=300)
 
 def is_valid_name(name):
     """Checks for allowed chars and length in STL/bundle name."""
